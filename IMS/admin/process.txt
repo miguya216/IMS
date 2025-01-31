@@ -1,0 +1,12 @@
+A basic process for a web-based inventory management system follows these steps:
+
+User Authentication – Login system for admins, managers, and staff.
+Dashboard Overview – Displays stock levels, recent transactions, and alerts.
+Product Management – Add, update, delete, and categorize inventory items.
+Stock In (Receiving Inventory) – Record new stock arrivals with quantity and supplier details.
+Stock Out (Sales/Usage) – Deduct sold or used items from inventory.
+Reorder Alerts – Notify when stock reaches a minimum threshold.
+Reporting & Analytics – Generate stock movement reports, trends, and summaries.
+User Roles & Permissions – Restrict access based on user roles.
+Audit Logs – Track changes and transactions for accountability.
+Backup & Security – Regular data backups and secure access controls.

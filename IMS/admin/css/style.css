@@ -1,0 +1,87 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.card {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 10px;
+}
+
+body .btn {
+    background-color: green;
+    border-color: green;
+    color: white;
+}
+
+body .btn:hover {
+    background-color: darkgreen; 
+    border-color: darkgreen;
+}
+
+.navbar {
+    border-radius: 5px;
+}
+
+
+/* Start of Navrbar */
+/* style.css */
+
+/* Sidebar Styles */
+.sidebar {
+    width: 250px; /* Sidebar width */
+    position: fixed; /* Fix sidebar to left side */
+    top: 0;
+    left: 0;
+    height: 100vh; /* Full height */
+    background-color: #28a745; /* Green background by default */
+    z-index: 1000;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Optional: for subtle shadow */
+    justify-content: space-between; /* Justify the content with space between */
+}
+
+/* Remove bullets from the sidebar's navigation list */
+.sidebar ul {
+    list-style-type: none; /* Removes bullets */
+}
+
+/* Sidebar text color and font size */
+.sidebar .nav {
+    color: white;
+    padding: 10px 15px;
+    font-weight: 500;
+    font-size: 30px; /* Change font size (can adjust as needed) */
+}
+
+/* Sidebar text color and font size */
+.sidebar .nav-link {
+    color: white;
+    padding: 10px 15px;
+    font-weight: 500;
+    font-size: 30px; /* Change font size (can adjust as needed) */
+}
+
+/* Sidebar link hover effect: change background to white and text to green */
+.sidebar .nav-link:hover {
+    background-color: white; /* White background on hover */
+    color: #28a745; /* Green text on hover */
+}
+
+/* Content area (Main area on the right side) */
+.content {
+    margin-left: 250px; /* Offset the content to the right of the sidebar */
+    padding-top: 20px;
+}
+
+/* Optional: To add responsiveness and adjust sidebar on small screens */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 200px; /* Adjust width on small screens */
+    }
+
+    .content {
+        margin-left: 200px; /* Adjust content margin */
+    }
+}
+
+/* end of Navrbar */
