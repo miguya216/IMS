@@ -1,4 +1,6 @@
-
+<?php
+function details (){
+?>
 <div class="modal-container" id="modal_cont">
     <div class="modal">
         <h1>Modal Example</h1>
@@ -53,3 +55,4 @@
                 </div>       
     </div>        
 </div>
+<?php } ?>
