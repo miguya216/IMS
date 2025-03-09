@@ -1,0 +1,461 @@
+*{
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+    font-family: sans-serif ;
+}
+
+body {
+    background-color: #005a34;
+    margin-left: 80px; /* Adjust this value based on your navbar height */
+
+}
+
+/* Start of Navrbar *//* Default Sidebar (Expanded) */
+.sidebar {
+    list-style: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 250px; /* Default size */
+    background-color: rgba(51, 51, 51, 0.8);
+    backdrop-filter: blur(10px);
+    transition: width 0.3s ease-in-out;
+    box-shadow: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    z-index: 1000;
+}
+
+/* Sidebar Header (Logo + IMS Text) *//* Sidebar */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 250px; /* Default width */
+    background-color: rgba(51, 51, 51, 0.8);
+    backdrop-filter: blur(10px);
+    transition: width 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+/* Sidebar Header */
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 15px;
+    width: 100%;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease-in-out;
+}
+
+/* Logo */
+.sidebar-logo {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+    object-fit: contain;
+    transition: width 0.3s ease-in-out, height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+/* Sidebar Title */
+.sidebar-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    transition: font-size 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+/* Sidebar Links */
+.sidebar a {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    transition: 0.3s;
+    white-space: nowrap;
+}
+
+.sidebar a:hover {
+    background-color: #151515;
+    color: white;
+    font-size: 18px;
+}
+
+/* Icons */
+.nav-icon {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+    transition: width 0.3s ease-in-out, height 0.3s ease-in-out;
+}
+.sidebar.shrink .sidebar-header {
+    border-bottom: none;
+}
+
+/* Shrinking Sidebar */
+.sidebar.shrink {
+    width: 70px;
+}
+
+/* Hide logo and text when sidebar shrinks */
+.sidebar.shrink .sidebar-logo,
+.sidebar.shrink .sidebar-title,
+.sidebar.shrink span {
+    width: 0;
+    height: 0;
+    opacity: 0;
+    margin: 0;
+    display: none;
+}
+
+/* Keep icons visible when shrunk */
+.sidebar.shrink .nav-icon {
+    width: 0;
+    height: 0;
+    opacity: 0;
+    margin: 0;
+    display: none;
+}
+
+/* Hide text when sidebar shrinks */
+.sidebar.shrink a {
+    font-size: 0;
+    padding: 12px;
+}
+
+/* Menu Button */
+#menu-btn {
+    position: absolute;
+    top: 15px;
+    left: 10px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 1100;
+}
+
+#menu-btn img {
+    width: 30px;
+    height: 30px;
+}
+
+.sidebar.shrink #menu-btn img {
+    width: 40px; /* Adjust size as needed */
+    height: 40px;
+}
+
+
+/* Content Area */
+.content {
+    margin-left: 250px;
+    padding: 20px;
+    transition: margin-left 0.3s ease-in-out;
+}
+
+/* Adjust Content When Sidebar Shrinks */
+.content.shrink {
+    margin-left: 50px;
+}
+/* end of Navrbar */
+
+
+.header-container {
+    pointer-events: auto;
+    opacity: 1;
+    font-size: 18px;
+    width: 100%;
+    background:rgb(51, 51, 51);
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    color: white;
+}
+
+
+.field-container {
+    align-items: center;
+    font-size: 18px;
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 20px;
+    background: rgb(65, 65, 65);
+    border-radius: 8px;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.field-content {
+    color: #ffffff;
+    width: 100%;
+    padding: 10px;
+    overflow-x: auto;
+}
+/* Input field container */
+.field-details {
+    margin-left: 15px;
+    display: flex;
+    flex-wrap: nowrap; /* Prevents wrapping */
+    gap: 15px;
+    overflow-x: auto; /* Enables scrolling */
+    padding-bottom: 10px;
+}
+
+.input-box {
+    flex: 1;
+    min-width: 180px; /* Prevents shrinking too much */
+    max-width: 250px; /* Limits max width */
+}
+.search-bar {
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 250px;
+}
+
+.list-container {
+    overflow-x: auto; 
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    position: relative;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.table-data {
+    scroll-snap-type: y mandatory;
+    border-collapse: collapse;
+    max-height: 550px;
+    overflow-y: auto; 
+    position: relative;
+    overflow-x: auto;
+    width: 100%;
+    white-space: nowrap;
+}
+.table-box {
+    min-width: 100%;
+    width: auto;
+    border-collapse: collapse;
+    border-radius: 8px;
+    table-layout: fixed;
+}
+.table-box th, .table-box td {
+    min-width: 150px; /* Adjust column width */
+    white-space: nowrap; /* Prevents text from wrapping */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table-box th {
+    text-align: center;
+    background: #005a34;
+    color: white;
+    width: auto;
+    position: sticky;
+    top: 0;
+    padding: 12px 15px;
+    z-index: 200;
+}
+
+.table-box td {
+    padding: 7px 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+    white-space: normal;
+}
+
+.table-box tr {
+    scroll-snap-align: start;
+}
+
+
+/* Force the columns to have the same width */
+.header-box th, .table-box td {
+    width: calc(100% / 6); /* Adjust based on column count */
+}
+
+/* Alternate row colors */
+.table-box tbody tr:nth-child(even) {
+    background: #4f4f4f;
+    color: #ffffff;
+}
+
+.table-box tbody tr:nth-child(odd) {
+    background: #393939; /* Light background for odd rows */
+    color: #ffffff;
+}
+
+/* Hover effect on rows */
+.table-box tbody tr:hover {
+    background: #000000;
+}
+.table-box tbody tr .btn-edit:hover {
+    background:#003921;
+}
+
+.table-box tbody tr .btn-delete:hover {
+    background: #65000a;
+}
+.btn {
+    background:#005a34;; /* Yellow */
+    color: white;
+}
+/* Edit Button */
+.btn-edit {
+    background:#005a34;
+    color: white;
+}
+
+/* Delete Button */
+.btn-delete {
+    background: #97000f; /* Red */
+    color: white;
+}
+/* Hover Effects */
+.btn:hover {
+    background:#003921;
+}
+/* Responsive adjustments for small screens */
+@media (max-width: 768px) {
+    .table-box th, .table-box td {
+        font-size: 15px; /* Adjust font size */
+        padding: 8px;
+    }
+}
+
+@media (max-width: 500px) {
+    .table-box th, .table-box td {
+        font-size: 15px; /* Reduce font size further */
+        padding: 6px;
+    }
+}
+
+.modal-container {
+    pointer-events: none;
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(49, 48, 48);
+    color: rgb(0, 0, 0);
+    position: fixed;
+    inset: 0; 
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    transform: scale(0.9); /* Start slightly smaller */
+}
+
+.modal-container.show{
+    pointer-events: auto;
+    opacity: 1;
+    transform: scale(1); /* Scale to normal size */
+}
+.header-container.show{
+    pointer-events: none;
+    opacity: 0;
+}
+/* When the sidebar is shrunk */
+.sidebar.shrink ~ .modal-container {
+    width: calc(100vw - 70px);
+}
+.modal{
+    display: block;
+    background-color: rgb(68, 68, 68);
+    min-width: 200px;
+    min-height: 200px;
+    width: 600px;
+    height: 650px;
+    max-width: 100%;
+    padding: 30px 50px;
+    border-radius: 5px;
+    text-align: center;
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    color: white;
+}
+
+
+/* Input field container */
+.field-details {
+    margin-left: 15px;
+    display: flex;
+    flex-wrap: wrap; /* Prevents wrapping */
+    gap: 15px;
+    padding-bottom: 10px;
+}
+
+.input-box {
+    flex: 1;
+    min-width: 400px; /* Prevents shrinking too much */
+    max-width: 250px; /* Limits max width */
+}
+
+.field-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* Button container */
+.field div:last-child {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Button styling */
+.field .btn-delete .btn-edit {
+    padding: 10px;
+    font-size: 16px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .field-details {
+        flex-wrap: wrap; /* Wrap input fields in smaller screens */
+        justify-content: center;
+    }
+    .modal-container {
+        left: 0; /* Remove left offset */
+        width: 100vw; /* Full screen width */
+    }
+}
+
+@media (max-width: 500px) {
+    .field {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .field div:last-child {
+        flex-direction: column;
+    }
+}
+/* end of input fields */
