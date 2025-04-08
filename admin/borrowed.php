@@ -14,14 +14,12 @@ if (file_exists('views/inventory/itemList.php')) {
     <title>Request</title>
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
     <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="css/borrowed.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-        <div class="header-container"><h2>Borrowed Assets</h2>
-            <div class="list-container">
-                <div class="list">
+        <div class="brw-header-container"><h2>Borrowed Assets</h2>
+            <div class="brw-list-container">
                     <?php requestList(); ?>
-                </div>
             </div>
         </div>
     <div>

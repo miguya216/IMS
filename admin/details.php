@@ -3,8 +3,8 @@ function details (){
 ?>
 <div class="modal-container" id="modal_cont">
     <div class="modal">
-        <h1>Modal Example</h1>
-            <div class="field-details">
+        <h1>Item Details</h1>
+                <div class="field-details">
                     <label for="barcode">Barcode</label>
                     <input type="text" class="form-control" id="barcode" required>
                 </div>
@@ -50,7 +50,7 @@ function details (){
                 </div>
 
                 <div>
-                    <button type="submit" class="btn" id="saveDetails">Save Changes</button>
+                    <button type="submit" class="btn" id="saveDetails">Save</button>
                     <button type="submit" class="btn" id="close">Close</button>
                 </div>       
     </div>        

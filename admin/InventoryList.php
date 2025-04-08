@@ -16,16 +16,16 @@ if (file_exists('views/inventory/itemList.php')) {
     <title>Inventory Management</title>
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
     <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="css/inventoryList.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body> 
   
-    <div id="inventory" class="header-container">
-        <div class="field-container">
+    <div id="inventory" class="header-inventory">
+        <div class="field-inventory">
             <form id="searchForm">
-                <div class="field-details">
-                <div class="field-content"><h4>Search here:</h4>
-                <div class="input-box">
+                <div class="invt-field-details">
+                    <div class="invt-field-header"><h4>Search here:</h4>
+                    <div class="invt-input-box">
                         <input type="text" class="search-bar" id="searchInput" placeholder="Type to Search Item" onkeyup="searchInventory()" required>
                     </div>
                     </div>
@@ -34,10 +34,8 @@ if (file_exists('views/inventory/itemList.php')) {
             </form>
         </div>
 
-        <div class="list-container">
-            <div class="list">
+        <div class="invt-list-container">
                 <?php itemList(); ?>
-            </div>
         </div>
     </div>
     

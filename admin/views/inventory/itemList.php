@@ -4,8 +4,8 @@ if (!defined('IN_APP')) {
 }
 function itemList(){ ?>
                     <!-- <h2>Item List:</h2> -->
-                    <div class="table-data">
-                        <table class="table-box" id="inventoryTable">      
+                    <div class="invt-table-data">
+                        <table class="invt-table-box" id="inventoryTable">      
                             <thead>
                                 <tr>
                                     <th>Assets</th>

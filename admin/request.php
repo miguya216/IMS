@@ -14,7 +14,7 @@ if (file_exists('views\request\form.php')) {
     <title>Request</title>
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
     <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="css/request.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="request-container">

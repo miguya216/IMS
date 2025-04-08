@@ -1,6 +1,6 @@
 <?php function requestList(){ ?>
-    <div class="table-data">
-    <table class="table-box" id="inventoryTable">      
+    <div class="brw-table-data">
+    <table class="brw-table-box" id="inventoryTable">      
         <thead>
             <tr>
                 <th>Item Name</th>
