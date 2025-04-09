@@ -176,3 +176,51 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // end of add item modal
+
+// start of details user modal
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("JavaScript loaded");
+
+    const inventory = document.getElementById('users');
+    const modal = document.getElementById('modal_cont_detail_user');
+    const closeModal = document.getElementById('close_user');
+    const buttons = document.querySelectorAll('[id^="edit-"]');
+
+    buttons.forEach(button => {
+        button.addEventListener('click', () => {
+            modal.classList.add('show');
+            if (inventory) inventory.style.display = 'none'; // Hide inventory
+        });
+    });
+
+    if (closeModal) {
+        closeModal.addEventListener('click', () => {
+            modal.classList.remove('show');
+            if (inventory) inventory.style.display = 'block'; // Show inventory again
+        });
+    } else {
+        console.error("Close button not found!");
+    }
+});
+
+// end of details user modal
+
+// start of add user modal
+
+document.addEventListener("DOMContentLoaded", function () {
+    const addItemBtn = document.getElementById("addUserBtn");
+    const modal = document.getElementById("modal_cont_add_user");
+    const closeBtn = document.getElementById("close_add_user");
+
+    addItemBtn.addEventListener("click", () => {
+        modal.classList.add("show");
+        document.body.style.overflow = "hidden";
+    });
+
+    closeBtn.addEventListener("click", () => {
+        modal.classList.remove("show");
+        document.body.style.overflow = "auto";
+    });
+});
+
+// end of add user modal

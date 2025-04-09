@@ -27,14 +27,10 @@ if (file_exists('views/inventory/itemList.php')) {
                 <div class="invt-field-details">
                     <div class="invt-field-header"><h4>Search here:</h4>
                         <div class="invt-input-box">
-                            <input type="text" class="search-bar" id="searchInput" placeholder="Type to Search Item" onkeyup="searchInventory()" required>
+                            <input type="text" class="search-bar" id="searchInput" placeholder="Type to Search Account" onkeyup="searchInventory()" required>
                                 <button type="button" class="btn" id="addItemBtn">
                                     <img src="imgs/add.png" alt="Add Items" class="invt-icon">
                                     Add Item
-                                </button>
-                                <button type="button" class="btn">
-                                    <img src="imgs/import.png" alt="Import file" class="invt-icon">
-                                    Import .CSV
                                 </button>
                         </div>
                     </div>

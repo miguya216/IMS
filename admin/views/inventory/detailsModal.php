@@ -50,7 +50,7 @@ function details (){
                 </div>
 
                 <div>
-                    <button type="submit" class="btn" id="saveDetails">Save Details</button>
+                    <button type="submit" class="btn" id="saveDetails">Save Changes</button>
                     <button type="submit" class="btn" id="close">Close</button>
                 </div>       
     </div>        

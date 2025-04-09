@@ -30,16 +30,22 @@
         </li>
         <li>
             <a href="InventoryList.php">
-                <img src="imgs/list.png" alt="Inventory List" class="nav-icon">
-                <span>Inventory List</span>
+                <img src="imgs/list.png" alt="Assets" class="nav-icon">
+                <span>Assets</span>
             </a>
         </li>
-         <!-- <li>
+         <li>
             <a href="users.php">
                 <img src="imgs/user.png" alt="users" class="nav-icon">
                 <span>Users</span>
             </a>
-        </li> -->
+        </li>
+        <li>
+            <a href="account.php">
+                <img src="imgs/account.png" alt="account" class="nav-icon">
+                <span>Accounts</span>
+            </a>
+        </li>
         <li>
             <a href="request.php">
                 <img src="imgs/request.png" alt="Request" class="nav-icon">

@@ -1,40 +1,36 @@
-<?php
-if (file_exists('views/inventory/itemList.php')) {
+<?php 
+if (file_exists('views/users/userList.php')) {
     define('IN_APP', true); 
-    include ('views\inventory\itemList.php'); 
-    include('views\inventory\detailsModal.php');
-    include('views\inventory\addModal.php');
+    include ('views/users/userList.php'); 
+    include('views/users/addUserModal.php');
+    include('views/users/detailesUserModal.php');
 } else {
     echo "Error: StatsOverview file not found!";
 }
-?>
 
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventory Management</title>
+    <title>Users</title>
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
     <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body> 
-  
-    <div id="inventory" class="header-inventory">
+<body>
+
+<div id="users" class="header-inventory">
         <div class="field-inventory">
             <form id="searchForm">
                 <div class="invt-field-details">
                     <div class="invt-field-header"><h4>Search here:</h4>
                         <div class="invt-input-box">
-                            <input type="text" class="search-bar" id="searchInput" placeholder="Type to Search Item" onkeyup="searchInventory()" required>
-                                <button type="button" class="btn" id="addItemBtn">
+                            <input type="text" class="search-bar" id="searchInput" placeholder="Type to Search Users" onkeyup="searchInventory()" required>
+                                <button type="button" class="btn" id="addUserBtn">
                                     <img src="imgs/add.png" alt="Add Items" class="invt-icon">
-                                    Add Item
-                                </button>
-                                <button type="button" class="btn">
-                                    <img src="imgs/import.png" alt="Import file" class="invt-icon">
-                                    Import .CSV
+                                    Add User
                                 </button>
                         </div>
                     </div>
@@ -43,10 +39,10 @@ if (file_exists('views/inventory/itemList.php')) {
         </div>
 
         <div class="invt-list-container">
-                <?php itemList(); ?>
+            <?php userList(); ?>
         </div>
     </div>
-    
+
     <div>
         <?php 
             include ('navbar.php'); 
@@ -55,19 +51,20 @@ if (file_exists('views/inventory/itemList.php')) {
 
     <div>
         <?php 
-            details();
+            detailesUserModal();
         ?>
     </div>
+
     <div>
         <?php 
-            addModal();
+            userModal();
         ?>
     </div>
-    
-<!-- JavaScript -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="script/script.js"></script>
-<script src="script/inventory.js"></script>
+      
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script/script.js"></script>
 
 </body>
 </html>
