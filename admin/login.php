@@ -30,7 +30,7 @@ include ('controller/login.php');
                     <form id="loginForm" method="POST">
                         <div class="mb-3">
                             <label for="email" class="form-label">Username</label>
-                            <input name = "username" type="email" class="form-control" id="email" required>
+                            <input name = "username" type="text" class="form-control" id="email" required>
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>

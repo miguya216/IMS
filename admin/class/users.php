@@ -16,7 +16,7 @@ class User {
     // }
 
     public function login($username, $password) {
-        $stmt = $this->conn->prepare("SELECT * FROM account WHERE username = ? and password = ?");
+        $stmt = $this->conn->prepare("SELECT * FROM account WHERE username = ? and password_hash = ?");
         $stmt->bind_param("ss", $username, $password);
         $stmt->execute();
     

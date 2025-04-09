@@ -1,7 +1,7 @@
 <?php
-function details (){
+function addModal (){
 ?>
-<div class="modal-container" id="modal_cont">
+<div class="modal-container" id="modal_cont_add">
     <div class="modal">
         <h1>Item Details</h1>
                 <div class="field-details">
@@ -50,8 +50,8 @@ function details (){
                 </div>
 
                 <div>
-                    <button type="submit" class="btn" id="saveDetails">Save</button>
-                    <button type="submit" class="btn" id="close">Close</button>
+                    <button type="submit" class="btn" id="saveDetails">Add Item</button>
+                    <button type="submit" class="btn" id="close_add">Close</button>
                 </div>       
     </div>        
 </div>

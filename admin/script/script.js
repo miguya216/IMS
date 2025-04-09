@@ -129,7 +129,7 @@ function displayRequests() {
 }
 
 
-// start of modal
+// start of details modal
 document.addEventListener('DOMContentLoaded', () => {
     console.log("JavaScript loaded");
 
@@ -155,4 +155,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// end of modal
+// end of details modal
+
+// start of add item modal
+
+document.addEventListener("DOMContentLoaded", function () {
+    const addItemBtn = document.getElementById("addItemBtn");
+    const modal = document.getElementById("modal_cont_add");
+    const closeBtn = document.getElementById("close_add");
+
+    addItemBtn.addEventListener("click", () => {
+        modal.classList.add("show");
+        document.body.style.overflow = "hidden";
+    });
+
+    closeBtn.addEventListener("click", () => {
+        modal.classList.remove("show");
+        document.body.style.overflow = "auto";
+    });
+});
+
+// end of add item modal

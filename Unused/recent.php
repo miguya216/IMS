@@ -11,8 +11,6 @@ function recentList(){ ?>
                                     <th>Assets</th>
                                     <th>Serial Number</th>
                                     <th>Responsible to</th>
-                                    <th>Remarks</th>
-                                    <th>Institutes/Units</th>
                                 </tr>
                             </thead> 
                             <tbody>
@@ -21,11 +19,9 @@ function recentList(){ ?>
                                     if($recentList->num_rows > 0){
                                         while($row = $recentList->fetch_assoc()){
                                             echo"<tr>
-                                                        <td>{$row['assets']}</td>
-                                                        <td>{$row['serial_num']}</td>
-                                                        <td>{$row['responsibleTo']}</td>
-                                                        <td>{$row['remarks']}</td>
-                                                        <td>{$row['institute']}</td>    
+                                                        <td>{$row['assets_ID']}</td>
+                                                        <td>{$row['serial_number']}</td>
+                                                        <td>{$row['responsible_user_ID']}</td>   
                                                     </tr>";}
                                         } else {
                                             "<tr><td colspan='6'>No records found</td></tr>";

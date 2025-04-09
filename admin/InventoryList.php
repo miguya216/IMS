@@ -2,7 +2,8 @@
 if (file_exists('views/inventory/itemList.php')) {
     define('IN_APP', true); 
     include ('views\inventory\itemList.php'); 
-    include('details.php');
+    include('detailsModal.php');
+    include('addModal.php');
 } else {
     echo "Error: StatsOverview file not found!";
 }
@@ -25,9 +26,18 @@ if (file_exists('views/inventory/itemList.php')) {
             <form id="searchForm">
                 <div class="invt-field-details">
                     <div class="invt-field-header"><h4>Search here:</h4>
-                    <div class="invt-input-box">
-                        <input type="text" class="search-bar" id="searchInput" placeholder="Type to Search Item" onkeyup="searchInventory()" required>
-                    </div>
+                        <div class="invt-input-box">
+                            <input type="text" class="search-bar" id="searchInput" placeholder="Type to Search Item" onkeyup="searchInventory()" required>
+                            <button type="button" class="btn" id="addItemBtn">
+                                <img src="imgs/add.png" alt="Add Items" class="invt-icon">
+                                Add Item
+                            </button>
+
+                            <button type="button" class="btn">
+                                <img src="imgs/import.png" alt="Import file" class="invt-icon">
+                                Import .CSV
+                            </button>
+                        </div>
                     </div>
 
                 </div>
@@ -48,6 +58,11 @@ if (file_exists('views/inventory/itemList.php')) {
     <div>
         <?php 
             details();
+        ?>
+    </div>
+    <div>
+        <?php 
+            addModal();
         ?>
     </div>
     

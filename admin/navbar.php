@@ -29,17 +29,17 @@
             </a>
         </li>
         <li>
-            <a href="AddItem.php">
-                <img src="imgs/add.png" alt="Add Items" class="nav-icon">
-                <span>Add Items</span>
-            </a>
-        </li>
-        <li>
             <a href="InventoryList.php">
                 <img src="imgs/list.png" alt="Inventory List" class="nav-icon">
                 <span>Inventory List</span>
             </a>
         </li>
+         <!-- <li>
+            <a href="users.php">
+                <img src="imgs/user.png" alt="users" class="nav-icon">
+                <span>Users</span>
+            </a>
+        </li> -->
         <li>
             <a href="request.php">
                 <img src="imgs/request.png" alt="Request" class="nav-icon">

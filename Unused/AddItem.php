@@ -2,7 +2,7 @@
 if (file_exists('views/inventory/AddNewItem.php')) {
     define('IN_APP', true); 
     include ('views\inventory\AddNewItem.php');
-    include ('views\inventory\recent.php'); 
+    include ('views\inventory\itemList.php'); 
 } else {
     echo "Error: StatsOverview file not found!";
 }
@@ -27,7 +27,7 @@ if (file_exists('views/inventory/AddNewItem.php')) {
              </div>
             <div class="list-container">
                 <div class="recent">
-                    <?php recentList(); ?>
+                    <?php itemList(); ?>
                 </div>
             </div>
         </div>
