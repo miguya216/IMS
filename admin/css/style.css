@@ -171,6 +171,131 @@ body {
 }
 /* end of Navrbar */
 
+/* start of modal */
+
+.modal-container {
+    pointer-events: none;
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(49, 48, 48);
+    color: rgb(0, 0, 0);
+    position: fixed;
+    inset: 0; 
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    transform: scale(0.9); /* Start slightly smaller */
+}
+
+.modal-container.show{
+    pointer-events: auto;
+    opacity: 1;
+    transform: scale(1); /* Scale to normal size */
+}
+.header-container.show{
+    pointer-events: none;
+    opacity: 0;
+}
+/* When the sidebar is shrunk */
+.sidebar.shrink ~ .modal-container {
+    width: calc(100vw - 70px);
+}
+.modal{
+    display: block;
+    background-color: rgb(68, 68, 68);
+    min-width: 200px;
+    min-height: 200px;
+    max-height: 800px;
+    width: 90%;
+    height: 60%;
+    max-width: 900px;
+    padding: 30px 50px;
+    border-radius: 5px;
+    text-align: center;
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    color: white;
+}
+
+
+/* Input field container */
+.field-details {
+    margin-left: 15px;
+    display: flex;
+    flex-wrap: wrap; 
+    justify-content: center;
+    gap: 15px;
+    padding-bottom: 10px;
+}
+
+.input-box {
+    flex: 1 1 250px;
+    max-width: 300px;
+
+    /*flex: 1;*/
+    /*min-width: 400px;  Prevents shrinking too much */
+    /*max-width: 250px;  Limits max width */
+}
+
+.field-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* Button container */
+.field div:last-child {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Button styling */
+.field .btn-delete .btn-edit {
+    padding: 10px;
+    font-size: 16px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .field-details {
+        flex-wrap: wrap; /* Wrap input fields in smaller screens */
+        justify-content: center;
+    }
+    .modal-container {
+        left: 0; /* Remove left offset */
+        width: 100vw; /* Full screen width */
+    }
+    .modal{ 
+        margin-left: 80px;
+        height: 650px;
+    }
+}
+
+@media (max-width: 500px) {
+    .field {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .field div:last-child {
+        flex-direction: column;
+    }
+}
+/* end of modal
 
 /* Start of dashboard */
 .card-container{
@@ -414,123 +539,6 @@ body {
     .table-box th, .table-box td {
         font-size: 15px; /* Reduce font size further */
         padding: 6px;
-    }
-}
-
-.modal-container {
-    pointer-events: none;
-    opacity: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgb(49, 48, 48);
-    color: rgb(0, 0, 0);
-    position: fixed;
-    inset: 0; 
-    top: 0;
-    left: 0;
-    height: 100vh;
-    width: 100vw;
-    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-    transform: scale(0.9); /* Start slightly smaller */
-}
-
-.modal-container.show{
-    pointer-events: auto;
-    opacity: 1;
-    transform: scale(1); /* Scale to normal size */
-}
-.header-container.show{
-    pointer-events: none;
-    opacity: 0;
-}
-/* When the sidebar is shrunk */
-.sidebar.shrink ~ .modal-container {
-    width: calc(100vw - 70px);
-}
-.modal{
-    display: block;
-    background-color: rgb(68, 68, 68);
-    min-width: 200px;
-    min-height: 200px;
-    width: 600px;
-    height: 650px;
-    max-width: 100%;
-    padding: 30px 50px;
-    border-radius: 5px;
-    text-align: center;
-    position: relative;
-    margin-left: auto;
-    margin-right: auto;
-    color: white;
-}
-
-
-/* Input field container */
-.field-details {
-    margin-left: 15px;
-    display: flex;
-    flex-wrap: wrap; /* Prevents wrapping */
-    gap: 15px;
-    padding-bottom: 10px;
-}
-
-.input-box {
-    flex: 1;
-    min-width: 400px; /* Prevents shrinking too much */
-    max-width: 250px; /* Limits max width */
-}
-
-.field-control {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px;
-}
-
-/* Button container */
-.field div:last-child {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-/* Button styling */
-.field .btn-delete .btn-edit {
-    padding: 10px;
-    font-size: 16px;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .field-details {
-        flex-wrap: wrap; /* Wrap input fields in smaller screens */
-        justify-content: center;
-    }
-    .modal-container {
-        left: 0; /* Remove left offset */
-        width: 100vw; /* Full screen width */
-    }
-    .modal{ 
-        margin-left: 80px;
-    }
-}
-
-@media (max-width: 500px) {
-    .field {
-        width: 100%;
-        padding: 20px;
-    }
-
-    .btn {
-        width: 100%;
-        margin-bottom: 10px;
-    }
-
-    .field div:last-child {
-        flex-direction: column;
     }
 }
 /* end of inventory */
