@@ -15,9 +15,9 @@ if (file_exists('views/users/userList.php')) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Users</title>
-    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
-    <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="\ims\bootstrap\css\bootstrap.min.css">
+    <script src="\ims\bootstrap\js\bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="\ims\css\style.css">
 </head>
 <body>
 
@@ -38,9 +38,11 @@ if (file_exists('views/users/userList.php')) {
             </form>
         </div>
 
-        <div class="invt-list-container">
-            <?php userList(); ?>
-        </div>
+       <div class="field-inventory">
+            <div class="invt-list-container">
+                <?php userList(); ?>
+            </div>
+       </div>
     </div>
 
     <div>

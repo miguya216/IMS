@@ -60,7 +60,7 @@
         </li>
 
         <li>
-            <a href="login.php">
+            <a href="../logout.php">
                 <img src="imgs/logout.png" alt="Logout" class="nav-icon">
                 <span>Logout</span>
             </a>
@@ -68,6 +68,3 @@
         
     </ul>
 </nav>
-<!-- 
-</div>
-</div>  -->

@@ -20,6 +20,17 @@ CREATE TABLE unit (
     unit_name VARCHAR(100) NOT NULL
 );
 
+CREATE TABLE barcode (
+    barcode_image_path_ID INT AUTO_INCREMENT PRIMARY KEY,
+    barcode_image_path VARCHAR(255) NOT NULL
+);
+
+-- Role table
+CREATE TABLE role (
+    role_ID INT AUTO_INCREMENT PRIMARY KEY,
+    role_name VARCHAR(50) NOT NULL
+);
+
 -- User table
 CREATE TABLE user (
     user_ID INT AUTO_INCREMENT PRIMARY KEY,
@@ -36,15 +47,12 @@ CREATE TABLE asset (
     inventory_tag VARCHAR(100),
     serial_number VARCHAR(100),
     responsible_user_ID INT,
+    barcode_image_path_ID INT,
+    asset_status ENUM('active', 'inactive') DEFAULT 'active',
     FOREIGN KEY (brand_ID) REFERENCES brand(brand_ID),
     FOREIGN KEY (asset_type_ID) REFERENCES asset_type(asset_type_ID),
-    FOREIGN KEY (responsible_user_ID) REFERENCES user(user_ID)
-);
-
--- Role table
-CREATE TABLE role (
-    role_ID INT AUTO_INCREMENT PRIMARY KEY,
-    role_name VARCHAR(50) NOT NULL
+    FOREIGN KEY (responsible_user_ID) REFERENCES user(user_ID),
+    FOREIGN KEY (barcode_image_path_ID) REFERENCES barcode(barcode_image_path_ID)
 );
 
 -- Account table
@@ -55,9 +63,12 @@ CREATE TABLE account (
     password_hash VARCHAR(255) NOT NULL,
     role_ID INT,
     status ENUM('active', 'inactive') DEFAULT 'active',
+    remember_token VARCHAR(255),
+    token_expiry DATETIME,
     FOREIGN KEY (user_ID) REFERENCES user(user_ID),
     FOREIGN KEY (role_ID) REFERENCES role(role_ID)
 );
+
 
 -- Return table
 CREATE TABLE return_table (
@@ -77,4 +88,19 @@ CREATE TABLE session (
     login_timestamp DATETIME,
     logout_timestamp DATETIME,
     FOREIGN KEY (account_ID) REFERENCES account(account_ID)
+);
+
+-- Rquest table
+CREATE TABLE request_form (
+    request_ID INT AUTO_INCREMENT PRIMARY KEY,
+    student_ID VARCHAR(50) NOT NULL,
+    request_date DATE NOT NULL,
+    request_time TIME NOT NULL,
+    item_name VARCHAR(100) NOT NULL,
+    uom VARCHAR(50), 
+    quantity INT NOT NULL,
+    unit_ID INT, 
+    purpose TEXT,
+    request_note TEXT,
+    FOREIGN KEY (unit_ID) REFERENCES unit(unit_ID)
 );

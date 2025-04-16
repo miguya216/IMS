@@ -6,11 +6,11 @@
 }
 
 body {
-    background-color: #005a34;
+    /*background-color: #005a34;*/
+    background-color: #006727;
     margin-left: 80px; /* Adjust this value based on your navbar height */
 
 }
-
 /* Start of Navrbar *//* Default Sidebar (Expanded) */
 .sidebar {
     list-style: none;
@@ -22,32 +22,13 @@ body {
     background-color: rgba(51, 51, 51, 0.8);
     backdrop-filter: blur(10px);
     transition: width 0.3s ease-in-out;
-    box-shadow: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
     z-index: 1000;
 }
-
-/* Sidebar Header (Logo + IMS Text) *//* Sidebar */
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    width: 250px; /* Default width */
-    background-color: rgba(51, 51, 51, 0.8);
-    backdrop-filter: blur(10px);
-    transition: width 0.3s ease-in-out;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-    z-index: 1000;
-    overflow: hidden;
-}
-
 /* Sidebar Header */
 .sidebar-header {
     display: flex;
@@ -329,7 +310,7 @@ body {
     padding: 16px;
 }
 .card-content .title{
-    font-size: 30x;
+    font-size: 30px;
     margin-bottom: 10px; 
 }
 .card-content h2 {
@@ -456,7 +437,7 @@ body {
 
 .invt-table-box th {
     text-align: center;
-    background: #005a34;
+    background: linear-gradient(to bottom right, #005a34, #009708);
     color: white;
     width: auto;
     position: sticky;
@@ -488,39 +469,35 @@ body {
 }
 
 .invt-table-box tbody tr:nth-child(odd) {
-    background: #393939; /* Light background for odd rows */
+    background: #393939;
     color: #ffffff;
 }
 
 /* Hover effect on rows */
 .invt-table-box tbody tr:hover {
-    background: #000000;
-}
-.invt-table-box tbody tr .btn-edit:hover {
-    background:#003921;
-}
-
-.invt-table-box tbody tr .btn-delete:hover {
-    background: #65000a;
+    background: #272626;
 }
 .btn {
-    background:#005a34;; /* Yellow */
+    background: linear-gradient(to bottom right, #005a34, #009708);
     color: white;
 }
-/* Edit Button */
-.btn-edit {
-    background:#005a34;
-    color: white;
-}
-
-/* Delete Button */
 .btn-delete {
-    background: #97000f; /* Red */
+    background: linear-gradient(to bottom right, #8b0000, #d40000);
+    color: white;
+}
+.btn-edit {
+    background: linear-gradient(to bottom right, #005a34, #009708);
     color: white;
 }
 /* Hover Effects */
 .btn:hover {
-    background:#24242480;
+    background: linear-gradient(to bottom right, #009708, #005a34);
+}
+.btn-edit:hover {
+    background: linear-gradient(to bottom right, #009708, #005a34);
+}
+.btn-delete:hover {
+    background: linear-gradient(to bottom right, #d40000, #8b0000);
 }
 .invt-icon {
     width: 30px;
@@ -623,19 +600,6 @@ body {
     margin-top: 15px;
 }
 
-.btn {
-    background: #005a34;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.btn:hover {
-    background: #003921;
-}
-
 /* Responsive Design */
 @media (max-width: 768px) {
     .request-form {
@@ -709,7 +673,7 @@ body {
 
 .brw-table-box th {
     text-align: center;
-    background: #005a34;
+    background: linear-gradient(to bottom right, #005a34, #009708);
     color: white;
     width: auto;
     position: sticky;
@@ -750,15 +714,6 @@ body {
     background: #000000;
 }
 
-.btn {
-    background:#005a34;; /* Yellow */
-    color: white;
-}
-
-/* Hover Effects */
-.btn:hover {
-    background:#003921;
-}
 /* Responsive adjustments for small screens */
 @media (max-width: 768px) {
     .brw-table-box th, .brw-table-box td {

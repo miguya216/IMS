@@ -2,7 +2,12 @@
 if (!defined('IN_APP')) {
     die("Access Denied");
 }
-function userList(){ ?>
+require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\class\fetch_data.php';
+function userList(){ 
+    global $pdo;
+    $inventory = new Users($pdo);
+    $users = $inventory->fetchAllUsers();
+    ?>
   <div class="invt-table-data">
                         <table class="invt-table-box" id="userTable">      
                             <thead>
@@ -17,9 +22,8 @@ function userList(){ ?>
                             </thead> 
                             <tbody>
                                     <?php
-                                     include('class\fetch_users.php');
-                                        if ($result && $result->num_rows > 0) {
-                                            while ($row = $result->fetch_assoc()) {
+                                        if($users && count($users) > 0) {
+                                            foreach ($users as $row) {
                                                 echo "<tr>";
                                                 echo "<td>" . $row['user_ID'] . "</td>";
                                                 echo "<td>" . $row['full_name'] . "</td>";
@@ -35,8 +39,6 @@ function userList(){ ?>
                                         } else {
                                             echo "<tr><td colspan='6'>No users found.</td></tr>";
                                         }
-
-                                        $conn->close();
                                      ?>
                             </tbody>
                         </table>

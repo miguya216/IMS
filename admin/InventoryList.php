@@ -1,4 +1,5 @@
 <?php
+require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\auth\web_protector.php';
 if (file_exists('views/inventory/itemList.php')) {
     define('IN_APP', true); 
     include ('views\inventory\itemList.php'); 
@@ -15,9 +16,9 @@ if (file_exists('views/inventory/itemList.php')) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventory Management</title>
-    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
-    <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="\ims\bootstrap\css\bootstrap.min.css">
+    <script src="\ims\bootstrap\js\bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="\ims\css\style.css">
 </head>
 <body> 
   
@@ -42,8 +43,10 @@ if (file_exists('views/inventory/itemList.php')) {
             </form>
         </div>
 
-        <div class="invt-list-container">
-                <?php itemList(); ?>
+        <div class="field-inventory">
+            <div class="invt-list-container">
+                    <?php itemList(); ?>
+            </div>
         </div>
     </div>
     
