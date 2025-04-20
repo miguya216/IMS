@@ -8,7 +8,10 @@ function userList(){
     $inventory = new Users($pdo);
     $users = $inventory->fetchAllUsers();
     ?>
-  <div class="invt-table-data">
+                 <div class="invt-table-name">
+                    <span>Users Table</span>
+                </div>
+                    <div class="invt-table-data">
                         <table class="invt-table-box" id="userTable">      
                             <thead>
                                 <tr>

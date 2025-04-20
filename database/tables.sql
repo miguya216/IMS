@@ -47,7 +47,7 @@ CREATE TABLE asset (
     inventory_tag VARCHAR(100),
     serial_number VARCHAR(100),
     responsible_user_ID INT,
-    barcode_image_path_ID INT,
+    barcode_image_path_ID INT NOT NULL,
     asset_status ENUM('active', 'inactive') DEFAULT 'active',
     FOREIGN KEY (brand_ID) REFERENCES brand(brand_ID),
     FOREIGN KEY (asset_type_ID) REFERENCES asset_type(asset_type_ID),
