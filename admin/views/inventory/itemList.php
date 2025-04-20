@@ -2,7 +2,7 @@
 if (!defined('IN_APP')) {
     die("Access Denied");
 }
-require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\class\asset\fetch_data.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\class\fetch_data.php';
 function itemList(){ 
     global $pdo; 
     $inventory = new Inventory($pdo);

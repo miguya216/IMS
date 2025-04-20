@@ -1,5 +1,5 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/ims/class/asset/fetch_data.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/ims/class/fetch_data.php';
 
 header('Content-Type: application/json');
 
