@@ -20,29 +20,26 @@ if (isset($_SESSION['account_ID'])) {
   <style>
     body {
       background: linear-gradient(to bottom right, #005a34, #009708);
-      height: 100vh;
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
       color: white;
+      min-height: 100vh;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      flex-direction: column; /* added this */
-      position: relative; /* for positioning header */
+      padding: 40px 20px; /* spacing at top and sides */
+      box-sizing: border-box;
     }
     .header-container {
-      position: absolute;
-      top: 40px;
       text-align: center;
-      width: 100%;
-      padding: 0 20px;
+      margin-bottom: 30px; /* space between header and form */
+      padding: 0 10px;
     }
-
-
     .content-wrapper {
-      text-align: center;
       width: 100%;
       max-width: 400px;
+      text-align: center;
+      margin-top: 100px;
     }
 
     h1 {
@@ -64,6 +61,15 @@ if (isset($_SESSION['account_ID'])) {
         margin: 0 auto 15px auto;
         max-width: 350px;
     }
+    .input-box.remember-me {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 10px;
+        margin-top: 10px;
+        margin-left: 10px;
+        font-size: 16px;
+      }
 
 
     .form-control {
@@ -72,7 +78,8 @@ if (isset($_SESSION['account_ID'])) {
     }
 
     .login-btn {
-      background-color:rgb(55, 143, 59);
+      background-color: #005a34;
+      box-shadow: rgb(0, 0, 0);
       color: white;
       font-weight: bold;
       border: none;
@@ -83,14 +90,15 @@ if (isset($_SESSION['account_ID'])) {
     }
 
     .login-btn:hover {
-      background-color: #005a34;
+      background-color: #2ecc71;
       color: white;
     }
     .error-message {
+      font-size: large;
       min-height: 24px; /* reserve space */
       margin-top: 10px;
       text-align: center;
-      color:rgb(255, 255, 255);
+      color:rgb(190, 0, 10);
       font-weight: bold;
     }
 
@@ -100,6 +108,11 @@ if (isset($_SESSION['account_ID'])) {
       padding: 0;
     }
 
+    @media (max-width: 576px) {
+      .content-wrapper {
+        margin-top: 10px;
+      }
+    }
 
   </style>
 </head>
@@ -118,9 +131,9 @@ if (isset($_SESSION['account_ID'])) {
                 <div class="input-box">
                     <input name="password" type="password" class="form-control" placeholder="PASSWORD" required />
                 </div>
-                <div class="input-box">
-                    <input type="checkbox" name="remember_me" id="remember_me">
-                    <label for="remember_me">Remember Me</label>
+                <div class="input-box remember-me">
+                  <input type="checkbox" name="remember_me" id="remember_me" />
+                  <label for="remember_me">Remember Me</label>
                 </div>
                   <button type="submit" class="login-btn">Log In</button>
                 <div class="error-message">

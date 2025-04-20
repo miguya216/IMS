@@ -2,6 +2,7 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\auth\web_protector.php';
 if (file_exists('views/home/StatsOverview.php')) {
     define('IN_APP', true); 
+    include ('head.php');
     include ('views/home/StatsOverview.php');
 } else {
     echo "Error: StatsOverview file not found!";
@@ -17,7 +18,11 @@ if (file_exists('views/home/StatsOverview.php')) {
     <script src="\ims\bootstrap\js\bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="\ims\css\style.css">
 </head>
-<body>
+<body> 
+    
+<div id="inventory" class="header-inventory">
+<?php head();?>
+<div class="field-inventory">
         <div class="card-container">
                 <?php StatsOverview(); ?>
         </div>
@@ -25,6 +30,8 @@ if (file_exists('views/home/StatsOverview.php')) {
         <div>
             <?php include ('navbar.php'); ?>
         </div>
+        </div>
+</div>
     <!-- JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

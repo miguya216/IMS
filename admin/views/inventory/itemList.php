@@ -2,13 +2,15 @@
 if (!defined('IN_APP')) {
     die("Access Denied");
 }
-require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\class\fetch_data.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\class\asset\fetch_data.php';
 function itemList(){ 
     global $pdo; 
     $inventory = new Inventory($pdo);
     $assets = $inventory->fetchAllAssets();
 ?>
-                    <!-- <h2>Item List:</h2> -->
+                <div class="invt-table-name">
+                    <span>Asset Table</span>
+                </div>
                     <div class="invt-table-data">
                         <table class="invt-table-box" id="inventoryTable">      
                             <thead>
@@ -33,7 +35,11 @@ function itemList(){
                                             echo "<td>" . htmlspecialchars($row['user_unit']) . "</td>";
                                             echo "<td>
                                                     <button id='edit-" . htmlspecialchars($row['serial_number']) . "' class='btn btn-edit'>Details</button>
-                                                    <button class='btn btn-delete'>Delete</button>
+                                                    <button 
+                                                        class='btn btn-delete' 
+                                                        data-serial='" . htmlspecialchars($row['serial_number']) . "'>
+                                                        Delete
+                                                    </button>
                                                   </td>";
                                             echo "</tr>";
                                         }

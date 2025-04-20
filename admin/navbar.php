@@ -1,21 +1,11 @@
 
-<!-- navbar.html -->
- <!-- <div class="d-flex">
-  <div class="sidebar p-3">
-        <div class="sidebar-header d-flex align-items-center">
-        <img src="imgs\KLDlogo.png" alt="Logo" class="sidebar-logo">    
-        <h2 class="sidebar-wc ms-2">KLD IMS</h2>
-        </div>
-        <img id="menu-icon" src="imgs/menu.png" alt="Menu" class="menu-icon">
-        <br>  -->
 
 <!-- Visible Menu Button (when sidebar is closed) -->
   <nav> 
     
     <ul class="sidebar shrink">
         <li class="sidebar-header">
-            <img src="imgs/KLDlogo.png" alt="Logo" class="sidebar-logo">
-            <span class="sidebar-title">KLD IMS</span>
+        <span class="sidebar-title"><?= htmlspecialchars($_SESSION['full_name']) ?></span>
         </li>
 
         <li><button id="menu-btn">

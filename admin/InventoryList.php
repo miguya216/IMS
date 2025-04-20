@@ -2,6 +2,7 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\auth\web_protector.php';
 if (file_exists('views/inventory/itemList.php')) {
     define('IN_APP', true); 
+    include ('head.php');
     include ('views\inventory\itemList.php'); 
     include('views\inventory\detailsModal.php');
     include('views\inventory\addModal.php');
@@ -23,27 +24,25 @@ if (file_exists('views/inventory/itemList.php')) {
 <body> 
   
     <div id="inventory" class="header-inventory">
+        <?php head();?>
         <div class="field-inventory">
-            <form id="searchForm">
-                <div class="invt-field-details">
-                    <div class="invt-field-header"><h4>Search here:</h4>
-                        <div class="invt-input-box">
-                            <input type="text" class="search-bar" id="searchInput" placeholder="Type to Search Item" onkeyup="searchInventory()" required>
-                                <button type="button" class="btn" id="addItemBtn">
-                                    <img src="imgs/add.png" alt="Add Items" class="invt-icon">
-                                    Add Item
-                                </button>
-                                <button type="button" class="btn">
-                                    <img src="imgs/import.png" alt="Import file" class="invt-icon">
-                                    Import .CSV
-                                </button>
+                <form id="searchForm">
+                    <div class="invt-field-details">
+                        <div class="invt-field-header">
+                            <div class="invt-input-box">
+                                <input type="text" class="search-bar" id="searchInput" placeholder="Search Asset" onkeyup="searchInventory()" required>
+                                    <button type="button" class="btn" id="addItemBtn">
+                                        <img src="imgs/add.png" alt="Add Items" class="invt-icon">
+                                        Add Item
+                                    </button>
+                                    <button type="button" class="btn">
+                                        <img src="imgs/import.png" alt="Import file" class="invt-icon">
+                                        Import .CSV
+                                    </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </form>
-        </div>
-
-        <div class="field-inventory">
+                </form>
             <div class="invt-list-container">
                     <?php itemList(); ?>
             </div>

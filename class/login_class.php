@@ -10,7 +10,10 @@ class User {
     }
 
     public function login($username, $password, $remember = false) {
-        $stmt = $this->pdo->prepare("SELECT * FROM account WHERE username = :username");
+        $stmt = $this->pdo->prepare("SELECT a.*, u.full_name 
+                                                FROM account a
+                                                JOIN user u ON a.user_ID = u.user_ID
+                                                WHERE a.username = :username");
         $stmt->execute(['username' => $username]);
         $user = $stmt->fetch();
     
@@ -20,6 +23,7 @@ class User {
             $_SESSION['user_ID'] = $user['user_ID'];
             $_SESSION['role_ID'] = $user['role_ID'];
             $_SESSION['username'] = $username;
+            $_SESSION['full_name'] = $user['full_name'];
     
             // Remember me
             if ($remember) {

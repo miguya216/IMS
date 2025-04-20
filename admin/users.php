@@ -1,6 +1,8 @@
 <?php 
+require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\auth\web_protector.php';
 if (file_exists('views/users/userList.php')) {
     define('IN_APP', true); 
+    include ('head.php');
     include ('views/users/userList.php'); 
     include('views/users/addUserModal.php');
     include('views/users/detailesUserModal.php');
@@ -22,23 +24,21 @@ if (file_exists('views/users/userList.php')) {
 <body>
 
 <div id="users" class="header-inventory">
-        <div class="field-inventory">
-            <form id="searchForm">
-                <div class="invt-field-details">
-                    <div class="invt-field-header"><h4>Search here:</h4>
-                        <div class="invt-input-box">
-                            <input type="text" class="search-bar" id="searchInput" placeholder="Type to Search Users" onkeyup="searchInventory()" required>
-                                <button type="button" class="btn" id="addUserBtn">
-                                    <img src="imgs/add.png" alt="Add Items" class="invt-icon">
-                                    Add User
-                                </button>
+<?php head();?>
+       <div class="field-inventory">
+                <form id="searchForm">
+                    <div class="invt-field-details">
+                        <div class="invt-field-header">
+                            <div class="invt-input-box">
+                                <input type="text" class="search-bar" id="searchInput" placeholder="Search Users" onkeyup="searchInventory()" required>
+                                    <button type="button" class="btn" id="addUserBtn">
+                                        <img src="imgs/add.png" alt="Add Items" class="invt-icon">
+                                        Add User
+                                    </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </form>
-        </div>
-
-       <div class="field-inventory">
+                </form>
             <div class="invt-list-container">
                 <?php userList(); ?>
             </div>
@@ -53,13 +53,13 @@ if (file_exists('views/users/userList.php')) {
 
     <div>
         <?php 
-            detailesUserModal();
+           // detailesUserModal();
         ?>
     </div>
 
     <div>
         <?php 
-            userModal();
+            //userModal();
         ?>
     </div>
       
