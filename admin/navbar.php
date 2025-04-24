@@ -31,9 +31,9 @@
             </a>
         </li>
         <li>
-            <a href="account.php">
-                <img src="imgs/account.png" alt="account" class="nav-icon">
-                <span>Accounts</span>
+            <a href="reference.php">
+                <img src="imgs/reference.png" alt="reference" class="nav-icon">
+                <span>Reference Data</span>
             </a>
         </li>
         <li>

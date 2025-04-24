@@ -35,7 +35,8 @@ function userList(){
                                                 echo "<td>" . $row['role_name'] . "</td>";
                                                 echo "<td>
                                                         <button id='edit-" . htmlspecialchars($row['user_ID']) . "' class='btn btn-edit'>Details</button>
-                                                        <button class='btn btn-delete'>Delete</button>
+                                                        <button class='btn btn-delete'
+                                                        data-user='" . htmlspecialchars($row['user_ID']) . "'>Delete</button>
                                                     </td>";
                                                 echo "</tr>";
                                             }

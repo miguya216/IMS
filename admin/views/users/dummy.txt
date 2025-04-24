@@ -1,0 +1,65 @@
+<?php
+function addUserModal () {
+    require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\auth\users\InsertAuth.php';
+    $fetcher = new DataFetcher();
+    $units = $fetcher->getAllUnits();
+?>
+<div class="modal-container" id="modal_cont_add_user">
+    <div class="modal">
+        <form id="addUserForm" method="POST">
+
+            <h1>Insert Usert</h1>
+            <div class="notif-container">
+                <div id="add_user_responseMessage"></div>
+            </div>
+            <div class="field-details">
+                <div class="input-box">
+                    <label>
+                        <input type="checkbox" id="toggle_account_fields">
+                        Create an account for this user
+                    </label>
+                </div>
+
+                <div id="account_fields" class="field-details" style="display:none;">
+                    <div class="input-box">
+                        <label for="role">Role:</label>
+                        <input name="role" type="text" class="form-control field-details" id="role" disabled required>
+                    </div>
+                    <div class="input-box">
+                        <label for="username">Username:</label>
+                        <input type="text" name="username" class="form-control field-details" id="username" disabled required>
+                    </div>
+                    <div class="input-box">
+                        <label for="password">Password:</label>
+                        <input type="password" name="password" class="form-control field-details" id="password" disabled required>
+                    </div>
+                </div>
+
+                <div class="input-box">
+                    <label for="tag">Full Name:</label>
+                    <input name="full_name" type="text" class="form-control" id="full_name" required>
+                </div>   
+
+                <div class="input-box dual-input">
+                    <label for="unit">Unit/Institute:</label>
+                    <div class="flex-wrap-row">
+                        <select name="unit" class="form-control" id="unit" required>
+                            <option value="" selected disabled>Select Unit (Add new if none)</option>
+                            <?php foreach ($units as $unit): ?>
+                                <option value="<?= htmlspecialchars($unit['unit_name']) ?>"><?= htmlspecialchars($unit['unit_name']) ?></option>
+                            <?php endforeach; ?>
+                            <option value="__new_unit__">➕ Add new...</option>
+                        </select>
+                        <input type="text" name="new_unit" id="new_unit" class="form-control" placeholder="Enter new unit" style="display:none;">
+                    </div>
+                </div>
+
+                <div class="input-box">
+                    <button type="submit" class="btn" id="saveNewUser">Add Item</button>
+                    <li class="btn" id="close_add_user">Close</li>
+                </div> 
+            </div>      
+        </form>
+    </div>        
+</div>
+<?php } ?>

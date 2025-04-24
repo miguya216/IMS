@@ -10,8 +10,8 @@ function details() {
 <div class="modal-container" id="modal_cont_details">
     <div class="modal">
         <form method="POST" id="updateForm">
+            
                 <h1>Asset Details</h1>
-
                 <div class="notif-container">
                     <div id="update_responseMessage"></div>
                 </div>
@@ -44,6 +44,11 @@ function details() {
                         <?php endforeach; ?>
                     </select>
                 </div>
+
+                <!-- <div class="input-box">
+                    <label>Brand</label>
+                    <input type="text" class="form-control" id="detail_brand" name="brand">
+                </div> -->
 
                 <div class="input-box">
                 <label>Brand</label>

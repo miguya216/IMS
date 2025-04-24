@@ -69,7 +69,6 @@ if (file_exists('views/inventory/itemList.php')) {
 <!-- JavaScript -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="script/script.js"></script>
-<script src="script/inventory.js"></script>
 
 </body>
 </html>

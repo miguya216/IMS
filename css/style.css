@@ -2,7 +2,7 @@
     margin: 0px;
     padding: 0px;
     box-sizing: border-box;
-    font-family: sans-serif ;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
 body {
@@ -144,6 +144,7 @@ body {
 /* end of Navrbar */
 
 /* start of modal */
+
 .modal-container {
     position: fixed;
     inset: 0;
@@ -521,6 +522,13 @@ body {
     max-width: 100%;
     margin: 0 auto;
 }
+.reference-container{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    position: relative;
+    overflow: auto;
+}
 .invt-table-name {
     font-size: 18px;
     text-align: center;
@@ -530,7 +538,7 @@ body {
 .invt-table-data {
     scroll-snap-type: y mandatory;
     border-collapse: collapse;
-    max-height: 470px;
+    max-height: 450px;
     overflow-y: auto; 
     position: relative;
     overflow-x: auto;
@@ -539,10 +547,15 @@ body {
     scrollbar-width: thin;              /* For Firefox */
     scrollbar-color: rgb(65, 65, 65) rgb(51, 51, 51);
 }
+.reference-container .invt-table-data{
+    margin: 10px;
+}
 /* For Chrome, Edge, and Safari */
 .invt-table-data::-webkit-scrollbar {
     height: 8px;
     width: 8px;
+    max-height: 225px;
+   
 }
 
 .invt-table-data::-webkit-scrollbar-track {
@@ -557,11 +570,22 @@ body {
     border-radius: 8px;
     table-layout: fixed;
 }
+
+
 .invt-table-box th, .invt-table-box td {
     min-width: 150px;
     white-space: nowrap; 
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.reference-container .invt-table-box th, .invt-table-box td{
+    min-width: 100px;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0;
+    font-size: 18px;
 }
 
 .invt-table-box th {

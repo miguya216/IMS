@@ -30,7 +30,7 @@ if (file_exists('views/users/userList.php')) {
                     <div class="invt-field-details">
                         <div class="invt-field-header">
                             <div class="invt-input-box">
-                                <input type="text" class="search-bar" id="searchInput" placeholder="Search Users" onkeyup="searchInventory()" required>
+                                <input type="text" class="search-bar" id="searchInputUser" placeholder="Search Users" onkeyup="searchUser()" required>
                                     <button type="button" class="btn" id="addUserBtn">
                                         <img src="imgs/add.png" alt="Add Items" class="invt-icon">
                                         Add User
@@ -53,19 +53,18 @@ if (file_exists('views/users/userList.php')) {
 
     <div>
         <?php 
-           // detailesUserModal();
+            detailesUserModal();
         ?>
     </div>
 
     <div>
         <?php 
-            //userModal();
+           addUserModal();
         ?>
     </div>
       
     <!-- JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script/script.js"></script>
 
 </body>

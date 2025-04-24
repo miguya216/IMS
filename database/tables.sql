@@ -11,13 +11,9 @@ CREATE TABLE asset_type (
 -- Brand table
 CREATE TABLE brand (
     brand_ID INT AUTO_INCREMENT PRIMARY KEY,
-    brand_name VARCHAR(100) NOT NULL
-);
-
--- Unit table
-CREATE TABLE unit (
-    unit_ID INT AUTO_INCREMENT PRIMARY KEY,
-    unit_name VARCHAR(100) NOT NULL
+    brand_name VARCHAR(100) NOT NULL,
+    asset_type_ID INT,
+    FOREIGN KEY (asset_type_ID) REFERENCES asset_type (asset_type_ID)
 );
 
 CREATE TABLE barcode (
@@ -30,12 +26,18 @@ CREATE TABLE role (
     role_ID INT AUTO_INCREMENT PRIMARY KEY,
     role_name VARCHAR(50) NOT NULL
 );
+-- Unit table
+CREATE TABLE unit (
+    unit_ID INT AUTO_INCREMENT PRIMARY KEY,
+    unit_name VARCHAR(100) NOT NULL
+);
 
 -- User table
 CREATE TABLE user (
     user_ID INT AUTO_INCREMENT PRIMARY KEY,
     full_name VARCHAR(100) NOT NULL,
     unit_ID INT,
+    user_status ENUM('active', 'inactive') DEFAULT 'active',
     FOREIGN KEY (unit_ID) REFERENCES unit(unit_ID)
 );
 
@@ -44,8 +46,8 @@ CREATE TABLE asset (
     asset_ID INT AUTO_INCREMENT PRIMARY KEY,
     brand_ID INT,
     asset_type_ID INT,
-    inventory_tag VARCHAR(100),
-    serial_number VARCHAR(100),
+    inventory_tag VARCHAR(100) UNIQUE NOT NULL,
+    serial_number VARCHAR(100) UNIQUE NOT NULL,
     responsible_user_ID INT,
     barcode_image_path_ID INT NOT NULL,
     asset_status ENUM('active', 'inactive') DEFAULT 'active',
@@ -62,7 +64,6 @@ CREATE TABLE account (
     username VARCHAR(50) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     role_ID INT,
-    status ENUM('active', 'inactive') DEFAULT 'active',
     remember_token VARCHAR(255),
     token_expiry DATETIME,
     FOREIGN KEY (user_ID) REFERENCES user(user_ID),

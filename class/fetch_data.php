@@ -80,11 +80,32 @@ class Users {
         account ON user.user_ID = account.user_ID
     LEFT JOIN 
         role ON account.role_ID = role.role_ID
-";
+    WHERE
+        user.user_status = 'active'";
 
 
     $stmt = $this->pdo->query($sql);
     return $stmt->fetchAll();
+    }
+
+
+    public function fetchUserById($userId) {
+        $stmt = $this->pdo->prepare("SELECT 
+            u.user_ID,
+            u.full_name,
+            un.unit_name,
+            a.username,
+            a.password_hash,
+            r.role_name
+        FROM user u
+        JOIN unit un ON u.unit_ID = un.unit_ID
+        LEFT JOIN account a ON u.user_ID = a.user_ID
+        LEFT JOIN role r ON a.role_ID = r.role_ID
+        WHERE u.user_ID = :userId
+        ");
+    
+        $stmt->execute(['userId' => $userId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }
 ?>

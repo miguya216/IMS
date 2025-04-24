@@ -1,13 +1,13 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\auth\web_protector.php';
-if (file_exists('views/inventory/itemList.php')) {
+include ('head.php');
+if (file_exists('views\reference\rolesList.php')) {
     define('IN_APP', true); 
-    include ('head.php');
-    include ('views\inventory\itemList.php'); 
-    include('views\inventory\detailsModal.php');
-    include('views\inventory\addModal.php');
+    include ('views\reference\rolesList.php'); 
+    // include('views\inventory\detailsModal.php');
+    // include('views\inventory\addModal.php');
 } else {
-    echo "Error: StatsOverview file not found!";
+   // echo "Error: StatsOverview file not found!";
 }
 ?>
 
@@ -39,8 +39,8 @@ if (file_exists('views/inventory/itemList.php')) {
                         </div>
                     </div>
                 </form>
-            <div class="invt-list-container">
-                    <?php itemList(); ?>
+            <div>
+                    <?php roleList(); ?>
             </div>
         </div>
     </div>
