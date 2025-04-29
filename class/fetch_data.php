@@ -108,4 +108,76 @@ class Users {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }
+
+class Role {
+    private $pdo;
+    
+    public function __construct($pdo){
+        $this->pdo = $pdo;
+    }
+    public function fetchRoleById($role_ID){
+        $stmt = $this->pdo->prepare(
+            "SELECT role_ID, role_name
+            FROM role
+            WHERE role_ID = :role_ID"
+        );
+
+        $stmt->execute(['role_ID' => $role_ID]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+}
+
+class Unit {
+    private $pdo;
+    
+    public function __construct($pdo){
+        $this->pdo = $pdo;
+    }
+    public function fetchUnitById($unit_ID){
+        $stmt = $this->pdo->prepare(
+            "SELECT unit_name
+            FROM role
+            WHERE unit_ID = :unit_ID"
+        );
+
+        $stmt->execute(['unit_ID' => $unit_ID]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+}
+
+class Asset_type {
+    private $pdo;
+    
+    public function __construct($pdo){
+        $this->pdo = $pdo;
+    }
+    public function fetchAssetTypeById($Asset_type_ID){
+        $stmt = $this->pdo->prepare(
+            "SELECT Asset_type
+            FROM role
+            WHERE Asset_type_ID = :Asset_type_ID"
+        );
+
+        $stmt->execute(['Asset_type_ID' => $Asset_type_ID]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+}
+
+class Brand {
+    private $pdo;
+    
+    public function __construct($pdo){
+        $this->pdo = $pdo;
+    }
+    public function fetchBrandById($brand_ID){
+        $stmt = $this->pdo->prepare(
+            "SELECT brand
+            FROM role
+            WHERE brand_ID = :brand_ID"
+        );
+
+        $stmt->execute(['brand_ID' => $brand_ID]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+}
 ?>

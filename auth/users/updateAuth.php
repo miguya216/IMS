@@ -22,7 +22,7 @@ $response = $user->UpdateUser(
     if ($response === true) {
         echo "success";
     } elseif ($response === "duplicate") {
-        echo "No changes detected!";
+        echo "duplicate";
     } else {
         echo "Error: " . $response;
     }

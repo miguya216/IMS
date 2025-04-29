@@ -8,9 +8,9 @@ function itemList(){
     $inventory = new Inventory($pdo);
     $assets = $inventory->fetchAllAssets();
 ?>
-                <div class="invt-table-name">
+                <!-- <div class="invt-table-name">
                     <span>Asset Table</span>
-                </div>
+                </div> -->
                     <div class="invt-table-data">
                         <table class="invt-table-box" id="inventoryTable">      
                             <thead>
@@ -28,29 +28,24 @@ function itemList(){
                                     if ($assets && count($assets) > 0) {
                                         foreach ($assets as $row) {
                                             echo "<tr>";
-                                            echo "<td>" . htmlspecialchars($row['serial_number']) . "</td>";
-                                            echo "<td>" . htmlspecialchars($row['asset_type']) . "</td>";
-                                            echo "<td>" . htmlspecialchars($row['brand_name']) . "</td>";
-                                            echo "<td>" . htmlspecialchars($row['responsible_user']) . "</td>";
-                                            echo "<td>" . htmlspecialchars($row['user_unit']) . "</td>";
-                                            echo "<td>
-                                                    <button id='edit-" . htmlspecialchars($row['serial_number']) . "' class='btn btn-edit'>Details</button>
-                                                    <button 
-                                                        class='btn btn-delete' 
-                                                        data-serial='" . htmlspecialchars($row['serial_number']) . "'>
-                                                        Delete
-                                                    </button>
+                                            echo "<td data-label='Serial Number'>" . htmlspecialchars($row['serial_number']) . "</td>";
+                                            echo "<td data-label='Asset Type'>" . htmlspecialchars($row['asset_type']) . "</td>";
+                                            echo "<td data-label='Brand Name'>" . htmlspecialchars($row['brand_name']) . "</td>";
+                                            echo "<td data-label='Responsible to'>" . htmlspecialchars($row['responsible_user']) . "</td>";
+                                            echo "<td data-label='Unit'>" . htmlspecialchars($row['user_unit']) . "</td>";
+                                            echo "<td data-label='Action'>
+                                                    <div class='action-buttons'>
+                                                            <img id='edit-" . htmlspecialchars($row['serial_number']) . "' class='btn-edit' src='imgs/detail.png' alt='Details' />
+                                                            <img class='btn-delete' data-serial='" . htmlspecialchars($row['serial_number']) . "' src='imgs/delete.png' alt='Delete' />
+                                                    </div>
                                                   </td>";
                                             echo "</tr>";
                                         }
+                                        
                                     } else {
                                         echo "<tr><td colspan='6'>No asset data found.</td></tr>";
                                     }
                                      ?>
-                            </tbody>
-                        </table>
-                    </div>
-
                             </tbody>
                         </table>
                     </div>

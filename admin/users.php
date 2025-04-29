@@ -16,34 +16,32 @@ if (file_exists('views/users/userList.php')) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Users</title>
+    <title>Users | Accounts</title>
     <link rel="stylesheet" href="\ims\bootstrap\css\bootstrap.min.css">
     <script src="\ims\bootstrap\js\bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="\ims\css\style.css">
 </head>
 <body>
 
-<div id="users" class="header-inventory">
+<!-- <div id="users" class="header-inventory">
+</div> -->
 <?php head();?>
        <div class="field-inventory">
                 <form id="searchForm">
                     <div class="invt-field-details">
-                        <div class="invt-field-header">
+                        <!-- <div class="invt-field-header">
+                        </div> -->
                             <div class="invt-input-box">
-                                <input type="text" class="search-bar" id="searchInputUser" placeholder="Search Users" onkeyup="searchUser()" required>
-                                    <button type="button" class="btn" id="addUserBtn">
-                                        <img src="imgs/add.png" alt="Add Items" class="invt-icon">
-                                        Add User
-                                    </button>
+                                <input type="text" class="search-bar" id="searchInputUser" placeholder="Search Users" onkeyup="searchUser()" >
+                                <img type="button" class="button-add" id="addUserBtn" src="imgs/add.png" alt="Add Items">
+                                      
                             </div>
-                        </div>
                     </div>
                 </form>
             <div class="invt-list-container">
                 <?php userList(); ?>
             </div>
        </div>
-    </div>
 
     <div>
         <?php 

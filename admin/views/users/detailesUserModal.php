@@ -7,11 +7,9 @@ function detailesUserModal (){
 <div class="modal-container" id="modal_cont_detail_user">
     <div class="modal">
         <form id="userDetailsForm" method="POST">
-        <h1>Item Details</h1>
+        <h3>Edit User Information</h3>
             <div class="field-details">
-            <div class="notif-container">
-                <div id="detail_user_responseMessage"></div>
-            </div>
+         
             <div class="field-details">
                 <div class="input-box">
                     <label>
@@ -21,8 +19,8 @@ function detailesUserModal (){
                 </div>
 
                 <div class="input-box">
-                    <label for="user_detail_id">User ID</label>
-                    <input name="user_ID" type="text" class="form-control" id="user_detail_id" required>
+                    <label for="user_detail_id">User ID:</label>
+                    <input name="user_ID" type="text" class="form-control" id="user_detail_id" readonly>
                 </div>
 
                 <div class="input-box">
@@ -36,17 +34,17 @@ function detailesUserModal (){
                 </div>
                 
                 <div class="input-box">
-                    <label for="user_detail_username">username</label>
+                    <label for="user_detail_username">username:</label>
                     <input name="user_detail_username" type="text" class="form-control" id="user_detail_username" required>
                 </div>
 
                 <div class="input-box">
-                    <label for="user_detail_password">password</label>
+                    <label for="user_detail_password">password:</label>
                     <input name="user_detail_password" type="password" class="form-control" id="user_detail_password">
                 </div>
 
                 <div class="input-box">
-                    <label for="user_detail_fullname">Full name</label>
+                    <label for="user_detail_fullname">Full name:</label>
                     <input name="user_detail_fullname" type="text" class="form-control" id="user_detail_fullname" required>
                 </div>
 
@@ -61,7 +59,7 @@ function detailesUserModal (){
                 </div>
              
                 <div class="input-box">
-                    <button type="submit" class="btn" id="updateUserDetails">Save changes</button>
+                    <button type="submit" class="btn" id="updateUserDetails">Update</button>
                     <li class="btn" id="close_detail_user">Close</li>
                 </div> 
             </div>  

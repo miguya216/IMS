@@ -9,10 +9,8 @@ function addUserModal () {
     <div class="modal">
         <form id="addUserForm" method="POST">
 
-            <h1>Insert Usert</h1>
-            <div class="notif-container">
-                <div id="add_user_responseMessage"></div>
-            </div>
+            <h3>Register New User</h3>
+          
             <div class="field-details">
                 <div class="input-box">
                     <label>
@@ -26,9 +24,9 @@ function addUserModal () {
                     <select name="role" class="form-control" id="role" required>
                         <option value="" selected disabled>Select role (Add new if none)</option>
                         <?php foreach ($roles as $role): ?>
-                            <option value="<?= htmlspecialchars($role['role_name']) ?>"><?= htmlspecialchars($role['role_name']) ?></option>
+                            <option value="<?= htmlspecialchars($role['role_ID']) ?>"><?= htmlspecialchars($role['role_name']) ?></option>
                         <?php endforeach; ?>
-                        <option value="__new_role__">➕ Add new...</option>
+                        <option value="__new_role__">✙ Add new...</option>
                     </select>
                 </div>
 
@@ -56,9 +54,9 @@ function addUserModal () {
                         <select name="unit" class="form-control" id="unit" required>
                             <option value="" selected disabled>Select Unit (Add new if none)</option>
                             <?php foreach ($units as $unit): ?>
-                                <option value="<?= htmlspecialchars($unit['unit_name']) ?>"><?= htmlspecialchars($unit['unit_name']) ?></option>
+                                <option value="<?= htmlspecialchars($unit['unit_ID']) ?>"><?= htmlspecialchars($unit['unit_name']) ?></option>
                             <?php endforeach; ?>
-                            <option value="__new_unit__">➕ Add new...</option>
+                            <option value="__new_unit__">✙ Add new...</option>
                         </select>
                 </div>
 

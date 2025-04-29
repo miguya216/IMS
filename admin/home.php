@@ -19,19 +19,22 @@ if (file_exists('views/home/StatsOverview.php')) {
     <link rel="stylesheet" href="\ims\css\style.css">
 </head>
 <body> 
-    
+<!--     
 <div id="inventory" class="header-inventory">
+</div> -->
+
 <?php head();?>
+
 <div class="field-inventory">
         <div class="card-container">
                 <?php StatsOverview(); ?>
         </div>
-
+       
         <div>
             <?php include ('navbar.php'); ?>
         </div>
-        </div>
 </div>
+
     <!-- JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

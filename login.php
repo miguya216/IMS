@@ -117,10 +117,11 @@ if (isset($_SESSION['account_ID'])) {
   </style>
 </head>
 <body>
-  <div class="header-container">
-      <h1>KLD's Inventory Revolution</h1>
-      <p>Optimizing Inventory Management for Property, Procurement & Supply Unit</p>
-  </div>
+<div class="header-container">
+  <h1>KLD's Inventory Revolution</h1>
+  <p>Optimizing Inventory Management for Property, Procurement & Supply Unit</p>
+</div>
+
 
     <div class="content-wrapper">
         <div class="login-container">

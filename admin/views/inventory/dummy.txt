@@ -1,102 +1,102 @@
-
-<?php
-function addModal () {
-    require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\auth\asset\InsertAuth.php';
-    $fetcher = new DataFetcher();
-    $assetTypes = $fetcher->getAllAssetTypes();
-    $brands = $fetcher->getAllBrands();
-    $units = $fetcher->getAllUnits();
-    $users = $fetcher->getAllUsers(); // for Responsible To
+<?php 
+if (!defined('IN_APP')) {
+    die("Access Denied");
+}
+require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\class\fetch_data.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\class\uni_fetch.php';
+function itemList(){ 
+    global $pdo; 
+    $DataFetcher = new DataFetcher();
+    $inventory = new Inventory($pdo);
+    $assets = $inventory->fetchAllAssets();
+    $roles = $DataFetcher->getAllRoles();
 ?>
-<div class="modal-container" id="modal_cont_add">
-    <div class="modal">
-        <form id="addAssetForm" method="POST">
-        <input type="hidden" name="asset_hidden" id="asset_hidden">
-        <input type="hidden" name="unit_hidden" id="unit_hidden">
 
-            <h1>Insert Asset</h1>
-            <div class="notif-container">
-                <div id="add_responseMessage"></div>
+<!-- <div class="reference-container">         -->
+                <div class="invt-table-data">
+                    <div class="invt-table-name">
+                        <span>Asset Table</span>
+                    </div>
+                        <table class="invt-table-box" id="inventoryTable">      
+                            <thead>
+                                <tr>
+                                    <th>Serial Number</th>
+                                    <th>Asset Type</th>
+                                    <th>Brand Name</th>
+                                    <th>Responsible to</th>
+                                    <th>Unit</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead> 
+                            <tbody>
+                                    <?php
+                                    if ($assets && count($assets) > 0) {
+                                        foreach ($assets as $row) {
+                                            echo "<tr>";
+                                            echo "<td>" . htmlspecialchars($row['serial_number']) . "</td>";
+                                            echo "<td>" . htmlspecialchars($row['asset_type']) . "</td>";
+                                            echo "<td>" . htmlspecialchars($row['brand_name']) . "</td>";
+                                            echo "<td>" . htmlspecialchars($row['responsible_user']) . "</td>";
+                                            echo "<td>" . htmlspecialchars($row['user_unit']) . "</td>";
+                                            echo "<td>
+                                                    <button id='edit-" . htmlspecialchars($row['serial_number']) . "' class='btn btn-edit'>
+                                                    <img src='imgs/detail.png' alt='Details' class='invt-icon' />
+                                                    </button>
+                                                    <button 
+                                                        class='btn btn-delete' 
+                                                        data-serial='" . htmlspecialchars($row['serial_number']) . "'>
+                                                        <img src='imgs/delete.png' alt='Delete' class='invt-icon' />
+                                                    </button>
+                                                  </td>";
+                                            echo "</tr>";
+                                        }
+                                    } else {
+                                        echo "<tr><td colspan='6'>No asset data found.</td></tr>";
+                                    }
+                                     ?>
+                            </tbody>
+                        </table>
+                    </div>
+
+                            </tbody>
+                        </table>
+                   
+
+
+                             
+
+            <!-- <div class="invt-table-data">
+                <div class="invt-table-name">
+                    <span>Role Table</span>
+                </div>
+                        <table class="invt-table-box">      
+                            <thead>
+                                <tr>
+                                    <th hidden>Role ID</th>
+                                    <th>Role Name</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead> 
+                            <tbody>
+                                    <?php
+                                        if($roles && count($roles) > 0) {
+                                            foreach ($roles as $row) {
+                                                echo "<tr>";
+                                                echo "<td hidden>" . $row['role_ID'] . "</td>";
+                                                echo "<td>" . $row['role_name'] . "</td>";
+                                                echo "<td>
+                                                        <button id='edit-" . htmlspecialchars($row['role_ID']) . "' class='btn btn-edit'>
+                                                        <img src='imgs/detail.png' alt='Details' class='invt-icon' />
+                                                        </button>
+                                                    </td>";
+                                                echo "</tr>";
+                                            }
+                                        } else {
+                                            echo "<tr><td colspan='6'>No users found.</td></tr>";
+                                        }
+                                     ?>
+                            </tbody>
+                        </table>
             </div>
-            <div class="field-details">
-
-                <div class="input-box">
-                    <label for="tag">Inventory Tag</label>
-                    <input name="inventory_tag" type="text" class="form-control" id="tag" required>
-                </div>            
-
-                <div class="input-box">
-                    <label for="serialNum">Serial Number</label>
-                    <input name="serial_num" type="text" class="form-control" id="serialNum" required>
-                </div>
-
-                   <!-- BRAND -->
-                   <div class="input-box dual-input">
-                    <label for="brand">Brand</label>
-                    <div class="flex-wrap-row">
-                        <select name="brand" class="form-control" id="brand" required>
-                            <option value="" selected disabled>Select Brand (Add new if none)</option>
-                            <?php foreach ($brands as $brand): ?>
-                                <option value="<?= htmlspecialchars($brand['brand_name']) ?>"><?= htmlspecialchars($brand['brand_name']) ?></option>
-                            <?php endforeach; ?>
-                            <option value="__new_brand__">➕ Add new...</option>
-                        </select>
-                        <input type="text" name="new_brand" id="new_brand" class="form-control" placeholder="Enter new brand" style="display:none;">
-                    </div>
-                </div>
-
-                <!-- ASSET TYPE -->
-                <div class="input-box dual-input">
-                    <label for="asset">Asset Type</label>
-                    <div class="flex-wrap-row">
-                        <select name="asset" class="form-control" id="asset" required>
-                            <option value="" selected disabled>Select Asset Type (Add new if none)</option>
-                            <?php foreach ($assetTypes as $type): ?>
-                                <option value="<?= htmlspecialchars($type['asset_type']) ?>"><?= htmlspecialchars($type['asset_type']) ?></option>
-                            <?php endforeach; ?>
-                            <option value="__new_asset_type__">➕ Add new...</option>
-                        </select>
-                        <input type="text" name="new_asset" id="new_asset" class="form-control" placeholder="Enter new asset type" style="display:none;">
-                    </div>
-                </div>
-
-                <!-- RESPONSIBLE TO -->
-                <div class="input-box dual-input">
-                    <label for="responsibleTo">Responsible To</label>
-                    <div class="flex-wrap-row">
-                        <select name="responsibleTo" class="form-control" id="responsibleTo" required>
-                            <option value="" selected disabled>Select User (Add new if none)</option>
-                            <?php foreach ($users as $user): ?>
-                                <option value="<?= htmlspecialchars($user['full_name']) ?>"><?= htmlspecialchars($user['full_name']) ?></option>
-                            <?php endforeach; ?>
-                            <option value="__new_responsibleTo__">➕ Add new...</option>
-                        </select>
-                        <input type="text" name="new_responsibleTo" id="new_responsibleTo" class="form-control" placeholder="Enter new name" style="display:none;">
-                    </div>
-                </div>
-
-                <!-- UNIT -->
-                <div class="input-box dual-input">
-                    <label for="unit">Unit/Institute</label>
-                    <div class="flex-wrap-row">
-                        <select name="unit" class="form-control" id="unit" required>
-                            <option value="" selected disabled>Select Unit (Add new if none)</option>
-                            <?php foreach ($units as $unit): ?>
-                                <option value="<?= htmlspecialchars($unit['unit_name']) ?>"><?= htmlspecialchars($unit['unit_name']) ?></option>
-                            <?php endforeach; ?>
-                            <option value="__new_unit__">➕ Add new...</option>
-                        </select>
-                        <input type="text" name="new_unit" id="new_unit" class="form-control" placeholder="Enter new unit" style="display:none;">
-                    </div>
-                </div>
-
-                <div class="input-box">
-                    <button type="submit" class="btn" id="saveDetails">Add Item</button>
-                    <li class="btn" id="close_add">Close</li>
-                </div> 
-
-            </div>      
-        </form>
-    </div>        
-</div>
+</div> -->
 <?php } ?>

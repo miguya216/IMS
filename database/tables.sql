@@ -5,7 +5,8 @@ USE IMS;
 -- Asset Type table
 CREATE TABLE asset_type (
     asset_type_ID INT AUTO_INCREMENT PRIMARY KEY,
-    asset_type VARCHAR(100) NOT NULL
+    asset_type VARCHAR(100) NOT NULL,
+    asset_type_status ENUM('active', 'inactive') DEFAULT 'active'
 );
 
 -- Brand table
@@ -13,6 +14,7 @@ CREATE TABLE brand (
     brand_ID INT AUTO_INCREMENT PRIMARY KEY,
     brand_name VARCHAR(100) NOT NULL,
     asset_type_ID INT,
+    brand_status ENUM('active', 'inactive') DEFAULT 'active',
     FOREIGN KEY (asset_type_ID) REFERENCES asset_type (asset_type_ID)
 );
 
@@ -24,12 +26,14 @@ CREATE TABLE barcode (
 -- Role table
 CREATE TABLE role (
     role_ID INT AUTO_INCREMENT PRIMARY KEY,
-    role_name VARCHAR(50) NOT NULL
+    role_name VARCHAR(50) NOT NULL,
+    role_status ENUM('active', 'inactive') DEFAULT 'active'
 );
 -- Unit table
 CREATE TABLE unit (
     unit_ID INT AUTO_INCREMENT PRIMARY KEY,
-    unit_name VARCHAR(100) NOT NULL
+    unit_name VARCHAR(100) NOT NULL,
+    unit_status ENUM('active', 'inactive') DEFAULT 'active'
 );
 
 -- User table
@@ -61,9 +65,9 @@ CREATE TABLE asset (
 CREATE TABLE account (
     account_ID INT AUTO_INCREMENT PRIMARY KEY,
     user_ID INT,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    role_ID INT,
+    username VARCHAR(50) UNIQUE NULL,
+    password_hash VARCHAR(255) NULL,
+    role_ID INT NULL,
     remember_token VARCHAR(255),
     token_expiry DATETIME,
     FOREIGN KEY (user_ID) REFERENCES user(user_ID),

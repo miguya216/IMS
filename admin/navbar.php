@@ -1,17 +1,23 @@
 
+<!-- Notification Modal -->
+<div id="notifModal" class="notif-modal">
+    <div id="responseMessage"></div>
+</div>
 
-<!-- Visible Menu Button (when sidebar is closed) -->
   <nav> 
-    
+  <div class="content">
     <ul class="sidebar shrink">
-        <li class="sidebar-header">
-        <span class="sidebar-title"><?= htmlspecialchars($_SESSION['full_name']) ?></span>
-        </li>
-
-        <li><button id="menu-btn">
+        
+        <li>
+            <button id="menu-btn">
                 <img src="imgs\menu-btn.png" alt="Menu" width="30">
             </button>
         </li>
+
+        <li class="sidebar-header">
+            <span class="sidebar-title"><?= htmlspecialchars($_SESSION['full_name']) ?></span>
+        </li>
+        
         <li>
             <a href="home.php">
                 <img src="imgs/home.png" alt="Home" class="nav-icon"> 
@@ -37,24 +43,25 @@
             </a>
         </li>
         <li>
-            <a href="request.php">
+            <a href="#">
                 <img src="imgs/request.png" alt="Request" class="nav-icon">
                 <span>Request</span>
             </a>
         </li>
         <li>
-            <a href="borrowed.php">
+            <a href="#">
                 <img src="imgs/borrowed.png" alt="Borrow" class="nav-icon">
                 <span>Borrow</span>
             </a>
         </li>
 
         <li>
-            <a href="../logout.php">
+            <a href="../logout.php" class="logout-link">
                 <img src="imgs/logout.png" alt="Logout" class="nav-icon">
                 <span>Logout</span>
             </a>
         </li>
-        
     </ul>
+    </div>
 </nav>
+ 

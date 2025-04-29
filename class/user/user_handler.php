@@ -14,7 +14,44 @@ class User {
         try {
             // Begin transaction
             $this->pdo->beginTransaction();
-    
+
+             // Check if the role exists
+             if(!empty($role) || $role == !null){
+                if(is_numeric($role)){
+                    $stmtRole = $this->pdo->prepare("SELECT role_ID FROM role WHERE role_ID = ?");
+                    $stmtRole->execute([$role]);
+                    $role_id = $stmtRole->fetch()['role_ID'];
+                }else{
+                    $stmtRole = $this->pdo->prepare("SELECT role_ID FROM role WHERE role_name = ?");
+                    $stmtRole->execute([$role]);
+                    if ($stmtRole->rowCount() == 0) {
+                        $insertRole = $this->pdo->prepare("INSERT INTO role (role_name) VALUES (?)");
+                        $insertRole->execute([$role]);
+                        $role_id = $this->pdo->lastInsertId();
+                        }else{
+                            $role_id = $stmtRole->fetch()['role_ID'];
+                        }
+                }
+            }else{
+                $role_id = null;
+            }
+
+            if(is_numeric($unit)){
+                $stmt = $this->pdo->prepare("SELECT unit_ID FROM unit WHERE unit_ID = ?");
+                $stmt->execute([$unit]);
+                $unit_id = $stmt->fetch()['unit_ID'];
+            }else{
+                $stmt = $this->pdo->prepare("SELECT unit_ID FROM unit WHERE unit_name = ?");
+                $stmt->execute([$unit]);
+                if ($stmt->rowCount() == 0) {
+                    $insert = $this->pdo->prepare("INSERT INTO unit (unit_name) VALUES (?)");
+                    $insert->execute([$unit]);
+                    $unit_id = $this->pdo->lastInsertId();
+                } else {
+                    $unit_id = $stmt->fetch()['unit_ID'];
+                }
+            }
+        
             // Check if the user already exists in the unit
             $stmt = $this->pdo->prepare("
                 SELECT u.user_ID 
@@ -38,17 +75,6 @@ class User {
                 }
             }
     
-            // Check unit existence or insert new one
-            $stmt = $this->pdo->prepare("SELECT unit_ID FROM unit WHERE unit_name = ?");
-            $stmt->execute([$unit]);
-            if ($stmt->rowCount() == 0) {
-                $insert = $this->pdo->prepare("INSERT INTO unit (unit_name) VALUES (?)");
-                $insert->execute([$unit]);
-                $unit_id = $this->pdo->lastInsertId();
-            } else {
-                $unit_id = $stmt->fetch()['unit_ID'];
-            }
-    
             // Insert new user
             $stmt = $this->pdo->prepare("INSERT INTO user (full_name, unit_id) VALUES (:full_name, :unit_id)");
             $stmt->execute([
@@ -57,24 +83,17 @@ class User {
             ]);
             $userId = $this->pdo->lastInsertId();
     
-            // Check if the role exists
-            $stmtRole = $this->pdo->prepare("SELECT role_ID FROM role WHERE role_name = ?");
-            $stmtRole->execute([$role]);
-            if ($stmtRole->rowCount() == 0) {
-               $insertRole = $this->pdo->prepare("INSERT INTO role (role_name) VALUES (?)");
-               $insertRole->execute([$role]);
-               $role_id = $this->pdo->lastInsertId();
-            }else{
-                $role_id = $stmtRole->fetch()['role_ID'];
-            }
-    
             // Create account if credentials were provided
-            if (!empty($role) && !empty($username) && !empty($password)) {
+            if(!empty($password)){
                 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-    
+            }else{
+                $hashedPassword = null;
+            }
+            
+            if(!empty($username) && $role_ID = !null && $hashedPassword = !null){
                 $stmtAccount = $this->pdo->prepare("
-                    INSERT INTO account (user_id, username, password_hash, role_id)
-                    VALUES (:user_id, :username, :password_hash, :role_id)
+                INSERT INTO account (user_id, username, password_hash, role_id)
+                VALUES (:user_id, :username, :password_hash, :role_id)
                 ");
                 $stmtAccount->execute([
                     ':user_id' => $userId,
@@ -83,6 +102,7 @@ class User {
                     ':role_id' => $role_id
                 ]);
             }
+              
     
             $this->pdo->commit();
             return true;
@@ -125,9 +145,13 @@ class UpdateUser {
             // Track changes
             $changes = false;
             if ($fullname !== $currentData['full_name']) $changes = true;
+
             if ((int)$unit_ID !== (int)$currentData['unit_ID']) $changes = true;
+
             if (!empty($username) && $username !== $currentData['username']) $changes = true;
+
             if (!empty($password)) $changes = true;
+            
             if (!empty($role)) {
                 // Get role ID for comparison
                 $stmt = $this->pdo->prepare("SELECT role_ID FROM role WHERE role_name = ?");

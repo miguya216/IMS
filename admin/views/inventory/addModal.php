@@ -13,31 +13,30 @@ function addModal () {
         <input type="hidden" value="none" name="asset" id="asset_hidden">
         <input type="hidden" value="none" name="unit" id="unit_hidden">
         
-            <h1>Insert Asset</h1>
-            <div class="notif-container">
-                <div id="add_responseMessage"></div>
-            </div>
+            <h3>Register New Asset</h3>
+     
+
             <div class="field-details">
                 
                 <div class="input-box">
-                    <label for="tag">Inventory Tag</label>
+                    <label for="tag">Inventory Tag:</label>
                     <input name="inventory_tag" type="text" class="form-control" id="tag" required>
                 </div>            
 
                 <div class="input-box">
-                    <label for="serialNum">Serial Number</label>
+                    <label for="serialNum">Serial Number:</label>
                     <input name="serial_num" type="text" class="form-control" id="serialNum" required>
                 </div>
 
                    <!-- BRAND -->
                    <div class="input-box">
-                    <label for="brand">Brand</label>
+                    <label for="brand">Brand:</label>
                         <select name="brand" class="form-control" id="brand" required>
                             <option value="" selected disabled>Select Brand (Add new if none)</option>
                             <?php foreach ($brands as $brand): ?>
                                 <option value="<?= htmlspecialchars($brand['brand_ID']) ?>"><?= htmlspecialchars($brand['brand_name']) ?></option>
                             <?php endforeach; ?>
-                            <option value="__new_brand__">➕ Add new...</option>
+                            <option value="__new_brand__">✙ Add new...</option>
                         </select>
                     </div>
                     <div class="input-box">
@@ -47,13 +46,13 @@ function addModal () {
 
                 <!-- ASSET TYPE -->
                 <div class="input-box">
-                    <label for="asset">Asset Type</label>
+                    <label for="asset">Asset Type:</label>
                         <select name="asset" class="form-control" id="asset" required>
                             <option value="" selected disabled>Select Asset Type (Add new if none)</option>
                             <?php foreach ($assetTypes as $type): ?>
                                 <option value="<?= htmlspecialchars($type['asset_type_ID']) ?>"><?= htmlspecialchars($type['asset_type']) ?></option>
                             <?php endforeach; ?>
-                            <option value="__new_asset_type__">➕ Add new...</option>
+                            <option value="__new_asset_type__">✙ Add new...</option>
                         </select>
                 </div>
                 <div class="input-box">
@@ -63,13 +62,13 @@ function addModal () {
 
                 <!-- RESPONSIBLE TO -->
                 <div class="input-box">
-                    <label for="responsibleTo">Responsible To</label>
+                    <label for="responsibleTo">Responsible To:</label>
                         <select name="responsibleTo" class="form-control" id="responsibleTo" required>
                             <option value="" selected disabled>Select User (Add new if none)</option>
                             <?php foreach ($users as $user): ?>
                                 <option value="<?= htmlspecialchars($user['user_ID']) ?>"><?= htmlspecialchars($user['full_name']) ?></option>
                             <?php endforeach; ?>
-                            <option value="__new_responsibleTo__">➕ Add new...</option>
+                            <option value="__new_responsibleTo__">✙ Add new...</option>
                         </select>
                 </div>
                 <div class="input-box">
@@ -79,13 +78,13 @@ function addModal () {
 
                 <!-- UNIT -->
                 <div class="input-box">
-                    <label for="unit">Unit/Institute</label>
+                    <label for="unit">Unit/Institute:</label>
                         <select name="unit" class="form-control" id="unit" required>
                             <option value="" selected disabled>Select Unit (Add new if none)</option>
                             <?php foreach ($units as $unit): ?>
                                 <option value="<?= htmlspecialchars($unit['unit_ID']) ?>"><?= htmlspecialchars($unit['unit_name']) ?></option>
                             <?php endforeach; ?>
-                            <option value="__new_unit__">➕ Add new...</option>
+                            <option value="__new_unit__">✙ Add new...</option>
                         </select>
                 </div>
                 <div class="input-box">
@@ -94,8 +93,8 @@ function addModal () {
                 </div>
 
                 <div class="input-box">
-                    <button type="submit" class="btn" id="saveDetails">Add Item</button>
-                    <li type=""submit class="btn" id="close_add">Close</li>
+                    <button type="submit" class="btn" id="saveDetails">Register</button>
+                    <li type="" submit class="btn" id="close_add">Close</li>
                 </div> 
 
             </div>      
