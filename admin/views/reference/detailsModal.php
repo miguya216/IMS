@@ -10,12 +10,12 @@ function detailsRefModal (){
                 <div class="field-details">
                     <input type="hidden" name="entity_type" id="entity_type" />
                     <div class="input-box">
-                        <label>Role ID:</label>
+                        <label> ID:</label>
                         <input name="entity_ID" type="text" class="form-control" id="entity_ID" readonly>
                     </div>
 
                     <div class="input-box">
-                        <label>Role Name:</label>
+                        <label> Name:</label>
                         <input name="entity_name" type="text" class="form-control" id="entity_name" required>
                     </div>
                 

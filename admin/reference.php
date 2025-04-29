@@ -1,9 +1,9 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\auth\web_protector.php';
 include ('head.php');
-if (file_exists('views\reference\rolesList.php')) {
+if (file_exists('views\reference\refList.php')) {
     define('IN_APP', true); 
-    include ('views\reference\rolesList.php'); 
+    include ('views\reference\refList.php'); 
     include('views\reference\detailsModal.php');
     // include('views\inventory\addModal.php');
 } else {
@@ -27,23 +27,19 @@ if (file_exists('views\reference\rolesList.php')) {
     </div> -->
     <?php head();?>
         <div class="field-inventory">
-            <div>
-                    <?php roleList(); ?>
-            </div>
+                    <?php refList(); ?>
         </div>
     
-    
-    <div>
+
         <?php 
             include ('navbar.php'); 
         ?>
-    </div>
 
-    <div>
+
         <?php 
           detailsRefModal();
         ?>
-    </div>
+   
     
 <!-- JavaScript -->
 <script src="script/script.js"></script>

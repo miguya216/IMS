@@ -311,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
         button.addEventListener('click', () => {
             const serial = button.getAttribute('data-serial');
             if (!serial) return;
-            if (confirm(`Are you sure you want to delete user with User ID: ${serial}?`)) {
+            if (confirm(`Are you sure you want to delete Asset with serial number: ${serial}?`)) {
                 fetch('/ims/auth/asset/deleteAuth.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -320,7 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(res => res.text())
                 .then(response => {
                     if (response.trim().toLowerCase() === 'success') {
-                        showPopup('User successfully inactivated.', '#005a34');
+                        showPopup('Asset successfully inactivated.', '#005a34');
                         setTimeout(() => location.reload(), 1500);
                     } else {
                         showPopup('Error: ' + response, '#FF0000');
@@ -468,6 +468,33 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+// Start of delete users
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.btn-delete').forEach(button => {
+        button.addEventListener('click', () => {
+            const user = button.getAttribute('data-user');
+            if (!user) return;
+            if (confirm(`Are you sure you want to delete user with User ID: ${user}?`)) {
+                fetch('/ims/auth/users/deleteAuth.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ user })
+                })
+                .then(res => res.text())
+                .then(response => {
+                    if (response.trim().toLowerCase() === 'success') {
+                        showPopup('User successfully inactivated.', '#005a34');
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        showPopup('Error: ' + response, '#FF0000');
+                    }
+                })
+                .catch(() => showPopup('Something went wrong.', '#FF0000'));
+            }
+        });
+    });
+});
+
 // Field toggle handler
 function toggleNewField(selectId, inputId, triggerValue) {
     const select = document.getElementById(selectId), input = document.getElementById(inputId);
@@ -540,36 +567,59 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-    
 
-    document.querySelectorAll('.btn-delete').forEach(button => {
-        button.addEventListener('click', async () => {
-            const types = ["role", "unit", "assetType", "brand"];
-            const type = types.find(t => button.dataset[t.toLowerCase()]);
-            const id = button.dataset[type?.toLowerCase()];
 
-            if (!id || !type) return;
+// Start of delete reference
 
-            const confirm = await showPopup(`Are you sure you want to delete ${type.replace('_', ' ')} with ID: ${id}?`, "confirm");
-            if (!confirm) return;
+document.querySelectorAll('.btn-delete').forEach(button => {
+    button.addEventListener('click', () => {
+        let type = '';
+        let id = '';
 
-            try {
-                const res = await fetch('/ims/auth/reference/deleteAuth.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams({ id, type: type.toLowerCase() })
-                });
-                const text = (await res.text()).trim().toLowerCase();
-                if (text === "success") {
-                    showPopup(`${type.replace('_', ' ')} successfully deleted.`, "success");
-                    setTimeout(() => location.reload(), 500);
+        if (button.hasAttribute('data-role')) {
+            type = 'role';
+            id = button.getAttribute('data-role');
+        } else if (button.hasAttribute('data-unit')) {
+            type = 'unit';
+            id = button.getAttribute('data-unit');
+        } else if (button.hasAttribute('data-asset-type')) {
+            type = 'asset_type';
+            id = button.getAttribute('data-asset-type');
+        } else if (button.hasAttribute('data-brand')) {
+            type = 'brand';
+            id = button.getAttribute('data-brand');
+        }
+
+        if (!type || !id) return;
+
+        if (confirm(`Are you sure you want to delete this ${type.replace('_', ' ')}?`)) {
+            const payload = new URLSearchParams({
+                id,
+                type
+            });
+
+            // Add specific field name required by backend
+            payload.append(`${type}_ID`, id);
+            
+            fetch('/ims/auth/reference/deleteAuth.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: payload
+            })
+            .then(res => res.text())
+            .then(response => {
+                if (response.trim().toLowerCase() === 'success') {
+                    showPopup(`${type.replace('_', ' ')} successfully deleted.`, '#005a34');
+                    setTimeout(() => location.reload(), 1500);
                 } else {
-                    showPopup(`Error: ${text}`, "error");
+                    showPopup('Error: ' + response, '#FF0000');
                 }
-            } catch (err) {
-                console.error(err);
-                showPopup("Something went wrong.", "error");
-            }
-        });
+            })
+            .catch(() => showPopup('Something went wrong.', '#FF0000'));
+        }
     });
+});
+
 });

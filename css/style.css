@@ -358,30 +358,30 @@ body {
 /* end of modal
 
 /* Dashboard Cards */
-/* Dashboard Cards */
+/* Container for all cards */
 .card-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    justify-content: flex-start;
-    align-items: stretch;
-    padding: 16px;
-    width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  justify-content: flex-start;
+  align-items: stretch;
+  padding: 16px;
+  width: 100%;
 }
 
+/* Shared card base style */
 .card {
-    height: 300px;
-    flex: 1 1 220px;
-    max-width: 360px;
-    background: linear-gradient(to bottom right, #f9f9f9, #f1f1f1);
-    border-radius: 12px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    padding: 16px;
-    transition: transform 0.2s ease, box-shadow 0.3s ease;
-    min-height: 150px;
-    overflow: hidden; /* prevent overflow */
+  height: 360px;
+  flex: 1 1 300px;
+  max-width: 360px;
+  background: linear-gradient(to bottom right, #f9f9f9, #f1f1f1);
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  overflow: hidden;
 }
 
 .card:hover {
@@ -431,7 +431,7 @@ body {
 }
 
 
-/* start of table related */
+
 /* .header-inventory {
     
     opacity: 1;
@@ -443,6 +443,8 @@ body {
     padding: 10px;
     color: black;
 } */
+
+/* start of table related */
 .head-section {
     display: flex;
     justify-content: space-between; /* Spread left and right */
@@ -584,27 +586,14 @@ body {
     width: 100%;
     white-space: nowrap;
     scrollbar-width: thin;              /* For Firefox */
-    scrollbar-color: rgb(65, 65, 65) rgb(51, 51, 51);
+    scrollbar-color: rgb(251, 234, 200);
 }
-
-/* For Chrome, Edge, and Safari */
-.invt-table-data::-webkit-scrollbar {
-    height: 8px;
-    width: 8px;
-    max-height: 225px;
-   
-}
-
-.invt-table-data::-webkit-scrollbar-track {
-    background: #333;
-    border-radius: 10px;
-}
-
 .invt-table-box {
     width: 100%;
     border-collapse: collapse;
     border-radius: 8px;
 }
+
 table {
     border-collapse: separate;
     border-spacing: 0;
@@ -612,6 +601,7 @@ table {
     overflow: hidden;
     background-color: white;
     color: rgb(30, 30, 30);
+    table-layout: auto; /* allow content to define column width */
 }
 
 thead th {
@@ -622,17 +612,17 @@ thead th {
 }
 
 .invt-table-box th, .invt-table-box td {
-    min-width: 150px;
+    max-width: 200px; /* ✅ limit max width */
     white-space: nowrap; 
     overflow: hidden;
     text-overflow: ellipsis;
+    font-size: clamp(0.75rem, 1vw, 1rem); /* ✅ responsive text resizing */
 }
 
 .invt-table-box thead {
     text-align: center;
     background: linear-gradient(to bottom right, #005a34, #009708);
     color: white;
-    width: auto;
     position: sticky;
     top: 0;
     padding: 2px 5px;
@@ -640,19 +630,15 @@ thead th {
 }
 
 .invt-table-box td {
-    padding: 7px 10px;
-    border: 0.1px solid;
+    padding: 2px 5px;
     white-space: normal;
+    height: 50px; /* ✅ Fixed height – adjust as needed */
 }
 
 .invt-table-box tr {
     scroll-snap-align: start;
 }
 
-
-.invt-header-box th, .invt-table-box td {
-    width: calc(100% /6); 
-}
 
 .invt-table-box tbody tr:nth-child(even) {
     background: rgb(255, 233, 233);
@@ -725,67 +711,50 @@ thead th {
     gap: 10px;
     justify-content: center;
 }
-
-.reference-container {
+/* Specific style for table cards */
+.table-card {
     display: flex;
-    flex-wrap: nowrap;
-    gap: 5px;
-    justify-content: center;
-    margin-bottom: 20px;
-}
-
-.reference-container .invt-table-data {
-    flex: 1 1 45%;
-    min-width: 100px;
-    max-width: 350px;
-    background: rgb(235, 235, 235);
-    border-radius: 10px;
-    padding: 10px;
-    box-sizing: border-box;
-    overflow: auto;
-    transition: all 0.4s ease;
-}
-
-.reference-container .invt-table-data:hover {
-    transform: translateY(-30px ) scale(1.05); /* slight lift on hover */
-    box-shadow: 0 8px 16px rgba(0,0,0,0.3); /* stronger shadow on hover */
-    
-}
-
-.reference-container .invt-input-box .btn {
-    width: 45px;
-    height: 45px;
-    object-fit: contain;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-    padding: 8px;              
-    border-radius: 50%;         
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.reference-container .invt-table-box th, .invt-table-box td{
-    min-width: 100px;
-    white-space: nowrap; 
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding: 0;
-    font-size: 14px;
-}
-
-.reference-container table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: center;
-}
-
-.reference-container th,
-.reference-container td {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+.invt-table-box td, .invt-table-box th {
     text-align: center;
     vertical-align: middle;
-    padding: 8px;
 }
+
+  
+/* Title of the table */
+.table-card h3 {
+    margin-top: 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* Scrollable table area */
+.table-card .invt-table-data {
+    width: 100%;
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 8px;
+    scrollbar-gutter: stable; /* Prevent layout shift */
+}
+  
+/* Custom Scrollbar */
+.table-card .invt-table-data::-webkit-scrollbar {
+    width: 6px;
+}
+.table-card .invt-table-data::-webkit-scrollbar-thumb {
+    background-color: rgb(251, 234, 200);
+    border-radius: 3px;
+}
+
+.inactive {
+    color: red;
+    font-weight: bold;
+}
+
+  
 /* Mobile Responsive Card View */
 @media screen and (max-width: 768px) {
     .action-buttons .btn {

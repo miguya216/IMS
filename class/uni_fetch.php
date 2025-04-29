@@ -10,19 +10,19 @@ class DataFetcher {
     }
 
     public function getAllAssetTypes() {
-        return $this->fetchAll("SELECT * FROM asset_type");
+        return $this->fetchAll("SELECT * FROM asset_type WHERE asset_type_status = 'active'");
     }
 
     public function getAllBrands() {
-        return $this->fetchAll("SELECT * FROM brand");
+        return $this->fetchAll("SELECT * FROM brand WHERE brand_status = 'active'");
     }
 
     public function getAllUnits() {
-        return $this->fetchAll("SELECT * FROM unit");
+        return $this->fetchAll("SELECT * FROM unit WHERE unit_status = 'active'");
     }
 
     public function getAllRoles() {
-        return $this->fetchAll("SELECT * FROM role");
+        return $this->fetchAll("SELECT * FROM role WHERE role_status = 'active'");
     }
 
     public function getAllBarcodes() {
@@ -30,7 +30,7 @@ class DataFetcher {
     }
 
     public function getAllUsers() {
-        return $this->fetchAll("SELECT * FROM user");
+        return $this->fetchAll("SELECT * FROM user WHERE user_status = 'active'");
     }
 
     public function getAllAssets() {

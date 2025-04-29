@@ -29,10 +29,10 @@ function itemList(){
                                         foreach ($assets as $row) {
                                             echo "<tr>";
                                             echo "<td data-label='Serial Number'>" . htmlspecialchars($row['serial_number']) . "</td>";
-                                            echo "<td data-label='Asset Type'>" . htmlspecialchars($row['asset_type']) . "</td>";
-                                            echo "<td data-label='Brand Name'>" . htmlspecialchars($row['brand_name']) . "</td>";
-                                            echo "<td data-label='Responsible to'>" . htmlspecialchars($row['responsible_user']) . "</td>";
-                                            echo "<td data-label='Unit'>" . htmlspecialchars($row['user_unit']) . "</td>";
+                                            echo "<td class = '". htmlspecialchars($row['asset_type_status']) ."'  data-label='Asset Type'>" . htmlspecialchars($row['asset_type']) . "</td>";
+                                            echo "<td class = '". htmlspecialchars($row['brand_status']) ."'  data-label='Brand Name'>" . htmlspecialchars($row['brand_name']) . "</td>";
+                                            echo "<td class = '". htmlspecialchars($row['user_status']) ."'  data-label='Responsible to'>" . htmlspecialchars($row['responsible_user']) . "</td>";
+                                            echo "<td class = '". htmlspecialchars($row['unit_status']) ."'  data-label='Unit'>" . htmlspecialchars($row['user_unit']) . "</td>";
                                             echo "<td data-label='Action'>
                                                     <div class='action-buttons'>
                                                             <img id='edit-" . htmlspecialchars($row['serial_number']) . "' class='btn-edit' src='imgs/detail.png' alt='Details' />

@@ -3,15 +3,15 @@ if (!defined('IN_APP')) {
 die("Access Denied");
 }
 require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\class\uni_fetch.php';
-function roleList(){ 
+function refList(){ 
 $fetcher = new DataFetcher();
 $roles = $fetcher->getAllRoles();
 $units = $fetcher->getAllUnits();
 $asset_types = $fetcher->getAllAssetTypes();
 $brand = $fetcher->getAllBrands();
 ?>
-
-<div class="reference-container">
+<div class="card-container">
+<div class="card table-card">
 <div class="invt-table-data">
         <div class="invt-table-name">
             <span>Role Table</span>
@@ -57,55 +57,57 @@ $brand = $fetcher->getAllBrands();
                     </tbody>
                 </table>
 </div>
-
-            
-<div class="invt-table-data">
-<div class="invt-table-name">
-    <span>Unit Table</span>
-</div>
-    <table class="invt-table-box" id="unitTable">      
-                    <thead>
-                        <tr>
-                            <th hidden>Unit ID</th>
-                            <th>Unit Name</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead> 
-                    <tbody>
-                    <?php
-                        if ($units && count($units) > 0) {
-                            foreach ($units as $row) {
-                                echo "<tr>";
-                                echo "<td hidden>" . $row['unit_ID'] . "</td>";
-                                echo "<td>" . $row['unit_name'] . "</td>";
-                                echo "<td>
-                                        <img 
-                                            data-entity='unit' 
-                                            data-id='" . htmlspecialchars($row['unit_ID']) . "' 
-                                            data-name='" . htmlspecialchars($row['unit_name']) . "' 
-                                            class='btn-edit' 
-                                            src='imgs/detail.png' 
-                                            alt='Details' 
-                                        />
-                                        <img 
-                                            class='btn-delete' 
-                                            data-unit='" . htmlspecialchars($row['unit_ID']) . "' 
-                                            src='imgs/delete.png' 
-                                            alt='Delete' 
-                                        />
-                                    </td>";
-                                echo "</tr>";
-                            }
-                        } else {
-                            echo "<tr><td colspan='6'>No units found.</td></tr>";
-                        }
-                        ?>
-                    </tbody>
-                </table>
 </div>
 
-<div class="invt-table-data">
-        
+<div class="card table-card">
+    <div class="invt-table-data">
+        <div class="invt-table-name">
+            <span>Unit Table</span>
+        </div>
+            <table class="invt-table-box" id="unitTable">      
+                            <thead>
+                                <tr>
+                                    <th hidden>Unit ID</th>
+                                    <th>Unit Name</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead> 
+                            <tbody>
+                            <?php
+                                if ($units && count($units) > 0) {
+                                    foreach ($units as $row) {
+                                        echo "<tr>";
+                                        echo "<td hidden>" . $row['unit_ID'] . "</td>";
+                                        echo "<td>" . $row['unit_name'] . "</td>";
+                                        echo "<td>
+                                                <img 
+                                                    data-entity='unit' 
+                                                    data-id='" . htmlspecialchars($row['unit_ID']) . "' 
+                                                    data-name='" . htmlspecialchars($row['unit_name']) . "' 
+                                                    class='btn-edit' 
+                                                    src='imgs/detail.png' 
+                                                    alt='Details' 
+                                                />
+                                                <img 
+                                                    class='btn-delete' 
+                                                    data-unit='" . htmlspecialchars($row['unit_ID']) . "' 
+                                                    src='imgs/delete.png' 
+                                                    alt='Delete' 
+                                                />
+                                            </td>";
+                                        echo "</tr>";
+                                    }
+                                } else {
+                                    echo "<tr><td colspan='6'>No units found.</td></tr>";
+                                }
+                                ?>
+                            </tbody>
+                        </table>
+    </div>
+</div>
+
+<div class="card table-card">
+    <div class="invt-table-data">
         <div class="invt-table-name">
             <span>Asset Type Table</span>
         </div>
@@ -149,13 +151,14 @@ $brand = $fetcher->getAllBrands();
 
                     </tbody>
                 </table>
-            </div>
+    </div>
+</div>
 
-            
-            <div class="invt-table-data">
+<div class="card table-card">
+    <div class="invt-table-data">
             <div class="invt-table-name">
-            <span>Brand Table</span>
-        </div>
+                <span>Brand Table</span>
+            </div>
         
                 <table class="invt-table-box" id="BrandTable">      
                     <thead>
@@ -197,10 +200,7 @@ $brand = $fetcher->getAllBrands();
 
                     </tbody>
                 </table>
-            </div>
+    </div>
 </div>
-
-<div class="reference-container">
-
 </div>
 <?php } ?>

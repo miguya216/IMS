@@ -30,13 +30,13 @@ function userList(){
                                                 echo "<tr>";
                                                 echo "<td data-label='User ID'>" . htmlspecialchars($row['user_ID']) . "</td>";
                                                 echo "<td data-label='Full Name'>" . htmlspecialchars($row['full_name']) . "</td>";
-                                                echo "<td data-label='Unit'>" . htmlspecialchars($row['unit_name']) . "</td>";
+                                                echo "<td class = '". htmlspecialchars($row['unit_status']) ."' data-label='Unit'>" . htmlspecialchars($row['unit_name']) . "</td>";
                                                 echo "<td data-label='Username'>" . htmlspecialchars($row['username']) . "</td>";
-                                                echo "<td data-label='Role'>" . htmlspecialchars($row['role_name']) . "</td>";
+                                                echo "<td class = '". htmlspecialchars($row['role_status']) ."' data-label='Role'>" . htmlspecialchars($row['role_name']) . "</td>";
                                                 echo "<td data-label='Action'>
                                                         <div class='action-buttons'>
                                                         <img id='edit-" . htmlspecialchars($row['user_ID']) . "' class='btn-edit' src='imgs/detail.png' alt='Details' />
-                                                        <img class='btn-delete' data-serial='" . htmlspecialchars($row['user_ID']) . "' src='imgs/delete.png' alt='Delete' />
+                                                        <img class='btn-delete' data-user='" . htmlspecialchars($row['user_ID']) . "' src='imgs/delete.png' alt='Delete' />
                                                         </div>
                                                       </td>";
                                                 echo "</tr>";
