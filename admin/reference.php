@@ -16,7 +16,7 @@ if (file_exists('views\reference\refList.php')) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reference</title>
+    <title>Reference Data</title>
     <link rel="stylesheet" href="\ims\bootstrap\css\bootstrap.min.css">
     <script src="\ims\bootstrap\js\bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="\ims\css\style.css">

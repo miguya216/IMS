@@ -73,6 +73,11 @@ function searchUser() {
 }
 // end of dynamic Searching
 
+// start of request form tab
+function openRequestForm(){
+    window.open('/ims/admin/requestForm.php', 'KLD IMS | Request Form');
+}
+//
 // start of reusable popup modal
 function showPopup(message, color = '#005a34') {
     const notifModal = document.getElementById('notifModal');

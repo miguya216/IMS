@@ -32,9 +32,8 @@ if (file_exists('views/users/userList.php')) {
                         <!-- <div class="invt-field-header">
                         </div> -->
                             <div class="invt-input-box">
-                                <input type="text" class="search-bar" id="searchInputUser" placeholder="Search Users" onkeyup="searchUser()" >
                                 <img type="button" class="button-add" id="addUserBtn" src="imgs/add.png" alt="Add Items">
-                                      
+                                <input type="text" class="search-bar" id="searchInputUser" placeholder="Search Users" onkeyup="searchUser()" >    
                             </div>
                     </div>
                 </form>

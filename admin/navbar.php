@@ -43,15 +43,15 @@
             </a>
         </li>
         <li>
-            <a href="#">
+            <a href="request.php">
                 <img src="imgs/request.png" alt="Request" class="nav-icon">
                 <span>Request</span>
             </a>
         </li>
         <li>
-            <a href="#">
+            <a href="checkedOut-items.php">
                 <img src="imgs/borrowed.png" alt="Borrow" class="nav-icon">
-                <span>Borrow</span>
+                <span>Checked-Out Items</span>
             </a>
         </li>
 

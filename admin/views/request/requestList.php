@@ -1,6 +1,10 @@
-<?php function requestList(){ ?>
-    <div class="brw-table-data">
-    <table class="brw-table-box" id="inventoryTable">      
+<?php 
+if (!defined('IN_APP')) {
+die("Access Denied");
+}
+function requestList(){ ?>
+    <div class="invt-table-data">
+    <table class="invt-table-box" id="requestTable">      
         <thead>
             <tr>
                 <th>Item Name</th>
@@ -23,7 +27,7 @@
                 <td>2025-03-10</td>
                 <td>Borrowed</td>
                 <td>
-                    <button class="btn btn-edit">Details</button>
+                    <img class='btn-edit' src='imgs/detail.png' alt='Details' />
                 </td>
             </tr>
             <tr>
@@ -35,7 +39,7 @@
                 <td>2025-03-05</td>
                 <td>Returned</td>
                 <td>
-                    <button class="btn btn-edit">Details</button>
+                    <img class='btn-edit' src='imgs/detail.png' alt='Details' />
                 </td>
             </tr>
             <tr>
@@ -47,7 +51,7 @@
                 <td>2025-03-08</td>
                 <td>Borrowed</td>
                 <td>
-                    <button class="btn btn-edit">Details</button>
+                    <img class='btn-edit' src='imgs/detail.png' alt='Details' />
                 </td>
             </tr>
             <tr>
@@ -59,7 +63,7 @@
                 <td>2025-03-12</td>
                 <td>Borrowed</td>
                 <td>
-                    <button class="btn btn-edit">Details</button>
+                    <img class='btn-edit' src='imgs/detail.png' alt='Details' />
                 </td>
             </tr>
             <tr>
@@ -71,7 +75,7 @@
                 <td>2025-03-15</td>
                 <td>Borrowed</td>
                 <td>
-                    <button class="btn btn-edit">Details</button>
+                    <img class='btn-edit' src='imgs/detail.png' alt='Details' />
                 </td>
             </tr>
         </tbody>

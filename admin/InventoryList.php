@@ -22,28 +22,22 @@ if (file_exists('views/inventory/itemList.php')) {
     <link rel="stylesheet" href="\ims\css\style.css">
 </head>
 <body> 
-  
-    <!-- <div id="inventory" class="header-inventory">
-    </div> -->
+
         <?php head();?>
+
         <div class="field-inventory">
                 <form id="searchForm">
                     <div class="invt-field-details">
-                        <!-- <div class="invt-field-header">
-                        </div> -->
                             <div class="invt-input-box">
+                                <img type="button" id="addItemBtn" src="imgs/add.png" alt="Add Items" class="button-add">
                                 <input type="text" class="search-bar" id="searchInput" placeholder="Search Asset" onkeyup="searchInventory()">
-                                    
-                                        <img type="button" id="addItemBtn" src="imgs/add.png" alt="Add Items" class="button-add">
-                                        <img type="button" src="imgs/import.png" alt="Import file" class="button-add">
-                             
                             </div>
-                        
                     </div>
                 </form>
-            <div class="invt-list-container">
-                    <?php itemList(); ?>
-            </div>
+
+                <div class="invt-list-container">
+                        <?php itemList(); ?>
+                </div>
         </div>
    
         <?php include ('navbar.php'); ?>
