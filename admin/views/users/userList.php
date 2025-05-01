@@ -12,7 +12,7 @@ function userList(){
                     <span>Users Table</span>
                 </div> -->
                     <div class="invt-table-data">
-                        <table class="invt-table-box" id="userTable">      
+                        <table class="invt-table-box filterable-table" id="userTable">      
                             <thead>
                                 <tr>
                                     <th>user ID</th>

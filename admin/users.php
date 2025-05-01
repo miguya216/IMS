@@ -34,6 +34,17 @@ if (file_exists('views/users/userList.php')) {
                             <div class="invt-input-box">
                                 <img type="button" class="button-add" id="addUserBtn" src="imgs/add.png" alt="Add Items">
                                 <input type="text" class="search-bar" id="searchInputUser" placeholder="Search Users" onkeyup="searchUser()" >    
+                                <select id="mainFilter" class="dropdown-filter">
+                                    <option value="">Filter by...</option>
+                                    <option value="1">name</option>
+                                    <option value="2">unit</option>
+                                    <option value="3">username</option>
+                                    <option value="4">role</option>
+                                </select>
+
+                                <select id="subFilter" class="dropdown-filter" disabled>
+                                <option value="">Select a value</option>
+                                </select>
                             </div>
                     </div>
                 </form>

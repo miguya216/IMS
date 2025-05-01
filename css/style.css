@@ -606,12 +606,23 @@ body {
 
 .invt-input-box {
     min-width: 500px; /* Prevents shrinking too much */
-    max-width: 500px; /* Limits max width */
+    max-width: auto; /* Limits max width */
     align-items: center;
     gap: 10px; /* Space between input and buttons */
     flex-wrap: wrap; /* Optional: allows wrapping on small screens */
     display: flex;
+    color: black;
 }
+.dropdown-filter {
+    display: flex;
+    justify-content: flex-end;
+    padding: 5px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 150px;
+}
+
 
 .search-bar {
     padding: 5px;

@@ -73,6 +73,49 @@ function searchUser() {
 }
 // end of dynamic Searching
 
+// start of dynamic populate filter
+document.addEventListener("DOMContentLoaded", function () {
+    const mainFilter = document.getElementById("mainFilter");
+    const subFilter = document.getElementById("subFilter");
+    const table = document.querySelector(".filterable-table");
+    const rows = table.querySelectorAll("tbody tr");
+
+    mainFilter.addEventListener("change", () => {
+        const colIndex = parseInt(mainFilter.value, 10);
+        subFilter.innerHTML = `<option value="">Select a value</option>`;
+        subFilter.disabled = true;
+
+        if (!isNaN(colIndex)) {
+            const uniqueValues = new Set();
+            rows.forEach(row => {
+                const text = row.cells[colIndex].textContent.trim();
+                if (text) uniqueValues.add(text);
+            });
+
+            [...uniqueValues].sort().forEach(val => {
+                const option = document.createElement("option");
+                option.value = val;
+                option.textContent = val;
+                subFilter.appendChild(option);
+            });
+
+            subFilter.disabled = false;
+        }
+    });
+
+    subFilter.addEventListener("change", () => {
+        const colIndex = parseInt(mainFilter.value, 10);
+        const selected = subFilter.value.toLowerCase();
+
+        rows.forEach(row => {
+            const cellText = row.cells[colIndex].textContent.toLowerCase();
+            row.style.display = !selected || cellText === selected ? "" : "none";
+        });
+    });
+});
+
+// end of dynamic populate filter
+
 // start of request form tab
 function openRequestForm(){
     window.open('/ims/admin/requestForm.php', 'KLD IMS | Request Form');

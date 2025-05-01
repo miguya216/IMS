@@ -12,7 +12,7 @@ function itemList(){
                     <span>Asset Table</span>
                 </div> -->
                     <div class="invt-table-data">
-                        <table class="invt-table-box" id="inventoryTable">      
+                        <table class="invt-table-box filterable-table" id="inventoryTable">      
                             <thead>
                                 <tr>
                                     <th>Serial Number</th>

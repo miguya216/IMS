@@ -31,6 +31,17 @@ if (file_exists('views/inventory/itemList.php')) {
                             <div class="invt-input-box">
                                 <img type="button" id="addItemBtn" src="imgs/add.png" alt="Add Items" class="button-add">
                                 <input type="text" class="search-bar" id="searchInput" placeholder="Search Asset" onkeyup="searchInventory()">
+                                <select id="mainFilter" class="dropdown-filter">
+                                    <option value="">Filter by...</option>
+                                    <option value="1">Asset Type</option>
+                                    <option value="2">Brand</option>
+                                    <option value="3">Responsible To</option>
+                                    <option value="4">Unit</option>
+                                </select>
+
+                                <select id="subFilter" class="dropdown-filter" disabled>
+                                <option value="">Select a value</option>
+                                </select>
                             </div>
                     </div>
                 </form>

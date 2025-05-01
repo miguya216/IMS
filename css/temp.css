@@ -19,15 +19,30 @@ body {
 
 }
 
+.request-body{
+    background-image: 
+    url('../admin/imgs/kld2.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
 /* Start of Navrbar */
 .sidebar {
+    background-image: 
+        linear-gradient(to bottom right, #005a34, #006705),
+        url('../admin/imgs/kld2.png');
+    background-blend-mode: overlay;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
     list-style: none;
     position: fixed;
     top: 0;
     left: 0;
     height: 100vh;
-    width: 250px; /* Default size */
-    background: linear-gradient(to bottom right, #005a34, #009708); 
+    width: 250px;
     backdrop-filter: blur(10px);
     transition: width 0.3s ease-in-out;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
@@ -37,6 +52,7 @@ body {
     justify-content: flex-start;
     z-index: 10;
 }
+
 /* Sidebar Header */
 .sidebar-header {
     display: flex;
@@ -431,55 +447,55 @@ body {
 }
 
 
-
-/* .header-inventory {
-    
-    opacity: 1;
-    font-size: 18px;
-    width: 100%;
-    background:rgb(235, 235, 235);
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    padding: 10px;
-    color: black;
-} */
-
-/* start of table related */
+/* start of head section*/
 .head-section {
     display: flex;
-    justify-content: space-between; /* Spread left and right */
+    justify-content: space-between;
     align-items: center;
-    background: rgb(250, 243, 233);
+    flex-wrap: wrap;
     padding: 8px;
-    margin-bottom: 5px;
+    background: rgb(250, 243, 233);
     border-radius: 8px;
-    color: black;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.left-head{
+
+.left-head {
+    margin-left: 15px;
     display: flex;
     align-items: center;
-    gap: 15px;
-}
-.right-head {
-    margin-right: 50px;
-    display: flex;
-    align-items: center;
-    gap: 30px;
+    gap: 10px;
+    white-space: nowrap;   /* Prevent wrap */
+    overflow: hidden;       /* Prevent overflow */
+    text-overflow: ellipsis;
+    flex-shrink: 0;         /* Don’t shrink */
 }
 
+
+.right-head {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    flex: 1;
+    min-width: 200px;
+    margin-right: 30px;
+}
 .head-section h1 {
     font-size: 20px;
     font-weight: 600;
     margin: 0;
     line-height: 1.4;
+    white-space: nowrap;   /* Prevent wrap */
 }
-.kld-logo{
+
+.kld-logo {
     width: 50px;
     height: 50px;
     object-fit: contain;
 }
+
 .icon-head {
     width: 45px;
     height: 45px;
@@ -494,9 +510,79 @@ body {
 .icon-head:hover {
     transform: scale(1.1);
     box-shadow: 0 0 5px rgb(120, 120, 120);
-    background:  rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.2);
 }
+@media (max-width: 768px) {
+    .head-section {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 12px;
+    }
 
+    .left-head {
+        flex-direction: row;   /* Ensure horizontal layout */
+        justify-content: flex-start;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: nowrap;     /* Key: don't wrap internally */
+        margin-bottom: 10px;
+    }
+
+    .right-head {
+        justify-content: flex-start;
+        width: 100%;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .icon-head {
+        width: 36px;
+        height: 36px;
+        padding: 6px;
+    }
+
+    .kld-logo {
+        width: 40px;
+        height: 40px;
+    }
+
+    .head-section h1 {
+        font-size: 18px;
+        white-space: nowrap;
+    }
+}
+/* end of head section*/
+
+/* .header-inventory {
+    
+    opacity: 1;
+    font-size: 18px;
+    width: 100%;
+    background:rgb(235, 235, 235);
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    color: black;
+} */
+
+/* .invt-field-header {
+    color: #ffffff;
+    width: 100%;
+    padding: 10px;
+    overflow-x: auto;
+} */
+
+/* .invt-input-box .btn {
+    padding: 8px;
+    font-size: 14px;
+    width: 150px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+} */
+ 
+/* start of table related */
 .field-inventory {
     pointer-events: auto;
     align-items: center;
@@ -510,12 +596,6 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.invt-field-header {
-    color: #ffffff;
-    width: 100%;
-    padding: 10px;
-    overflow-x: auto;
-}
 /* Input field container */
 .invt-field-details {
     margin-left: 15px;
@@ -531,15 +611,6 @@ body {
     gap: 10px; /* Space between input and buttons */
     flex-wrap: wrap; /* Optional: allows wrapping on small screens */
     display: flex;
-}
-.invt-input-box .btn {
-    padding: 8px;
-    font-size: 14px;
-    width: 150px; 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
 }
 
 .search-bar {
@@ -585,7 +656,7 @@ body {
     overflow-x: auto;
     width: 100%;
     white-space: nowrap;
-    scrollbar-width: thin;              /* For Firefox */
+    scrollbar-width: thin;   
     scrollbar-color: rgb(251, 234, 200);
 }
 .invt-table-box {
@@ -612,11 +683,11 @@ thead th {
 }
 
 .invt-table-box th, .invt-table-box td {
-    max-width: 200px; /* ✅ limit max width */
+    max-width: 200px;
     white-space: nowrap; 
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: clamp(0.75rem, 1vw, 1rem); /* ✅ responsive text resizing */
+    font-size: clamp(0.75rem, 1vw, 1rem);
 }
 
 .invt-table-box thead {
@@ -632,7 +703,7 @@ thead th {
 .invt-table-box td {
     padding: 2px 5px;
     white-space: normal;
-    height: 50px; /* ✅ Fixed height – adjust as needed */
+    height: 50px;
 }
 
 .invt-table-box tr {
@@ -711,6 +782,7 @@ thead th {
     gap: 10px;
     justify-content: center;
 }
+
 /* Specific style for table cards */
 .table-card {
     display: flex;
@@ -723,7 +795,6 @@ thead th {
     vertical-align: middle;
 }
 
-  
 /* Title of the table */
 .table-card h3 {
     margin-top: 0;
@@ -754,7 +825,6 @@ thead th {
     font-weight: bold;
 }
 
-  
 /* Mobile Responsive Card View */
 @media screen and (max-width: 768px) {
     .action-buttons .btn {
@@ -765,7 +835,12 @@ thead th {
     .invt-table-box thead {
         display: none; /* Hide table headers */
     }
-
+    .invt-table-box td {
+        height: 80px; 
+    }
+    .table-card .invt-table-box td {
+        height: 50px;
+    }
     .invt-table-box, 
     .invt-table-box tbody, 
     .invt-table-box tr, 
@@ -793,9 +868,13 @@ thead th {
         font-weight: bold;
         display: block;
         margin-bottom: 5px;
-        color: #f9f9f9;
+        color: #000000;
     }
-
+    .invt-table-box tr:hover td::before {
+        color: white; /* Optional: keep labels distinct or lighter */
+    }
+  
+    
     .invt-icon {
         width: 20px;
         height: 20px;
@@ -835,214 +914,3 @@ thead th {
   }
   
 /* end of inventory */
-
-
-/* start of request form */
-.request-container {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-.request-form {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    width: 100%;
-}
-
-/* Left Column - Request Form */
-.request-box {
-    flex: 1;
-    min-width: 200px;
-    max-width: 600px;
-    background: rgb(65, 65, 65);
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    color: white;
-    overflow: auto; /* Enables scrollbars */
-    
-}
-
-/* Right Column - Instructions */
-.instruction-box {
-    flex: 1;
-    min-width: 200px;
-    max-width: 600px;
-    background: rgb(51, 51, 51);
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    color: white;
-    overflow: auto; /* Enables scrollbars */
-    
-}
-
-/* Header Styling */
-.header-request {
-    text-align: center;
-    font-size: 20px;
-    margin-bottom: 15px;
-}
-
-/* Input Fields */
-.request-fields {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-}
-
-.input-box {
-    flex: 1;
-    min-width: 250px;
-}
-
-.field-control {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px;
-    margin-right: 20px;
-}
-
-/* Button Box */
-.button-box {
-    text-align: center;
-    margin-top: 15px;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .request-form {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .request-box,
-    .instruction-box {
-        max-width: 100%;
-        max-height: 300px; /* Adjusts for smaller screens */
-        overflow: auto; /* Enables scrollbars */
-    }
-
-    .btn{
-        width: 100%;
-        margin-bottom: 10px;
-    }
-}
-
-/* end of request form */
-
-/* start of borrow */
-
-.brw-header-container {
-    font-size: 18px;
-    width: 100%;
-    background:rgb(51, 51, 51);
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    padding: 10px;
-    color: white;
-}
-
-
-.brw-list-container {
-    overflow-x: auto; 
-    text-align: center;
-    justify-content: center;
-    align-items: center;
-    padding: 10px;
-    position: relative;
-    max-width: 100%;
-    margin: 0 auto;
-}
-
-.brw-table-data {
-    scroll-snap-type: y mandatory;
-    border-collapse: collapse;
-    max-height: 550px;
-    overflow-y: auto; 
-    position: relative;
-    overflow-x: auto;
-    width: 100%;
-    white-space: nowrap;
-}
-
-.brw-table-box {
-    min-width: 100%;
-    width: auto;
-    border-collapse: collapse;
-    border-radius: 8px;
-    table-layout: fixed;
-}
-.brw-table-box th, .brw-table-box td {
-    min-width: 150px; /* Adjust column width */
-    white-space: nowrap; /* Prevents text from wrapping */
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.brw-table-box th {
-    text-align: center;
-    background: linear-gradient(to bottom right, #005a34, #009708);
-    color: white;
-    width: auto;
-    position: sticky;
-    top: 0;
-    padding: 12px 15px;
-    /* z-index: 900; */
-}
-
-.brw-table-box td {
-    padding: 7px 10px;
-    border: 1px solid #ddd;
-    text-align: left;
-}
-
-.brw-table-box tr {
-    scroll-snap-align: start;
-}
-
-
-/* Force the columns to have the same width */
-.header-box th, .brw-table-box td {
-    width: calc(100% / 6); /* Adjust based on column count */
-}
-
-/* Alternate row colors */
-.brw-table-box tbody tr:nth-child(even) {
-    background: #4f4f4f;
-    color: #ffffff;
-}
-
-.brw-table-box tbody tr:nth-child(odd) {
-    background: #393939; /* Light background for odd rows */
-    color: #ffffff;
-}
-
-/* Hover effect on rows */
-.brw-table-box tbody tr:hover {
-    background: #000000;
-}
-
-/* Responsive adjustments for small screens */
-@media (max-width: 768px) {
-    .brw-table-box th, .brw-table-box td {
-        font-size: 14px; /* Adjust font size */
-        padding: 8px;
-    }
-}
-
-@media (max-width: 500px) {
-    .brw-table-box th, .brw-table-box td {
-        font-size: 12px; /* Reduce font size further */
-        padding: 6px;
-    }
-}
-
-/* end of borrow */
