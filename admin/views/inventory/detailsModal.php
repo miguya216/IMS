@@ -41,12 +41,7 @@ function details() {
                         <?php endforeach; ?>
                     </select>
                 </div>
-
-                <!-- <div class="input-box">
-                    <label>Brand</label>
-                    <input type="text" class="form-control" id="detail_brand" name="brand">
-                </div> -->
-
+                
                 <div class="input-box">
                 <label>Brand:</label>
                     <select name="brand" class="form-control" id="detail_brand" required>

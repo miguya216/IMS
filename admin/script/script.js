@@ -120,7 +120,41 @@ document.addEventListener("DOMContentLoaded", function () {
 function openRequestForm(){
     window.open('/ims/admin/requestForm.php', 'KLD IMS | Request Form');
 }
-//
+// end of request form tab
+
+// start of barcode tab
+function openBarcode(){
+    window.open('/ims/admin/barcodeListPreview.php', 'Barcode List');
+}
+
+function downloadBarcodePDF() {
+    // Clone the content without scroll
+    const original = document.getElementById('barcodeContent');
+    const clone = original.cloneNode(true);
+
+    // Create a temporary container
+    const container = document.createElement('div');
+    container.style.position = 'fixed';
+    container.style.top = '-10000px';
+    container.appendChild(clone);
+    document.body.appendChild(container);
+
+    // Generate PDF from the clone
+    const opt = {
+        margin:       0.5,
+        filename:     'Barcode_List.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(clone).save().then(() => {
+        // Clean up
+        document.body.removeChild(container);
+    });
+}
+// end of barcode tab
+
 // start of reusable popup modal
 function showPopup(message, color = '#005a34') {
     const notifModal = document.getElementById('notifModal');

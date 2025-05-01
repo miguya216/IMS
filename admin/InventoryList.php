@@ -29,6 +29,7 @@ if (file_exists('views/inventory/itemList.php')) {
                 <form id="searchForm">
                     <div class="invt-field-details">
                             <div class="invt-input-box">
+                                <img type="button" onclick="openBarcode()" src="imgs/print-barcode.png" alt="Download Barcode PDF" class="icon-head">
                                 <img type="button" id="addItemBtn" src="imgs/add.png" alt="Add Items" class="button-add">
                                 <input type="text" class="search-bar" id="searchInput" placeholder="Search Asset" onkeyup="searchInventory()">
                                 <select id="mainFilter" class="dropdown-filter">

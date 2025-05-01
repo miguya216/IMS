@@ -1,5 +1,6 @@
 <?php
-function head(){?>
+function head(){
+?>
 
 <div class="head-section">
             <div class="left-head">
@@ -9,10 +10,12 @@ function head(){?>
             <div class="right-head">
                 
                 <img type="button" src="imgs/import.png" alt="Import file" class="icon-head">
-                <img onclick="openRequestForm()" src="imgs/requestFrom.png" alt="Form" class="icon-head">
-                <img src="imgs/print.png" alt="Print" class="icon-head">
+                <img type="button" onclick="openRequestForm()" src="imgs/requestFrom.png" alt="Form" class="icon-head">
+                <img type="button" src="imgs/print.png" alt="Download Barcode PDF" class="icon-head">
                 <img src="imgs/settings.png" alt="Setting" class="icon-head">
             </div>
         </div>
-        
-<?php }?>
+
+<?php 
+
+}?>

@@ -95,7 +95,7 @@ CREATE TABLE session (
     FOREIGN KEY (account_ID) REFERENCES account(account_ID)
 );
 
--- Rquest table
+-- Request table
 CREATE TABLE request_form (
     request_ID INT AUTO_INCREMENT PRIMARY KEY,
     student_ID VARCHAR(50) NOT NULL,
