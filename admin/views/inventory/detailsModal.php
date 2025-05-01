@@ -14,6 +14,14 @@ function details() {
         <h3>Edit Asset Details</h3>
              
                 <div class="field-details">
+
+                <div class="input-box">
+                    <label>Barcode:</label>
+                    <div class="qr-wrapper">
+                        <img id="qrCodeImg" src="" alt="QR code">
+                    </div>
+                </div>
+                
                 <div class="input-box">
                     <label>Barcode:</label>
                     <div class="barcode-wrapper">

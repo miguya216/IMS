@@ -11,12 +11,36 @@ class ComposerStaticInit906787304fff11015cfe879175918ee2
         array (
             'Picqer\\Barcode\\' => 15,
         ),
+        'E' => 
+        array (
+            'Endroid\\QrCode\\' => 15,
+        ),
+        'D' => 
+        array (
+            'DASPRiD\\Enum\\' => 13,
+        ),
+        'B' => 
+        array (
+            'BaconQrCode\\' => 12,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
         'Picqer\\Barcode\\' => 
         array (
             0 => __DIR__ . '/..' . '/picqer/php-barcode-generator/src',
+        ),
+        'Endroid\\QrCode\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/endroid/qr-code/src',
+        ),
+        'DASPRiD\\Enum\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/dasprid/enum/src',
+        ),
+        'BaconQrCode\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/bacon/bacon-qr-code/src',
         ),
     );
 

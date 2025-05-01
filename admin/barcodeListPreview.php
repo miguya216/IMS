@@ -1,11 +1,18 @@
 <?php
     require_once $_SERVER['DOCUMENT_ROOT'] . '/ims/class/conn.php';
 
-    $sql = "SELECT a.inventory_tag, a.serial_number, at.asset_type, b.brand_name, br.barcode_image_path
+    $sql = "SELECT 
+                a.inventory_tag, 
+                a.serial_number, 
+                at.asset_type, 
+                b.brand_name, 
+                br.barcode_image_path,
+                qr.qr_image_path
             FROM asset a
             JOIN asset_type at ON a.asset_type_ID = at.asset_type_ID
             JOIN brand b ON a.brand_ID = b.brand_ID
-            JOIN barcode br ON a.barcode_image_path_ID = br.barcode_image_path_ID";
+            JOIN barcode br ON a.barcode_image_path_ID = br.barcode_image_path_ID
+            JOIN qr_code qr ON a.qr_image_path_ID = qr.qr_image_path_ID";
 
     $stmt = $pdo->query($sql);
     ?>
@@ -36,7 +43,8 @@
     <?php while ($row = $stmt->fetch()) { ?>
         <div class="row mb-4 align-items-start border-bottom pb-3">
             <div class="col-sm-4">
-                <img src="../barcodes/<?php echo htmlspecialchars(basename($row['barcode_image_path'])); ?>" alt="Barcode" style="max-width: 100%;">
+                <img src="../barcodes/<?php echo htmlspecialchars(basename($row['barcode_image_path'])); ?>" alt="Barcode" style="max-width: 100%; margin-bottom: 10px">
+                <img src="../qrcodes/<?php echo htmlspecialchars(basename($row['qr_image_path'])); ?>" alt="Barcode" style="max-width: 100%;">
             </div>
             <div class="col-sm-8">
                 <p><strong>Tag:</strong> <?php echo htmlspecialchars($row['inventory_tag']); ?></p>

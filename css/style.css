@@ -289,6 +289,24 @@ body {
     padding: 4px;
 }
 
+.qr-wrapper {
+    flex: 2;
+    min-width: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.qr-wrapper img {
+    max-width: 150px;  /* Adjust this value as needed */
+    max-height: 150px; /* Adjust this value as needed */
+    width: auto;
+    height: auto;
+    background-color: white;
+    padding: 4px;
+}
+
+
 
 /* Field container */
 .field-details {

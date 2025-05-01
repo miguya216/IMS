@@ -29,7 +29,7 @@ function StatsOverview() { ?>
 
 
 <!-- Link the external JS -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/IMS/admin/script/chart.js"></script>
 <script src="/IMS/admin/script/stats.js"></script>
 <?php }
     

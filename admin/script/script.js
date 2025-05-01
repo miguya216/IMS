@@ -321,6 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     .then(res => res.json())
                     .then(data => {
                         if (data) {
+                            document.getElementById("qrCodeImg").src = '/ims/' + data.qr_image_path;
                             document.getElementById("barcodeImg").src = '/ims/' + data.barcode_image_path;
                             document.getElementById("detail_tag").value = data.inventory_tag;
                             document.getElementById("detail_serial").value = data.serial_number;

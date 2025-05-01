@@ -11,4 +11,4 @@ INSERT INTO user (full_name, unit_ID)
 VALUES ('Jen Camille Dominguez', 1);
 
 INSERT INTO account (user_ID, username, password_hash, role_ID) 
-VALUES (1, 'admin_unit2025', '$2y$10$141uwWCyZkNSJvIFzubJ3OD3QCNscMqM25nZIsjawWqWbtPjAqFNG', 1, 'active');
+VALUES (1, 'admin_unit2025', '$2y$10$141uwWCyZkNSJvIFzubJ3OD3QCNscMqM25nZIsjawWqWbtPjAqFNG', 1);

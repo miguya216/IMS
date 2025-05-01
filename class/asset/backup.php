@@ -3,17 +3,14 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\class\conn.php';
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 use Picqer\Barcode\BarcodeGeneratorPNG;
-use Endroid\QrCode\QrCode;
-use Endroid\QrCode\Writer\PngWriter;
-
 class Asset {
     private $pdo;
 
-    public function __construct() {
+   public function __construct() {
         global $pdo;
         $this->pdo = $pdo;
     }
-
+        
     public function insertAsset($inventory_tag, $serial_num, $asset_type, $brand, $responsible_to, $unit) {
         try {
             // Check duplicates
@@ -24,24 +21,25 @@ class Asset {
             }
 
             // Check or insert brand
-            if (is_numeric($brand)) {
+            if(is_numeric($brand)){
                 $stmt = $this->pdo->prepare("SELECT brand_ID, asset_type_id FROM brand WHERE brand_ID = ?");
                 $stmt->execute([$brand]);
                 $row = $stmt->fetch();
                 $brand_id = $row['brand_ID'];
                 $asset_type_id = $row['asset_type_id'];
-            } else {
-                if (is_numeric($asset_type)) {
+            }else{
+                // Check or insert asset_type
+                if(is_numeric($asset_type)){
                     $stmt = $this->pdo->prepare("SELECT asset_type_ID FROM asset_type WHERE asset_type_ID = ?");
                     $stmt->execute([$asset_type]);
                     $asset_type_id = $stmt->fetch()['asset_type_ID'];
-                } else if ('none' === $asset_type || null === $asset_type || '' === $asset_type) {
+                }else if ('none' === $asset_type || null === $asset_type || '' === $asset_type){
                     $stmt = $this->pdo->prepare("SELECT brand_ID, asset_type_id FROM brand WHERE brand_ID = ?");
                     $stmt->execute([$brand]);
                     $row = $stmt->fetch();
                     $brand_id = $row['brand_ID'];
                     $asset_type_id = $row['asset_type_id'];
-                } else {
+                }else{
                     $insert = $this->pdo->prepare("INSERT INTO asset_type (asset_type) VALUES (?)");
                     $insert->execute([$asset_type]);
                     $asset_type_id = $this->pdo->lastInsertId();
@@ -50,26 +48,27 @@ class Asset {
                 $insert->execute([$brand, $asset_type_id]);
                 $brand_id = $this->pdo->lastInsertId();
             }
-
+    
             // Check or insert user
-            if (is_numeric($responsible_to)) {
+            if(is_numeric($responsible_to)){
                 $stmt = $this->pdo->prepare("SELECT user_ID, unit_ID FROM user WHERE user_ID = ?");
                 $stmt->execute([$responsible_to]);
                 $user = $stmt->fetch();
                 $user_id = $user['user_ID'];
                 $unit_id = $user['unit_ID'];
-            } else {
-                if (is_numeric($unit)) {
+            }else{
+                if(is_numeric($unit)){
                     $stmt = $this->pdo->prepare("SELECT unit_ID FROM unit WHERE unit_ID = ?");
                     $stmt->execute([$unit]);
                     $unit_id = $stmt->fetch()['unit_ID'];
-                } else if ('none' === $unit) {
+                }else if('none' === $unit){
                     $stmt = $this->pdo->prepare("SELECT user_ID, unit_ID FROM user WHERE user_ID = ?");
                     $stmt->execute([$responsible_to]);
                     $user = $stmt->fetch();
                     $user_id = $user['user_ID'];
                     $unit_id = $user['unit_ID'];
-                } else {
+                }
+                else{
                     $insert = $this->pdo->prepare("INSERT INTO unit (unit_name) VALUES (?)");
                     $insert->execute([$unit]);
                     $unit_id = $this->pdo->lastInsertId();
@@ -78,45 +77,32 @@ class Asset {
                 $insert->execute([$responsible_to, $unit_id]);
                 $user_id = $this->pdo->lastInsertId();
             }
-
+    
             // Generate barcode
             $generator = new BarcodeGeneratorPNG();
             $barcodeData = $generator->getBarcode($inventory_tag, $generator::TYPE_CODE_128);
-            $barcodeFilename = uniqid('barcode_') . '.png';
-            $barcodePath = 'barcodes/' . $barcodeFilename;
-            file_put_contents($_SERVER['DOCUMENT_ROOT'] . '/ims/' . $barcodePath, $barcodeData);
-
-            // Generate QR code
-            $qrCode = new QrCode($inventory_tag);
-            $qrWriter = new PngWriter();
-            $qrFilename = uniqid('qr_') . '.png';
-            $qrPath = 'qrcodes/' . $qrFilename;
-            $qrData = $qrWriter->write($qrCode);  // Correct usage of write() method
-            file_put_contents($_SERVER['DOCUMENT_ROOT'] . '/ims/' . $qrPath, $qrData->getString());
-
-
+            $filename = uniqid('barcode_') . '.png';
+            $barcode_path = 'barcodes/' . $filename;
+            file_put_contents($_SERVER['DOCUMENT_ROOT'] . '/ims/' . $barcode_path, $barcodeData);
+    
             // Insert barcode path
             $stmt = $this->pdo->prepare("INSERT INTO barcode (barcode_image_path) VALUES (?)");
-            $stmt->execute([$barcodePath]);
+            $stmt->execute([$barcode_path]);
             $barcode_id = $this->pdo->lastInsertId();
-
-            // Insert QR code path
-            $stmt = $this->pdo->prepare("INSERT INTO qr_code (qr_image_path) VALUES (?)");
-            $stmt->execute([$qrPath]);
-            $qr_id = $this->pdo->lastInsertId();
-
+    
             // Insert asset
-            $stmt = $this->pdo->prepare("INSERT INTO asset (brand_ID, asset_type_ID, inventory_tag, serial_number, responsible_user_ID, barcode_image_path_ID, qr_image_path_ID) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$brand_id, $asset_type_id, $inventory_tag, $serial_num, $user_id, $barcode_id, $qr_id]);
-
+            $stmt = $this->pdo->prepare("INSERT INTO asset (brand_ID, asset_type_ID, inventory_tag, serial_number, responsible_user_ID, barcode_image_path_ID) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$brand_id, $asset_type_id, $inventory_tag, $serial_num, $user_id, $barcode_id]);
+    
             return true;
-
+    
         } catch (PDOException $e) {
             return $e->getMessage();
         }
     }
-}
+    
 
+}
 
 class UpdateAsset {
     private $pdo;

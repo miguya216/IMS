@@ -43,24 +43,26 @@ class Inventory {
 
     public function fetchAssetBySerial($serial) {
         $stmt = $this->pdo->prepare("SELECT 
-                a.serial_number,
-                a.inventory_tag,
-                b.barcode_image_path,
-                at.asset_type,
-                at.asset_type_status,
-                br.brand_name,
-                br.brand_status,
-                u.full_name AS responsible_user,
-                u.user_status,
-                un.unit_name AS user_unit,
-                un.unit_status
-            FROM asset a
-            LEFT JOIN barcode b ON a.barcode_image_path_ID = b.barcode_image_path_ID
-            LEFT JOIN asset_type at ON a.asset_type_ID = at.asset_type_ID
-            LEFT JOIN brand br ON a.brand_ID = br.brand_ID
-            LEFT JOIN user u ON a.responsible_user_ID = u.user_ID
-            LEFT JOIN unit un ON u.unit_ID = un.unit_ID
-            WHERE a.serial_number = :serial");
+            a.serial_number,
+            a.inventory_tag,
+            b.barcode_image_path,
+            q.qr_image_path,
+            at.asset_type,
+            at.asset_type_status,
+            br.brand_name,
+            br.brand_status,
+            u.full_name AS responsible_user,
+            u.user_status,
+            un.unit_name AS user_unit,
+            un.unit_status
+        FROM asset a
+        LEFT JOIN barcode b ON a.barcode_image_path_ID = b.barcode_image_path_ID
+        LEFT JOIN qr_code q ON a.qr_image_path_ID = q.qr_image_path_ID
+        LEFT JOIN asset_type at ON a.asset_type_ID = at.asset_type_ID
+        LEFT JOIN brand br ON a.brand_ID = br.brand_ID
+        LEFT JOIN user u ON a.responsible_user_ID = u.user_ID
+        LEFT JOIN unit un ON u.unit_ID = un.unit_ID
+        WHERE a.serial_number = :serial");
     
         $stmt->execute(['serial' => $serial]);
         return $stmt->fetch(PDO::FETCH_ASSOC);

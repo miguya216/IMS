@@ -57,9 +57,9 @@ if (file_exists('views/inventory/itemList.php')) {
         <?php details();?>
         <?php addModal();?>
     
-<!-- JavaScript -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
+<script src="script/html2pdf.bundle.min.js"></script>
 <script src="script/script.js"></script>
+
 
 </body>
 </html>

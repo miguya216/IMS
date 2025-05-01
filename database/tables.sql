@@ -23,6 +23,12 @@ CREATE TABLE barcode (
     barcode_image_path VARCHAR(255) NOT NULL
 );
 
+CREATE TABLE qr_code (
+    qr_image_path_ID INT AUTO_INCREMENT PRIMARY KEY,
+    qr_image_path VARCHAR(255) NOT NULL
+);
+
+
 -- Role table
 CREATE TABLE role (
     role_ID INT AUTO_INCREMENT PRIMARY KEY,
@@ -54,11 +60,13 @@ CREATE TABLE asset (
     serial_number VARCHAR(100) UNIQUE NOT NULL,
     responsible_user_ID INT,
     barcode_image_path_ID INT NOT NULL,
+    qr_image_path_ID INT,
     asset_status ENUM('active', 'inactive') DEFAULT 'active',
     FOREIGN KEY (brand_ID) REFERENCES brand(brand_ID),
     FOREIGN KEY (asset_type_ID) REFERENCES asset_type(asset_type_ID),
     FOREIGN KEY (responsible_user_ID) REFERENCES user(user_ID),
-    FOREIGN KEY (barcode_image_path_ID) REFERENCES barcode(barcode_image_path_ID)
+    FOREIGN KEY (barcode_image_path_ID) REFERENCES barcode(barcode_image_path_ID),
+    FOREIGN KEY (qr_image_path_ID) REFERENCES qr_code(qr_image_path_ID)
 );
 
 -- Account table
@@ -98,14 +106,45 @@ CREATE TABLE session (
 -- Request table
 CREATE TABLE request_form (
     request_ID INT AUTO_INCREMENT PRIMARY KEY,
-    student_ID VARCHAR(50) NOT NULL,
+    borrower_name VARCHAR(50) NOT NULL,
+    kld_email VARCHAR(50) NOT NULL,
     request_date DATE NOT NULL,
     request_time TIME NOT NULL,
-    item_name VARCHAR(100) NOT NULL,
+    brand_ID INT,
     uom VARCHAR(50), 
     quantity INT NOT NULL,
     unit_ID INT, 
     purpose TEXT,
     request_note TEXT,
+    response_status ENUM('approved', 'rejected', 'pending') DEFAULT 'pending',
+    request_status ENUM('active', 'inactive') DEFAULT 'active',
+    FOREIGN KEY (brand_ID) REFERENCES brand (brand_ID),
     FOREIGN KEY (unit_ID) REFERENCES unit(unit_ID)
 );
+
+-- Borrow Table
+CREATE TABLE borrow (
+    borrow_ID INT AUTO_INCREMENT PRIMARY KEY,
+    asset_ID INT,
+    borrow_date DATE NOT NULL,
+    borrow_time TIME NOT NULL,
+    due_date DATE NOT NULL,
+    due_time TIME NOT NULL,
+    borrow_status ENUM('active', 'inactive') DEFAULT 'active',
+    FOREIGN KEY (asset_ID) REFERENCES asset (asset_ID)
+);
+
+CREATE TABLE message (
+    message_ID INT AUTO_INCREMENT PRIMARY KEY,
+    sender_ID INT NOT NULL,
+    receiver_ID INT NOT NULL,              
+    subject VARCHAR(255),                 
+    message_text TEXT NOT NULL,
+    timestamp_sent DATETIME DEFAULT CURRENT_TIMESTAMP,
+    is_read BOOLEAN DEFAULT FALSE,
+    message_status ENUM('active', 'archived') DEFAULT 'active',
+    FOREIGN KEY (sender_ID) REFERENCES user(user_ID),
+    FOREIGN KEY (receiver_ID) REFERENCES user(user_ID)
+);
+
+
