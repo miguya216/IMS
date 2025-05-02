@@ -16,7 +16,7 @@ function details() {
                 <div class="field-details">
 
                 <div class="input-box">
-                    <label>Barcode:</label>
+                    <label>QR Code:</label>
                     <div class="qr-wrapper">
                         <img id="qrCodeImg" src="" alt="QR code">
                     </div>

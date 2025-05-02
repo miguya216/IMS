@@ -15,7 +15,6 @@ function head(){
                 <img src="imgs/settings.png" alt="Setting" class="icon-head">
             </div>
         </div>
-
 <?php 
 
 }?>

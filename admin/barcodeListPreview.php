@@ -36,7 +36,7 @@
 <div id="barcodeContent">
     <h3 class="mb-4 text-center">Barcode List</h3>
     <div class="row mb-2 fw-bold border-bottom pb-2">
-        <div class="col-sm-4 text-start">Barcode:</div>
+        <div class="col-sm-4 text-start">Barcode | QR Code:</div>
         <div class="col-sm-8 text-start">Details:</div>
     </div>
 
@@ -57,6 +57,5 @@
 </div>
     </div>
 </div>
-<script src="script/script.js"></script>
 </body>
 </html>
