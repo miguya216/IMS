@@ -23,9 +23,7 @@ if (file_exists('views/home/StatsOverview.php')) {
 <!--     
 <div id="inventory" class="header-inventory">
 </div> -->
-<?php include 'barcode.php';?>
 <?php head();?>
-<!-- <?php  detailsPopUp();  ?> -->
 
 <input type="text" id="barcode_input" style="display: none;" />
 <div class="field-inventory">
@@ -41,8 +39,7 @@ if (file_exists('views/home/StatsOverview.php')) {
     JavaScript -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
-    
     <script src="script/script.js"></script>
-    <!-- <script src="script/barcodeScanner.js"></script> -->
+    <script src="script/importCsv.js"></script>
 </body>
 </html>

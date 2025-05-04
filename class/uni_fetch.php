@@ -44,6 +44,9 @@ class DataFetcher {
     public function getAllRequests() {
         return $this->fetchAll("SELECT * FROM request_form");
     }
+    public function getAllLogs() {
+        return $this->fetchAll("SELECT * FROM logs");
+    }
 
     private function fetchAll($query) {
         $stmt = $this->pdo->query($query);

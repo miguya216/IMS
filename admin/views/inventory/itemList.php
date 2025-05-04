@@ -18,7 +18,7 @@ function itemList(){
                                     <th>Serial Number</th>
                                     <th>Asset Type</th>
                                     <th>Brand Name</th>
-                                    <th>Responsible to</th>
+                                    <th>Responsible to</th> 
                                     <th>Unit</th>
                                     <th>Action</th>
                                 </tr>

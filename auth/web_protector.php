@@ -5,19 +5,23 @@ require_once($_SERVER['DOCUMENT_ROOT'] . '/ims/class/uni_fetch.php');
 
 // Check remember me token if session is missing
 if (!isset($_SESSION['account_ID']) && isset($_COOKIE['remember_token'])) {
-    $stmt = $pdo->prepare("SELECT a.*, u.full_name 
+    $stmt = $pdo->prepare("
+        SELECT 
+            a.*, 
+            CONCAT(u.f_name, ' ', u.m_name, ' ', u.l_name) AS full_name
         FROM account a
         JOIN user u ON a.user_ID = u.user_ID
-        WHERE a.remember_token = :token AND a.token_expiry > NOW()");
+        WHERE a.remember_token = :token AND a.token_expiry > NOW()
+    ");
     $stmt->execute(['token' => $_COOKIE['remember_token']]);
     $user = $stmt->fetch();
 
     if ($user) {
-        $_SESSION['account_ID'] = $user['account_ID'];
-        $_SESSION['user_ID'] = $user['user_ID'];
-        $_SESSION['role_ID'] = $user['role_ID'];
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['full_name'] = $user['full_name'];
+        $_SESSION['account_ID']  = $user['account_ID'];
+        $_SESSION['user_ID']     = $user['user_ID'];
+        $_SESSION['role_ID']     = $user['role_ID'];
+        $_SESSION['username']    = $user['username'];
+        $_SESSION['full_name']   = $user['full_name'];
     } else {
         setcookie("remember_token", "", time() - 3600, "/");
     }

@@ -60,20 +60,33 @@ function addModal () {
                     <input type="text" name="new_asset" id="new_asset" class="form-control" placeholder="Enter new asset type" style="display:none;">
                 </div>
 
-                <!-- RESPONSIBLE TO -->
+              <!-- RESPONSIBLE TO -->
                 <div class="input-box">
                     <label for="responsibleTo">Responsible To:</label>
-                        <select name="responsibleTo" class="form-control" id="responsibleTo" required>
-                            <option value="" selected disabled>Select User (Add new if none)</option>
-                            <?php foreach ($users as $user): ?>
-                                <option value="<?= htmlspecialchars($user['user_ID']) ?>"><?= htmlspecialchars($user['full_name']) ?></option>
-                            <?php endforeach; ?>
-                            <option value="__new_responsibleTo__">✙ Add new...</option>
-                        </select>
+                    <select name="responsibleTo" class="form-control" id="responsibleTo" required>
+                        <option value="" selected disabled>Select User (Add new if none)</option>
+                        <?php foreach ($users as $user): ?>
+                            <option value="<?= htmlspecialchars($user['user_ID']) ?>"><?= 
+                                htmlspecialchars($user['f_name']) . ' ' .
+                                htmlspecialchars($user['m_name']). ' ' .
+                                htmlspecialchars($user['l_name']) ?></option>
+                        <?php endforeach; ?>
+                        <option value="__new_responsibleTo__">✙ Add new...</option>
+                    </select>
+                </div>
+
+                <!-- New Name Fields -->
+                <div class="input-box">
+                    <label for="new_responsibleTo"></label>
+                    <input type="text" name="new_responsibleTo_f" class="form-control" id="new_responsibleTo_f" style="display: none;" placeholder="Enter First name">
                 </div>
                 <div class="input-box">
-                    <label for="responsibleTo"></label>
-                    <input type="text" name="new_responsibleTo" id="new_responsibleTo" class="form-control" placeholder="Enter new name" style="display:none;">
+                    <label for="new_responsibleTo"></label>
+                    <input type="text" name="new_responsibleTo_m" class="form-control" id="new_responsibleTo_m" style="display: none;" placeholder="Enter Middle name">
+                </div>
+                <div class="input-box">
+                    <label for="new_responsibleTo"></label>
+                    <input type="text" name="new_responsibleTo_l" class="form-control" id="new_responsibleTo_l" style="display: none;" placeholder="Enter Last name">
                 </div>
 
                 <!-- UNIT -->

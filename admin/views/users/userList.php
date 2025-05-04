@@ -15,10 +15,10 @@ function userList(){
                         <table class="invt-table-box filterable-table" id="userTable">      
                             <thead>
                                 <tr>
-                                    <th>user ID</th>
+                                    <th>KLD ID</th>
                                     <th>Name</th>
                                     <th>Unit</th>
-                                    <th>User name</th>
+                                    <th>KLD email</th>
                                     <th>Role</th>
                                     <th>Action</th>
                                 </tr>
@@ -28,10 +28,10 @@ function userList(){
                                         if($users && count($users) > 0) {
                                             foreach ($users as $row) {
                                                 echo "<tr>";
-                                                echo "<td data-label='User ID'>" . htmlspecialchars($row['user_ID']) . "</td>";
+                                                echo "<td data-label='User ID'>" . htmlspecialchars($row['kld_ID']) . "</td>";
                                                 echo "<td data-label='Full Name'>" . htmlspecialchars($row['full_name']) . "</td>";
                                                 echo "<td class = '". htmlspecialchars($row['unit_status']) ."' data-label='Unit'>" . htmlspecialchars($row['unit_name']) . "</td>";
-                                                echo "<td data-label='Username'>" . htmlspecialchars($row['username']) . "</td>";
+                                                echo "<td data-label='Username'>" . htmlspecialchars($row['kld_email']) . "</td>";
                                                 echo "<td class = '". htmlspecialchars($row['role_status']) ."' data-label='Role'>" . htmlspecialchars($row['role_name']) . "</td>";
                                                 echo "<td data-label='Action'>
                                                         <div class='action-buttons'>

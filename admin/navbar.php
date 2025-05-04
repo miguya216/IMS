@@ -64,4 +64,4 @@
     </ul>
     </div>
 </nav>
- 
+ <?php require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\admin\detailsPopUp.php'; ?>

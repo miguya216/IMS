@@ -14,16 +14,16 @@ class Asset {
         $this->pdo = $pdo;
     }
 
-    public function insertAsset($inventory_tag, $serial_num, $asset_type, $brand, $responsible_to, $unit) {
+    public function insertAsset($inventory_tag, $serial_num, $asset_type, $brand, $responsibleTo, $f_name, $m_name, $l_name, $unit) {
         try {
-            // Check duplicates
+            // Check for duplicates
             $checkStmt = $this->pdo->prepare("SELECT * FROM asset WHERE inventory_tag = ? OR serial_number = ?");
             $checkStmt->execute([$inventory_tag, $serial_num]);
             if ($checkStmt->rowCount() > 0) {
                 return "duplicate";
             }
-
-            // Check or insert brand
+    
+            // === Handle Asset Type and Brand ===
             if (is_numeric($brand)) {
                 $stmt = $this->pdo->prepare("SELECT brand_ID, asset_type_id FROM brand WHERE brand_ID = ?");
                 $stmt->execute([$brand]);
@@ -35,171 +35,121 @@ class Asset {
                     $stmt = $this->pdo->prepare("SELECT asset_type_ID FROM asset_type WHERE asset_type_ID = ?");
                     $stmt->execute([$asset_type]);
                     $asset_type_id = $stmt->fetch()['asset_type_ID'];
-                } else if ('none' === $asset_type || null === $asset_type || '' === $asset_type) {
-                    $stmt = $this->pdo->prepare("SELECT brand_ID, asset_type_id FROM brand WHERE brand_ID = ?");
-                    $stmt->execute([$brand]);
-                    $row = $stmt->fetch();
-                    $brand_id = $row['brand_ID'];
-                    $asset_type_id = $row['asset_type_id'];
                 } else {
                     $insert = $this->pdo->prepare("INSERT INTO asset_type (asset_type) VALUES (?)");
                     $insert->execute([$asset_type]);
                     $asset_type_id = $this->pdo->lastInsertId();
                 }
+    
                 $insert = $this->pdo->prepare("INSERT INTO brand (brand_name, asset_type_id) VALUES (?, ?)");
                 $insert->execute([$brand, $asset_type_id]);
                 $brand_id = $this->pdo->lastInsertId();
             }
-
-            // Check or insert user
-            if (is_numeric($responsible_to)) {
-                $stmt = $this->pdo->prepare("SELECT user_ID, unit_ID FROM user WHERE user_ID = ?");
-                $stmt->execute([$responsible_to]);
+    
+            // === Handle User ===
+            if (is_numeric($responsibleTo)) {
+                // Existing user
+                $stmt = $this->pdo->prepare("SELECT user_ID FROM user WHERE user_ID = ?");
+                $stmt->execute([$responsibleTo]);
                 $user = $stmt->fetch();
+                if (!$user) return "Invalid user selected.";
                 $user_id = $user['user_ID'];
-                $unit_id = $user['unit_ID'];
             } else {
+                // New user, handle unit first
                 if (is_numeric($unit)) {
-                    $stmt = $this->pdo->prepare("SELECT unit_ID FROM unit WHERE unit_ID = ?");
-                    $stmt->execute([$unit]);
-                    $unit_id = $stmt->fetch()['unit_ID'];
-                } else if ('none' === $unit) {
-                    $stmt = $this->pdo->prepare("SELECT user_ID, unit_ID FROM user WHERE user_ID = ?");
-                    $stmt->execute([$responsible_to]);
-                    $user = $stmt->fetch();
-                    $user_id = $user['user_ID'];
-                    $unit_id = $user['unit_ID'];
+                    $unit_id = $unit;
                 } else {
                     $insert = $this->pdo->prepare("INSERT INTO unit (unit_name) VALUES (?)");
                     $insert->execute([$unit]);
                     $unit_id = $this->pdo->lastInsertId();
                 }
-                $insert = $this->pdo->prepare("INSERT INTO user (full_name, unit_ID) VALUES (?, ?)");
-                $insert->execute([$responsible_to, $unit_id]);
+    
+                $insert = $this->pdo->prepare("INSERT INTO user (f_name, m_name, l_name, unit_ID) VALUES (?, ?, ?, ?)");
+                $insert->execute([$f_name, $m_name, $l_name, $unit_id]); 
                 $user_id = $this->pdo->lastInsertId();
             }
-
-            // Generate barcode
+    
+            // === Barcode Generation ===
             $generator = new BarcodeGeneratorPNG();
             $barcodeData = $generator->getBarcode($inventory_tag, $generator::TYPE_CODE_128);
             $barcodeFilename = uniqid('barcode_') . '.png';
             $barcodePath = 'barcodes/' . $barcodeFilename;
             file_put_contents($_SERVER['DOCUMENT_ROOT'] . '/ims/' . $barcodePath, $barcodeData);
-
-            // Generate QR code
+    
+            $stmt = $this->pdo->prepare("INSERT INTO barcode (barcode_image_path) VALUES (?)");
+            $stmt->execute([$barcodePath]);
+            $barcode_id = $this->pdo->lastInsertId();
+    
+            // === QR Code Generation ===
             $qrCode = new QrCode($inventory_tag);
             $qrWriter = new PngWriter();
             $qrFilename = uniqid('qr_') . '.png';
             $qrPath = 'qrcodes/' . $qrFilename;
-            $qrData = $qrWriter->write($qrCode);  // Correct usage of write() method
+            $qrData = $qrWriter->write($qrCode);
             file_put_contents($_SERVER['DOCUMENT_ROOT'] . '/ims/' . $qrPath, $qrData->getString());
-
-
-            // Insert barcode path
-            $stmt = $this->pdo->prepare("INSERT INTO barcode (barcode_image_path) VALUES (?)");
-            $stmt->execute([$barcodePath]);
-            $barcode_id = $this->pdo->lastInsertId();
-
-            // Insert QR code path
+    
             $stmt = $this->pdo->prepare("INSERT INTO qr_code (qr_image_path) VALUES (?)");
             $stmt->execute([$qrPath]);
             $qr_id = $this->pdo->lastInsertId();
-
-            // Insert asset
-            $stmt = $this->pdo->prepare("INSERT INTO asset (brand_ID, asset_type_ID, inventory_tag, serial_number, responsible_user_ID, barcode_image_path_ID, qr_image_path_ID) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    
+            // === Insert Asset ===
+            $stmt = $this->pdo->prepare("INSERT INTO asset (brand_ID, asset_type_ID, inventory_tag, serial_number, responsible_user_ID, barcode_ID, qr_ID) VALUES (?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([$brand_id, $asset_type_id, $inventory_tag, $serial_num, $user_id, $barcode_id, $qr_id]);
-
+    
             return true;
-
+    
         } catch (PDOException $e) {
             return $e->getMessage();
         }
-    }
+    }    
 }
-
 
 class UpdateAsset {
     private $pdo;
 
     public function __construct() {
-         global $pdo;
-         $this->pdo = $pdo;
-     }
+        global $pdo;
+        $this->pdo = $pdo;
+    }
 
-     public function updateAssetDetails($serial_num, $asset_type, $brand, $responsible_to, $unit) {
+    public function updateAssetDetails($serial_num, $asset_type, $brand, $responsible_to, $unit) {
         try {
-            // Get or insert asset_type
-            $stmt = $this->pdo->prepare("SELECT asset_type_ID FROM asset_type WHERE asset_type = ?");
-            $stmt->execute([$asset_type]);
-            if ($stmt->rowCount() == 0) {
-                $insert = $this->pdo->prepare("INSERT INTO asset_type (asset_type) VALUES (?)");
-                $insert->execute([$asset_type]);
-                $asset_type_id = $this->pdo->lastInsertId();
-            } else {
-                $asset_type_id = $stmt->fetch()['asset_type_ID'];
+            // Check if the asset exists
+            $stmt = $this->pdo->prepare("SELECT asset_ID FROM asset WHERE serial_number = ?");
+            $stmt->execute([$serial_num]);
+            $asset = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$asset) {
+                return "Asset not found.";
             }
-    
-            // Get or insert brand
-            $stmt = $this->pdo->prepare("SELECT brand_ID FROM brand WHERE brand_name = ?");
-            $stmt->execute([$brand]);
-            if ($stmt->rowCount() == 0) {
-                $insert = $this->pdo->prepare("INSERT INTO brand (brand_name) VALUES (?)");
-                $insert->execute([$brand]);
-                $brand_id = $this->pdo->lastInsertId();
-            } else {
-                $brand_id = $stmt->fetch()['brand_ID'];
-            }
-    
-            // Get or insert unit
-            $stmt = $this->pdo->prepare("SELECT unit_ID FROM unit WHERE unit_name = ?");
-            $stmt->execute([$unit]);
-            if ($stmt->rowCount() == 0) {
-                $insert = $this->pdo->prepare("INSERT INTO unit (unit_name) VALUES (?)");
-                $insert->execute([$unit]);
-                $unit_id = $this->pdo->lastInsertId();
-            } else {
-                $unit_id = $stmt->fetch()['unit_ID'];
-            }
-    
-            // Get or insert user
-            $stmt = $this->pdo->prepare("SELECT user_ID FROM user WHERE full_name = ?");
-            $stmt->execute([$responsible_to]);
-            if ($stmt->rowCount() == 0) {
-                $insert = $this->pdo->prepare("INSERT INTO user (full_name, unit_ID) VALUES (?, ?)");
-                $insert->execute([$responsible_to, $unit_id]);
-                $user_id = $this->pdo->lastInsertId();
-            } else {
-                $user = $stmt->fetch();
-                $user_id = $user['user_ID'];
-    
-                // Update user's unit if changed
-                $checkUnit = $this->pdo->prepare("SELECT unit_ID FROM user WHERE user_ID = ?");
-                $checkUnit->execute([$user_id]);
-                $existingUnitId = $checkUnit->fetchColumn();
-                if ($existingUnitId != $unit_id) {
-                    $updateUnit = $this->pdo->prepare("UPDATE user SET unit_ID = ? WHERE user_ID = ?");
-                    $updateUnit->execute([$unit_id, $user_id]);
-                }
-            }
-    
-            // Update asset details (excluding inventory_tag and serial_number)
-            $stmt = $this->pdo->prepare("
-                UPDATE asset SET 
-                    asset_type_ID = ?, 
-                    brand_ID = ?, 
-                    responsible_user_ID = ?
-                WHERE serial_number = ?
-            ");
-            $stmt->execute([$asset_type_id, $brand_id, $user_id, $serial_num]);
-    
+
+            // Begin transaction
+            $this->pdo->beginTransaction();
+
+            // Update asset details (only editable fields)
+            $updateAssetStmt = $this->pdo->prepare("UPDATE asset 
+                SET asset_type_ID = ?, brand_ID = ?, responsible_user_ID = ? 
+                WHERE serial_number = ?");
+            $updateAssetStmt->execute([$asset_type, $brand, $responsible_to, $serial_num]);
+
+            // Update the user's unit
+            $updateUserStmt = $this->pdo->prepare("UPDATE user 
+                SET unit_ID = ? 
+                WHERE user_ID = ?");
+            $updateUserStmt->execute([$unit, $responsible_to]);
+
+            // Commit transaction
+            $this->pdo->commit();
             return true;
-    
+
         } catch (PDOException $e) {
+            $this->pdo->rollBack();
             return $e->getMessage();
         }
     }
-    
 }
+
+
 
 class DeleteAsset {
     private $pdo;

@@ -9,6 +9,7 @@ $roles = $fetcher->getAllRoles();
 $units = $fetcher->getAllUnits();
 $asset_types = $fetcher->getAllAssetTypes();
 $brand = $fetcher->getAllBrands();
+$logs = $fetcher->getAllLogs();
 ?>
 <div class="card-container">
 <div class="card table-card">
@@ -202,5 +203,52 @@ $brand = $fetcher->getAllBrands();
                 </table>
     </div>
 </div>
+</div>
+
+<div class="invt-list-container">
+    <div class="invt-table-data">
+        <div class="invt-table-name">
+            <span>User Logs</span>
+        </div>
+                <table class="invt-table-box" id="assetTable">      
+                    <thead>
+                        <tr>
+                            <th>Asset type ID</th>
+                            <th>User Logs</th>
+                        </tr>
+                    </thead> 
+                    <tbody>
+                    <?php
+                        if ($logs && count($logs) > 0) {
+                            foreach ($logs as $row) {
+                                echo "<tr>";
+                                echo "<td hidden>" . $row['log_ID'] . "</td>";
+                                echo "<td>" . $row['log_content'] . "</td>";
+                                // echo "<td>
+                                //         <img 
+                                //             data-entity='asset_type' 
+                                //             data-id='" . htmlspecialchars($row['asset_type_ID']) . "' 
+                                //             data-name='" . htmlspecialchars($row['asset_type']) . "' 
+                                //             class='btn-edit' 
+                                //             src='imgs/detail.png' 
+                                //             alt='Details' 
+                                //         />
+                                //         <img 
+                                //             class='btn-delete' 
+                                //             data-asset-type='" . htmlspecialchars($row['asset_type_ID']) . "' 
+                                //             src='imgs/delete.png' 
+                                //             alt='Delete' 
+                                //         />
+                                //     </td>";
+                                echo "</tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='6'>No logs found.</td></tr>";
+                        }
+                        ?>
+
+                    </tbody>
+                </table>
+    </div>
 </div>
 <?php } ?>

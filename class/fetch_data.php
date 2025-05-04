@@ -10,31 +10,25 @@ class Inventory {
 
     public function fetchAllAssets() {
         $sql = "
-           SELECT 
-                asset.asset_ID,
-                asset.inventory_tag,
-                asset.serial_number,
-                asset_type.asset_type,
-                asset_type.asset_type_status,
-                brand.brand_name,
-                brand.brand_status,
-                user.full_name AS responsible_user,
-                user.user_status,
-                unit.unit_name AS user_unit,
-                unit.unit_status
-            FROM 
-                asset
-            LEFT JOIN 
-                asset_type ON asset.asset_type_ID = asset_type.asset_type_ID
-            LEFT JOIN 
-                brand ON asset.brand_ID = brand.brand_ID
-            LEFT JOIN 
-                user ON asset.responsible_user_ID = user.user_ID
-            LEFT JOIN 
-                unit ON user.unit_ID = unit.unit_ID
-            WHERE 
-                asset.asset_status = 'active'
-        ";
+            SELECT 
+            a.asset_ID,
+            a.inventory_tag,
+            a.serial_number,
+            at.asset_type,
+            at.asset_type_status,
+            br.brand_name,
+            br.brand_status,
+            CONCAT(u.f_name, ' ', u.l_name) AS responsible_user,
+            u.user_status,
+            un.unit_name AS user_unit,
+            un.unit_status
+        FROM asset a
+        LEFT JOIN asset_type at ON a.asset_type_ID = at.asset_type_ID
+        LEFT JOIN brand br ON a.brand_ID = br.brand_ID
+        LEFT JOIN user u ON a.responsible_user_ID = u.user_ID
+        LEFT JOIN unit un ON u.unit_ID = un.unit_ID
+        WHERE a.asset_status = 'active'
+    ";
     
         $stmt = $this->pdo->query($sql);
         return $stmt->fetchAll();
@@ -43,26 +37,27 @@ class Inventory {
 
     public function fetchAssetBySerial($serial) {
         $stmt = $this->pdo->prepare("SELECT 
-            a.serial_number,
+            a.asset_ID,
             a.inventory_tag,
-            b.barcode_image_path,
-            q.qr_image_path,
+            a.serial_number,
+            at.asset_type_ID,
             at.asset_type,
-            at.asset_type_status,
-            br.brand_name,
-            br.brand_status,
-            u.full_name AS responsible_user,
-            u.user_status,
-            un.unit_name AS user_unit,
-            un.unit_status
+            b.brand_ID,
+            b.brand_name,
+            u.user_ID AS responsible_user,
+            CONCAT(u.f_name, ' ', u.m_name, ' ', u.l_name) AS responsible_name,
+            un.unit_ID,
+            un.unit_name,
+            qr.qr_image_path,
+            bc.barcode_image_path
         FROM asset a
-        LEFT JOIN barcode b ON a.barcode_image_path_ID = b.barcode_image_path_ID
-        LEFT JOIN qr_code q ON a.qr_image_path_ID = q.qr_image_path_ID
         LEFT JOIN asset_type at ON a.asset_type_ID = at.asset_type_ID
-        LEFT JOIN brand br ON a.brand_ID = br.brand_ID
+        LEFT JOIN brand b ON a.brand_ID = b.brand_ID
         LEFT JOIN user u ON a.responsible_user_ID = u.user_ID
         LEFT JOIN unit un ON u.unit_ID = un.unit_ID
-        WHERE a.serial_number = :serial");
+        LEFT JOIN barcode bc ON a.barcode_ID = bc.barcode_ID
+        LEFT JOIN qr_code qr ON a.qr_ID = qr.qr_ID
+        WHERE a.serial_number = :serial;");
     
         $stmt->execute(['serial' => $serial]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -78,50 +73,65 @@ class Users {
     }
     public function fetchAllUsers(){
         $sql = "
-        SELECT 
-            user.user_ID,
-            user.full_name,
-            unit.unit_name,
-            unit.unit_status,
-            account.username,
-            role.role_name,
-            role.role_status
-        FROM 
-            user
-        LEFT JOIN 
-            unit ON user.unit_ID = unit.unit_ID
-        LEFT JOIN 
-            account ON user.user_ID = account.user_ID
-        LEFT JOIN 
-            role ON account.role_ID = role.role_ID
-        WHERE
-            user.user_status = 'active'";
-    
+                SELECT 
+                    u.user_ID,
+                    u.kld_ID,
+                    CONCAT(u.f_name, ' ', u.l_name) AS full_name,
+                    
+                    un.unit_name,
+                    un.unit_status,
+
+                    r.role_name,
+                    r.role_status,
+                    
+                    k.kld_email
+                FROM user u
+                LEFT JOIN unit un ON u.unit_ID = un.unit_ID
+                LEFT JOIN account a ON u.user_ID = a.user_ID
+                LEFT JOIN role r ON a.role_ID = r.role_ID
+                LEFT JOIN kld k ON u.kld_ID = k.kld_ID
+                WHERE u.user_status = 'active';
+            ";
+
         $stmt = $this->pdo->query($sql);
         return $stmt->fetchAll();
     }
     
 
 
-    public function fetchUserById($userId) {
-        $stmt = $this->pdo->prepare("SELECT 
-            u.user_ID,
-            u.full_name,
-            un.unit_name,
-            un.unit_status,
-            a.username,
-            a.password_hash,
-            r.role_name
-        FROM user u
-        LEFT JOIN unit un ON u.unit_ID = un.unit_ID
-        LEFT JOIN account a ON u.user_ID = a.user_ID
-        LEFT JOIN role r ON a.role_ID = r.role_ID
-        WHERE u.user_ID = :userId");
+   public function fetchUserById($userId) {
+    $stmt = $this->pdo->prepare("SELECT 
+    u.user_ID,
+    u.f_name,
+    u.m_name,
+    u.l_name,
+    u.user_status,
     
-        $stmt->execute(['userId' => $userId]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
+    un.unit_name,
+    un.unit_status,
     
+    -- Fetch kld_ID directly from the user table
+    u.kld_ID, 
+    
+    -- If there's an account, fetch password_hash, else return NULL
+    IFNULL(a.password_hash, NULL) AS password_hash, 
+    
+    -- Fetch role only if account exists
+    IFNULL(r.role_name, NULL) AS role_name,
+    
+    -- Fetch kld_email only if there is a matching kld record
+    IFNULL(k.kld_email, NULL) AS kld_email
+    
+FROM user u
+LEFT JOIN unit un ON u.unit_ID = un.unit_ID
+LEFT JOIN account a ON u.user_ID = a.user_ID
+LEFT JOIN role r ON a.role_ID = r.role_ID
+LEFT JOIN kld k ON u.kld_ID = k.kld_ID
+WHERE u.user_ID = :userId");
+
+    $stmt->execute(['userId' => $userId]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}  
 }
 
 class Role {

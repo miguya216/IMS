@@ -127,7 +127,7 @@ if (isset($_SESSION['account_ID'])) {
         <div class="login-container">
             <form id="loginForm" method="POST">
                 <div class="input-box">
-                    <input name="username" type="text" class="form-control" placeholder="USERNAME" required />
+                    <input name="kld_email" type="email" class="form-control" placeholder="KLD EMAIL" required />
                 </div>
                 <div class="input-box">
                     <input name="password" type="password" class="form-control" placeholder="PASSWORD" required />

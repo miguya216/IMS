@@ -43,7 +43,7 @@ function details() {
                 <label>Asset Type:</label>
                     <select name="asset" class="form-control" id="detail_asset" required>
                         <?php foreach ($assetTypes as $type): ?>
-                            <option value="<?= htmlspecialchars($type['asset_type']) ?>">
+                            <option value="<?= htmlspecialchars($type['asset_type_ID']) ?>">
                                 <?= htmlspecialchars($type['asset_type']) ?>
                             </option>
                         <?php endforeach; ?>
@@ -54,7 +54,7 @@ function details() {
                 <label>Brand:</label>
                     <select name="brand" class="form-control" id="detail_brand" required>
                         <?php foreach ($brands as $brand): ?>
-                            <option value="<?= htmlspecialchars($brand['brand_name']) ?>">
+                            <option value="<?= htmlspecialchars($brand['brand_ID']) ?>">
                                 <?= htmlspecialchars($brand['brand_name']) ?>
                             </option>
                         <?php endforeach; ?>
@@ -64,10 +64,11 @@ function details() {
                 <div class="input-box">
                 <label>Responsible To:</label>
                     <select name="responsibleTo" class="form-control" id="detail_responsible" required>
-                        <?php foreach ($users as $user): ?>
-                            <option value="<?= htmlspecialchars($user['full_name']) ?>">
-                                <?= htmlspecialchars($user['full_name']) ?>
-                            </option>
+                    <?php foreach ($users as $user): ?>
+                            <option value="<?= htmlspecialchars($user['user_ID']) ?>"><?= 
+                                htmlspecialchars($user['f_name']) . ' ' .
+                                htmlspecialchars($user['m_name']). ' ' .
+                                htmlspecialchars($user['l_name']) ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -76,7 +77,7 @@ function details() {
                 <label>Unit/Institute:</label>
                     <select name="unit" class="form-control" id="detail_unit" required>
                         <?php foreach ($units as $unit): ?>
-                            <option value="<?= htmlspecialchars($unit['unit_name']) ?>">
+                            <option value="<?= htmlspecialchars($unit['unit_ID']) ?>">
                                 <?= htmlspecialchars($unit['unit_name']) ?>
                             </option>
                         <?php endforeach; ?>

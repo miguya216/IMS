@@ -11,8 +11,8 @@
             FROM asset a
             JOIN asset_type at ON a.asset_type_ID = at.asset_type_ID
             JOIN brand b ON a.brand_ID = b.brand_ID
-            JOIN barcode br ON a.barcode_image_path_ID = br.barcode_image_path_ID
-            JOIN qr_code qr ON a.qr_image_path_ID = qr.qr_image_path_ID";
+            JOIN barcode br ON a.barcode_ID = br.barcode_ID
+            JOIN qr_code qr ON a.qr_ID = qr.qr_ID";
 
     $stmt = $pdo->query($sql);
     ?>
@@ -24,7 +24,7 @@
     <link rel="stylesheet" href="\ims\bootstrap\css\bootstrap.min.css">
     <script src="\ims\bootstrap\js\bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="\ims\css\style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="script/html2pdf.bundle.min.js"></script>
 </head>
 <body class = "request-body">
     
@@ -36,7 +36,7 @@
 <div id="barcodeContent">
     <h3 class="mb-4 text-center">Barcode List</h3>
     <div class="row mb-2 fw-bold border-bottom pb-2">
-        <div class="col-sm-4 text-start">Barcode | QR Code:</div>
+        <div class="col-sm-4 text-start">Barcode:</div>
         <div class="col-sm-8 text-start">Details:</div>
     </div>
 
@@ -57,5 +57,6 @@
 </div>
     </div>
 </div>
+<script src="script/script.js"></script>
 </body>
 </html>

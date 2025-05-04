@@ -17,15 +17,16 @@ function detailesUserModal (){
                         Create an account for this user
                     </label>
                 </div>
-
+                <input name="user_ID" type="hidden" class="form-control" id="user_detail_user_ID">
+                
                 <div class="input-box">
-                    <label for="user_detail_id">User ID:</label>
-                    <input name="user_ID" type="text" class="form-control" id="user_detail_id" readonly>
+                    <label for="kld_ID">KLD ID:</label>
+                    <input name="kld_ID" type="text" class="form-control" id="user_detail_kld_ID" required>
                 </div>
 
                 <div class="input-box">
                     <label for="_user_role">Role:</label>
-                    <select name="user_detail_role" class="form-control" id="user_detail_role" required>
+                    <select name="role" class="form-control" id="user_detail_role" required>
                         <option value="" selected disabled>Select role</option>
                         <?php foreach ($roles as $role): ?>
                             <option value="<?= htmlspecialchars($role['role_name']) ?>"><?= htmlspecialchars($role['role_name']) ?></option>
@@ -34,23 +35,33 @@ function detailesUserModal (){
                 </div>
                 
                 <div class="input-box">
-                    <label for="user_detail_username">username:</label>
-                    <input name="user_detail_username" type="text" class="form-control" id="user_detail_username" required>
+                    <label for="kld_email">KLD email:</label>
+                    <input name="kld_email" type="text" class="form-control" id="user_detail_kld_email" required>
                 </div>
 
                 <div class="input-box">
-                    <label for="user_detail_password">password:</label>
-                    <input name="user_detail_password" type="password" class="form-control" id="user_detail_password">
+                    <label for="password">password:</label>
+                    <input name="password" type="password" class="form-control" id="user_detail_password">
                 </div>
 
                 <div class="input-box">
-                    <label for="user_detail_fullname">Full name:</label>
-                    <input name="user_detail_fullname" type="text" class="form-control" id="user_detail_fullname" required>
+                    <label for="f_name">First name:</label>
+                    <input name="f_name" type="text" class="form-control" id="user_detail_f_name" required>
+                </div>
+
+                <div class="input-box">
+                    <label for="m_name">Middle name:</label>
+                    <input name="m_name" type="text" class="form-control" id="user_detail_m_name" required>
+                </div>
+
+                <div class="input-box">
+                    <label for="l_name">Last name:</label>
+                    <input name="l_name" type="text" class="form-control" id="user_detail_l_name" required>
                 </div>
 
                 <div class="input-box">
                     <label for="unit">Unit/Institute:</label>
-                        <select name="user_detail_unit" class="form-control" id="user_detail_unit" required>
+                        <select name="unit" class="form-control" id="user_detail_unit" required>
                             <option value="" selected disabled>Select Unit (Add new if none)</option>
                             <?php foreach ($units as $unit): ?>
                                 <option value="<?= htmlspecialchars($unit['unit_ID']) ?>"><?= htmlspecialchars($unit['unit_name']) ?></option>

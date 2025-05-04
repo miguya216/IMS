@@ -77,41 +77,60 @@ function searchUser() {
 document.addEventListener("DOMContentLoaded", function () {
     const mainFilter = document.getElementById("mainFilter");
     const subFilter = document.getElementById("subFilter");
-    const table = document.querySelector(".filterable-table");
-    const rows = table.querySelectorAll("tbody tr");
 
-    mainFilter.addEventListener("change", () => {
-        const colIndex = parseInt(mainFilter.value, 10);
-        subFilter.innerHTML = `<option value="">Select a value</option>`;
-        subFilter.disabled = true;
+    // Function to initialize filtering when the table is visible
+    function initializeTableFiltering() {
+        const table = document.querySelector(".filterable-table");
+        if (!table) return; // Return early if the table is not found
 
-        if (!isNaN(colIndex)) {
-            const uniqueValues = new Set();
-            rows.forEach(row => {
-                const text = row.cells[colIndex].textContent.trim();
-                if (text) uniqueValues.add(text);
-            });
+        const rows = table.querySelectorAll("tbody tr");
 
-            [...uniqueValues].sort().forEach(val => {
-                const option = document.createElement("option");
-                option.value = val;
-                option.textContent = val;
-                subFilter.appendChild(option);
-            });
+        mainFilter.addEventListener("change", () => {
+            const colIndex = parseInt(mainFilter.value, 10);
+            subFilter.innerHTML = `<option value="">Select a value</option>`;
+            subFilter.disabled = true;
 
-            subFilter.disabled = false;
-        }
-    });
+            if (!isNaN(colIndex)) {
+                const uniqueValues = new Set();
+                rows.forEach(row => {
+                    const text = row.cells[colIndex].textContent.trim();
+                    if (text) uniqueValues.add(text);
+                });
 
-    subFilter.addEventListener("change", () => {
-        const colIndex = parseInt(mainFilter.value, 10);
-        const selected = subFilter.value.toLowerCase();
+                [...uniqueValues].sort().forEach(val => {
+                    const option = document.createElement("option");
+                    option.value = val;
+                    option.textContent = val;
+                    subFilter.appendChild(option);
+                });
 
-        rows.forEach(row => {
-            const cellText = row.cells[colIndex].textContent.toLowerCase();
-            row.style.display = !selected || cellText === selected ? "" : "none";
+                subFilter.disabled = false;
+            }
         });
-    });
+
+        subFilter.addEventListener("change", () => {
+            const colIndex = parseInt(mainFilter.value, 10);
+            const selected = subFilter.value.toLowerCase();
+
+            rows.forEach(row => {
+                const cellText = row.cells[colIndex].textContent.toLowerCase();
+                row.style.display = !selected || cellText === selected ? "" : "none";
+            });
+        });
+    }
+
+    // You could trigger this initialization when the table tab is shown (if using tabbed navigation)
+    const tableTab = document.getElementById("tableTab"); // Assume you have an ID for the tab with the table
+
+    // Example: Listen for tab change event if using Bootstrap tabs or similar
+    if (tableTab) {
+        tableTab.addEventListener("shown.bs.tab", () => {
+            initializeTableFiltering();
+        });
+    } else {
+        // If not using tabs, you can simply initialize the filter on DOMContentLoaded
+        initializeTableFiltering();
+    }
 });
 
 // end of dynamic populate filter
@@ -216,7 +235,9 @@ document.addEventListener("DOMContentLoaded", () => {
             // Initialize 'Add new...' input fields
             toggleNewField("asset", "new_asset", "__new_asset_type__");
             toggleNewField("brand", "new_brand", "__new_brand__");
-            toggleNewField("responsibleTo", "new_responsibleTo", "__new_responsibleTo__");
+            toggleNewField("responsibleTo", "new_responsibleTo_f", "__new_responsibleTo__");
+            toggleNewField("responsibleTo", "new_responsibleTo_m", "__new_responsibleTo__" , false);
+            toggleNewField("responsibleTo", "new_responsibleTo_l", "__new_responsibleTo__");
             toggleNewField("unit", "new_unit", "__new_unit__");
         });
 
@@ -257,7 +278,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-function toggleNewField(selectId, inputId, triggerValue) {
+function toggleNewField(selectId, inputId, triggerValue = true) {
     const select = document.getElementById(selectId);
     const input = document.getElementById(inputId);
 
@@ -317,27 +338,33 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll(".btn-edit").forEach(btn => {
             btn.addEventListener("click", () => {
                 const serial = btn.id.split("-")[1];
+
+                
                 fetch(`/ims/auth/asset/get_asset_by_serial.php?serial=${encodeURIComponent(serial)}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data) {
-                            document.getElementById("qrCodeImg").src = '/ims/' + data.qr_image_path;
-                            document.getElementById("barcodeImg").src = '/ims/' + data.barcode_image_path;
+                .then(res => res.json())
+                .then(response => {
+                    if (response.status === 'success') {
+                            const data = response.data;
+                            document.getElementById("qrCodeImg").src = '/ims/' + data.qr_path;
+                            document.getElementById("barcodeImg").src = '/ims/' +  data.barcode_path;
+                    
                             document.getElementById("detail_tag").value = data.inventory_tag;
                             document.getElementById("detail_serial").value = data.serial_number;
-                            document.getElementById("detail_asset").value = data.asset_type || "";
-                            document.getElementById("detail_brand").value = data.brand_name || "";
-                            document.getElementById("detail_responsible").value = data.responsible_user || "";
-                            document.getElementById("detail_unit").value = data.user_unit || "";
-
+                    
+                            document.getElementById("detail_asset").value = data.asset_type_ID;
+                            document.getElementById("detail_brand").value = data.brand_ID;
+                            document.getElementById("detail_responsible").value = data.responsible_user;
+                            document.getElementById("detail_unit").value = data.unit_ID;
+                    
                             captureInitialDetails();
                             modalDetails.classList.add("show");
                             document.body.style.overflow = "hidden";
                         } else {
-                            alert("Asset details not found.");
+                            alert(response.message || "Asset details not found.");
                         }
                     })
-                    .catch(() => alert("Error loading asset details."));
+                    .catch((err) => { console.error("Fetch error:", err);
+                    alert("Error loading asset details.");})
             });
         });
 
@@ -347,6 +374,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Start of asset details modal
 let initialDetails = {};
+function captureInitialDetails() {
+    initialDetails = {
+        tag: document.getElementById('detail_tag').value,
+        asset: document.getElementById('detail_asset').value,
+        brand: document.getElementById('detail_brand').value,
+        responsible: document.getElementById('detail_responsible').value,
+        unit: document.getElementById('detail_unit').value
+    };
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     const formUpdate = document.getElementById('updateForm');
@@ -378,16 +414,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-function captureInitialDetails() {
-    initialDetails = {
-        tag: document.getElementById('detail_tag').value,
-        asset: document.getElementById('detail_asset').value,
-        brand: document.getElementById('detail_brand').value,
-        responsible: document.getElementById('detail_responsible').value,
-        unit: document.getElementById('detail_unit').value
-    };
-}
-
 // Start of delete asset
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.btn-delete').forEach(button => {
@@ -417,58 +443,64 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.addEventListener("DOMContentLoaded", () => {
     const get = id => document.getElementById(id);
-    const toggleFields = (toggle, fields, forceRequired = true) => {
+
+    const toggleFields = (toggle, className = "account-field", forceRequired = true) => {
         const show = toggle.checked;
-        fields.forEach(f => {
-            if (!f) return;
-            f.parentElement.style.display = show ? "flex" : "none";
-            f.disabled = !show;
-            f.required = forceRequired && show;
+        document.querySelectorAll(`.${className}`).forEach(box => {
+            box.style.display = show ? "flex" : "none";
+            box.querySelectorAll("input, select").forEach(input => {
+                input.disabled = !show;
+                input.required = forceRequired && show;
+            });
         });
     };
-
-    const addUserBtn = get("addUserBtn"), modalAdd = get("modal_cont_add_user"),
-          closeAdd = get("close_add_user"), addUserForm = get("addUserForm"),
-          toggleAccount = get("toggle_account_fields"),
-          role = get("role"), username = get("username"), password = get("password");
-
+    
+    const addUserBtn = get("addUserBtn"),
+          modalAdd = get("modal_cont_add_user"),
+          closeAdd = get("close_add_user"),
+          addUserForm = get("addUserForm"),
+          toggleAccount = get("toggle_account_fields");
+    
     if (addUserBtn && modalAdd && closeAdd && addUserForm && toggleAccount) {
-        toggleFields({checked:false}, [role, username, password]);
-
-        toggleAccount.addEventListener("change", () => toggleFields(toggleAccount, [role, username, password]));
-
+        toggleFields(toggleAccount);
+    
+        toggleAccount.addEventListener("change", () => toggleFields(toggleAccount));
+    
         addUserBtn.addEventListener("click", () => {
             modalAdd.classList.add("show");
             document.body.style.overflow = "hidden";
             ["unit", "role"].forEach(f => toggleNewField(f, `new_${f}`, `__new_${f}__`));
         });
-
+    
         closeAdd.addEventListener("click", () => {
             modalAdd.classList.remove("show");
             document.body.style.overflow = "auto";
             addUserForm.reset();
             ["new_unit", "new_role"].forEach(id => {
                 const el = get(id);
-                if (el) Object.assign(el.style, {display:"none"}), el.disabled = true, el.required = false;
+                if (el) Object.assign(el.style, { display: "none" }), el.disabled = true, el.required = false;
             });
             toggleAccount.checked = false;
-            toggleFields({checked:false}, [role, username, password]);
+            toggleFields({ checked: false });
             setTimeout(() => location.reload(), 500);
         });
-
+    
         addUserForm.addEventListener("submit", e => {
             e.preventDefault();
             const data = new FormData(addUserForm);
-            if (!toggleAccount.checked) ["role", "username", "password"].forEach(k => data.set(k, ""));
+            if (!toggleAccount.checked) ["role", "kld_id", "kld_email", "password"].forEach(k => data.set(k, ""));
             fetch('/ims/auth/users/InsertAuth.php', { method: 'POST', body: data })
                 .then(res => res.text())
-                .then(res => showPopup(res.trim().toLowerCase() === "success" ? "User successfully added." : res, res.trim().toLowerCase() === "success" ? "#005a34" : "#FF0000"))
+                .then(res => showPopup(
+                    res.trim().toLowerCase() === "success" ? "User successfully added." : res,
+                    res.trim().toLowerCase() === "success" ? "#005a34" : "#FF0000"
+                ))
                 .catch(() => showPopup('Something went wrong.', '#FF0000'));
         });
     }
 
-    // User Detail Modal
-    const userModal = get('modal_cont_detail_user'), closeDetail = get('close_detail_user');
+    const userModal = document.getElementById('modal_cont_detail_user');
+    const closeDetail = document.getElementById('close_detail_user');
     if (userModal && closeDetail) {
         document.querySelectorAll(".btn-edit").forEach(btn => {
             btn.addEventListener("click", () => {
@@ -476,40 +508,62 @@ document.addEventListener("DOMContentLoaded", () => {
                     .then(res => res.json())
                     .then(d => {
                         if (!d) return alert("User details not found.");
-                        get("user_detail_id").value = d.user_ID || "";
-                        get("user_detail_fullname").value = d.full_name || "";
-                        get("user_detail_username").value = d.username || "";
-                        get("user_detail_password").value = "";
+                        // Set user details into modal
+                        document.getElementById("user_detail_user_ID").value = d.user_ID || "";
+                        document.getElementById("user_detail_kld_ID").value = d.kld_ID || "";
+                        document.getElementById("user_detail_f_name").value = d.f_name || "";
+                        document.getElementById("user_detail_m_name").value = d.m_name || "";
+                        document.getElementById("user_detail_l_name").value = d.l_name || "";
+                        document.getElementById("user_detail_kld_email").value = d.kld_email || "";
+                        document.getElementById("user_detail_password").value = "";
+                        
+
+                        // Populate select fields (role, unit)
                         ["role", "unit"].forEach(f => {
                             const s = get(`user_detail_${f}`);
                             Array.from(s.options).forEach(opt => opt.selected = opt.text === d[`${f}_name`]);
                         });
 
                         const toggleDetails = get("toggle_account_fields_details"),
-                              detailRole = get("user_detail_role"),
-                              detailUsername = get("user_detail_username"),
-                              detailPassword = get("user_detail_password");
-                        
-                        if (d.username) {
-                            // Has account
-                            toggleDetails.checked = true;
-                            toggleFields(toggleDetails, [detailRole, detailUsername], true);
-                            toggleFields(toggleDetails, [detailPassword], false); // Password NOT required when editing
+                            detailRole = get("user_detail_role"),
+                            detailUsername = get("user_detail_kld_email"),
+                            detailPassword = get("user_detail_password");
+
+                        const toggleAccountFields = (enabled, passwordRequired = true) => {
+                            // Toggle visibility and enable/disable fields
+                            [detailRole, detailUsername].forEach(f => {
+                                const wrapper = f.closest(".account-field") || f.parentElement;
+                                if (wrapper) wrapper.style.display = enabled ? "flex" : "none";
+                                f.disabled = !enabled;
+                                f.required = enabled;
+                            });
+
+                            const pwdWrapper = detailPassword.closest(".account-field") || detailPassword.parentElement;
+                            if (pwdWrapper) pwdWrapper.style.display = enabled ? "flex" : "none";
+                            detailPassword.disabled = !enabled;
+                            detailPassword.required = enabled && passwordRequired;
+                        };
+
+                        // If user has account details (role, email), show account fields
+                        const hasAccount = d.kld_email && d.role_name;
+                        if (hasAccount) {
+                            toggleDetails.checked = true; // Checkbox on
+                            toggleAccountFields(true, false); // Account fields enabled, password not required
                         } else {
-                            // No account
-                            toggleDetails.checked = false;
-                            toggleFields({checked:false}, [detailRole, detailUsername, detailPassword]);
+                            toggleDetails.checked = false; // Checkbox off
+                            toggleAccountFields(false); // Account fields hidden
                         }
 
+                        // Toggle the account fields visibility when checkbox is changed
                         toggleDetails.addEventListener("change", () => {
                             if (toggleDetails.checked) {
-                                toggleFields(toggleDetails, [detailRole, detailUsername], true);
-                                toggleFields(toggleDetails, [detailPassword], true);
+                                toggleAccountFields(true, true); // Password required when checkbox is checked
                             } else {
-                                toggleFields({checked:false}, [detailRole, detailUsername, detailPassword]);
+                                toggleAccountFields(false); // Hide account fields when unchecked
                             }
                         });
-
+                        captureInitialUserDetails();
+                        // Show modal
                         userModal.classList.add("show");
                         document.body.style.overflow = "hidden";
                     })
@@ -524,31 +578,61 @@ document.addEventListener("DOMContentLoaded", () => {
             setTimeout(() => location.reload(), 500);
         });
     }
+});
 
-    // Edit Form
-    const detailForm = get("userDetailsForm");
-    if (detailForm) {
-        let initial = {};
-        document.querySelectorAll('[data-open="details-modal"]').forEach(btn => btn.addEventListener("click", () => {
-            ["role", "user_ID", "username", "password", "full_name", "user_unit"].forEach(k => initial[k] = get(`user_detail_${k}`)?.value || "");
-        }));
+// Start of user details modal form submission
+let initialUserDetails = {};
+function captureInitialUserDetails() {
+    initialUserDetails = {
+        user_ID: document.getElementById('user_detail_user_ID').value,
+        kld_ID: document.getElementById('user_detail_kld_ID').value,
+        f_name: document.getElementById('user_detail_f_name').value,
+        m_name: document.getElementById('user_detail_m_name').value,
+        l_name: document.getElementById('user_detail_l_name').value,
+        kld_email: document.getElementById('user_detail_kld_email').value,
+        role: document.getElementById('user_detail_role').value,
+        unit: document.getElementById('user_detail_unit').value,
+        password: document.getElementById("user_detail_password").value
+    };
+}
 
-        detailForm.addEventListener("submit", e => {
+document.addEventListener('DOMContentLoaded', () => {
+    const formUpdateUser = document.getElementById('userDetailsForm');
+
+    if (formUpdateUser) {
+        formUpdateUser.addEventListener('submit', function (e) {
             e.preventDefault();
-            const current = {};
-            ["role", "user_ID", "username", "password", "full_name", "user_unit"].forEach(k => current[k] = get(`user_detail_${k}`)?.value || "");
-            if (!Object.keys(current).some(k => current[k] !== initial[k])) return showPopup("No changes detected.", 'orange');
+            const currentU = {
+                user_ID: document.getElementById('user_detail_user_ID').value,
+                kld_ID: document.getElementById('user_detail_kld_ID').value,
+                f_name: document.getElementById('user_detail_f_name').value,
+                m_name: document.getElementById('user_detail_m_name').value,
+                l_name: document.getElementById('user_detail_l_name').value,
+                kld_email: document.getElementById('user_detail_kld_email').value,
+                role: document.getElementById('user_detail_role').value,
+                unit: document.getElementById('user_detail_unit').value,
+                password: document.getElementById("user_detail_password").value
+            };
 
-            fetch("/ims/auth/users/updateAuth.php", { method: "POST", body: new FormData(detailForm) })
+            const changed = Object.keys(currentU).some(key => currentU[key] !== initialUserDetails[key]);
+            if (!changed) return showPopup("No changes detected.", 'orange');
+
+            const formData = new FormData(formUpdateUser);
+            fetch('/ims/auth/users/updateAuth.php', { method: 'POST', body: formData })
                 .then(res => res.text())
-                .then(r => {
-                    const resp = r.trim().toLowerCase();
-                    showPopup(resp === "success" ? "Success!" : resp === "duplicate" ? "No changes detected." : r, resp === "success" ? "#005a34" : "orange");
-                    if (resp === "success") initial = {...current};
+                .then(response => {
+                    console.log(response); // Log the response from the backend
+                    showPopup(response.trim().toLowerCase() === "success" ? 'Success!' : response, response.trim().toLowerCase() === "success" ? '#005a34' : '#FF0000');
                 })
                 .catch(() => showPopup('Something went wrong.', '#FF0000'));
         });
+
+        // Capture initial user details on modal open
+        document.querySelectorAll('[data-open="user-details-modal"]').forEach(button => {
+            button.addEventListener('click', () => captureInitialUserDetails());
+        });
     }
+
 });
 
 // Start of delete users
@@ -578,131 +662,131 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Field toggle handler
-function toggleNewField(selectId, inputId, triggerValue) {
-    const select = document.getElementById(selectId), input = document.getElementById(inputId);
-    if (!select || !input) return console.warn(`Missing ${selectId} or ${inputId}`);
-    const toggle = () => {
-        const match = select.value === triggerValue;
-        input.style.display = match ? "block" : "none";
-        input.required = match;
-        input.disabled = !match;
-    };
-    toggle();
-    select.addEventListener("change", toggle);
-}
+// // Field toggle handler
+// function toggleNewField(selectId, inputId, triggerValue) {
+//     const select = document.getElementById(selectId), input = document.getElementById(inputId);
+//     if (!select || !input) return console.warn(`Missing ${selectId} or ${inputId}`);
+//     const toggle = () => {
+//         const match = select.value === triggerValue;
+//         input.style.display = match ? "block" : "none";
+//         input.required = match;
+//         input.disabled = !match;
+//     };
+//     toggle();
+//     select.addEventListener("change", toggle);
+// }
 
 
-document.addEventListener("DOMContentLoaded", () => {
-    const modal = document.getElementById("editModal");
-    const modalTitle = document.getElementById("modalTitle");
-    const form = document.getElementById("editForm");
-    const responseDiv = document.getElementById("responseMessage");
-    const entityTypeField = document.getElementById("entity_type");
-    const idField = document.getElementById("entity_ID");
-    const nameField = document.getElementById("entity_name");
+// document.addEventListener("DOMContentLoaded", () => {
+//     const modal = document.getElementById("editModal");
+//     const modalTitle = document.getElementById("modalTitle");
+//     const form = document.getElementById("editForm");
+//     const responseDiv = document.getElementById("responseMessage");
+//     const entityTypeField = document.getElementById("entity_type");
+//     const idField = document.getElementById("entity_ID");
+//     const nameField = document.getElementById("entity_name");
 
-    const openModal = () => {
-        modal.classList.remove("hidden");
-        setTimeout(() => modal.classList.add("show"), 10);
-    };
+//     const openModal = () => {
+//         modal.classList.remove("hidden");
+//         setTimeout(() => modal.classList.add("show"), 10);
+//     };
 
-    const closeModal = () => {
-        modal.classList.remove("show");
-        setTimeout(() => modal.classList.add("hidden"), 300);
-    };
+//     const closeModal = () => {
+//         modal.classList.remove("show");
+//         setTimeout(() => modal.classList.add("hidden"), 300);
+//     };
 
-    const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1);
+//     const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1);
 
-    document.addEventListener("click", (e) => {
-        if (e.target.classList.contains("btn-edit")) {
-            const { entity, id, name } = e.target.dataset;
-            Object.assign(entityTypeField, { value: entity });
-            Object.assign(idField, { value: id });
-            Object.assign(nameField, { value: name });
-            modalTitle.textContent = `Manage ${capitalize(entity.replace("_", " "))}`;
-            responseDiv.textContent = "";
-            openModal();
-        }
+//     document.addEventListener("click", (e) => {
+//         if (e.target.classList.contains("btn-edit")) {
+//             const { entity, id, name } = e.target.dataset;
+//             Object.assign(entityTypeField, { value: entity });
+//             Object.assign(idField, { value: id });
+//             Object.assign(nameField, { value: name });
+//             modalTitle.textContent = `Manage ${capitalize(entity.replace("_", " "))}`;
+//             responseDiv.textContent = "";
+//             openModal();
+//         }
 
-        if (e.target.id === "close_ref") {
-            closeModal();
-            setTimeout(() => location.reload(), 500);
-        }
-    });
+//         if (e.target.id === "close_ref") {
+//             closeModal();
+//             setTimeout(() => location.reload(), 500);
+//         }
+//     });
 
-    if (form) {
-        form.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            try {
-                const res = await fetch("/ims/auth/reference/updateAuth.php", {
-                    method: "POST",
-                    body: new FormData(form)
-                });
-                const text = (await res.text()).trim().toLowerCase();
-                const messages = {
-                    success: ['Success!', '#005a34'],
-                    duplicate: ['No changes detected.', 'orange']
-                };
-                showPopup(...(messages[text] || [text, '#FF0000']));
-            } catch {
-                showPopup("Something went wrong.", "error");
-            }
-        });
-    }
+//     if (form) {
+//         form.addEventListener("submit", async (e) => {
+//             e.preventDefault();
+//             try {
+//                 const res = await fetch("/ims/auth/reference/updateAuth.php", {
+//                     method: "POST",
+//                     body: new FormData(form)
+//                 });
+//                 const text = (await res.text()).trim().toLowerCase();
+//                 const messages = {
+//                     success: ['Success!', '#005a34'],
+//                     duplicate: ['No changes detected.', 'orange']
+//                 };
+//                 showPopup(...(messages[text] || [text, '#FF0000']));
+//             } catch {
+//                 showPopup("Something went wrong.", "error");
+//             }
+//         });
+//     }
 
 
-// Start of delete reference
+// // Start of delete reference
 
-document.querySelectorAll('.btn-delete').forEach(button => {
-    button.addEventListener('click', () => {
-        let type = '';
-        let id = '';
+// document.querySelectorAll('.btn-delete').forEach(button => {
+//     button.addEventListener('click', () => {
+//         let type = '';
+//         let id = '';
 
-        if (button.hasAttribute('data-role')) {
-            type = 'role';
-            id = button.getAttribute('data-role');
-        } else if (button.hasAttribute('data-unit')) {
-            type = 'unit';
-            id = button.getAttribute('data-unit');
-        } else if (button.hasAttribute('data-asset-type')) {
-            type = 'asset_type';
-            id = button.getAttribute('data-asset-type');
-        } else if (button.hasAttribute('data-brand')) {
-            type = 'brand';
-            id = button.getAttribute('data-brand');
-        }
+//         if (button.hasAttribute('data-role')) {
+//             type = 'role';
+//             id = button.getAttribute('data-role');
+//         } else if (button.hasAttribute('data-unit')) {
+//             type = 'unit';
+//             id = button.getAttribute('data-unit');
+//         } else if (button.hasAttribute('data-asset-type')) {
+//             type = 'asset_type';
+//             id = button.getAttribute('data-asset-type');
+//         } else if (button.hasAttribute('data-brand')) {
+//             type = 'brand';
+//             id = button.getAttribute('data-brand');
+//         }
 
-        if (!type || !id) return;
+//         if (!type || !id) return;
 
-        if (confirm(`Are you sure you want to delete this ${type.replace('_', ' ')}?`)) {
-            const payload = new URLSearchParams({
-                id,
-                type
-            });
+//         if (confirm(`Are you sure you want to delete this ${type.replace('_', ' ')}?`)) {
+//             const payload = new URLSearchParams({
+//                 id,
+//                 type
+//             });
 
-            // Add specific field name required by backend
-            payload.append(`${type}_ID`, id);
+//             // Add specific field name required by backend
+//             payload.append(`${type}_ID`, id);
             
-            fetch('/ims/auth/reference/deleteAuth.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: payload
-            })
-            .then(res => res.text())
-            .then(response => {
-                if (response.trim().toLowerCase() === 'success') {
-                    showPopup(`${type.replace('_', ' ')} successfully deleted.`, '#005a34');
-                    setTimeout(() => location.reload(), 1500);
-                } else {
-                    showPopup('Error: ' + response, '#FF0000');
-                }
-            })
-            .catch(() => showPopup('Something went wrong.', '#FF0000'));
-        }
-    });
-});
+//             fetch('/ims/auth/reference/deleteAuth.php', {
+//                 method: 'POST',
+//                 headers: {
+//                     'Content-Type': 'application/x-www-form-urlencoded'
+//                 },
+//                 body: payload
+//             })
+//             .then(res => res.text())
+//             .then(response => {
+//                 if (response.trim().toLowerCase() === 'success') {
+//                     showPopup(`${type.replace('_', ' ')} successfully deleted.`, '#005a34');
+//                     setTimeout(() => location.reload(), 1500);
+//                 } else {
+//                     showPopup('Error: ' + response, '#FF0000');
+//                 }
+//             })
+//             .catch(() => showPopup('Something went wrong.', '#FF0000'));
+//         }
+//     });
+// });
 
-});
+// });

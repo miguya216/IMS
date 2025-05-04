@@ -19,7 +19,7 @@ function addUserModal () {
                     </label>
                 </div>
 
-                <div class="input-box">
+                <div class="input-box account-field">
                     <label for="role">Role:</label>
                     <select name="role" class="form-control" id="role" required>
                         <option value="" selected disabled>Select role (Add new if none)</option>
@@ -30,24 +30,41 @@ function addUserModal () {
                     </select>
                 </div>
 
-                <div class="input-box">
+                <div class="input-box account-field">
                     <label for="role"></label>
                     <input name="new_role" type="text" class="form-control" id="new_role" style="display:none;" required>
                 </div>
-                <div class="input-box">
-                    <label for="username">Username:</label>
-                    <input type="text" name="username" class="form-control" id="username" disabled required>
-                </div>
 
                 <div class="input-box">
+                    <label for="kld_id">KLD-ID:</label>
+                    <input name="kld_id" type="text" class="form-control" id="kld_id" placeholder="KLD-00-000000">
+                </div>
+
+                <div class="input-box account-field">
+                    <label for="kld_email">KLD-email:</label>
+                    <input type="email" name="kld_email" class="form-control" id="kld_email" placeholder="jmprepuya@kld.edu.ph">
+                </div>
+
+                <div class="input-box account-field">
                     <label for="password">Password:</label>
-                    <input type="password" name="password" class="form-control" id="password" disabled required>
+                    <input type="password" name="password" class="form-control" id="password">
                 </div>
+                
+                <div class="input-box">
+                    <label for="f_name">First Name:</label>
+                    <input name="f_name" type="text" class="form-control" id="f_name" required>
+                </div> 
 
                 <div class="input-box">
-                    <label for="full_name">Full Name:</label>
-                    <input name="full_name" type="text" class="form-control" id="full_name" required>
+                    <label for="m_name">Middle Name:</label>
+                    <input name="m_name" type="text" class="form-control" id="m_name" required>
                 </div> 
+
+                <div class="input-box">
+                    <label for="l_name">Last Name:</label>
+                    <input name="l_name" type="text" class="form-control" id="l_name" required>
+                </div> 
+
 
                 <div class="input-box">
                     <label for="unit">Unit/Institute:</label>
@@ -66,7 +83,7 @@ function addUserModal () {
                 </div>
 
                 <div class="input-box">
-                    <button type="submit" class="btn" id="saveNewUser">Add Item</button>
+                    <button type="submit" class="btn" id="saveNewUser">Register</button>
                     <li type="submit" class="btn" id="close_add_user">Close</li>
                 </div> 
             </div>      
