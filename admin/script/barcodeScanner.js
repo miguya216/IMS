@@ -16,7 +16,11 @@ document.addEventListener('DOMContentLoaded', function () {
             buffer = ''; // reset buffer
 
             if (barcode !== "") {
+<<<<<<< HEAD
                 fetch('../class/get_details_by_barcode.php', {
+=======
+                fetch('../class/get_by_details_barcode_img.php', {
+>>>>>>> c0eb7cda9e3509a5a4e3af95f6568498a6bd10e8
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
@@ -28,6 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
+<<<<<<< HEAD
                         document.getElementById('barcodeImg_b').src = "../" + (data.asset.barcode_image_path || 'barcodes/placeholder.png');
                         document.getElementById('qrCodeImg_b').src = "../" + (data.asset.qr_image_path || 'qrcodes/placeholder.png');
                         document.getElementById('detail_tag_b').value = data.asset.inventory_tag || '';
@@ -36,6 +41,16 @@ document.addEventListener('DOMContentLoaded', function () {
                         document.getElementById('detail_brand_b').value = data.asset.brand || '';
                         document.getElementById('detail_responsible_b').value = data.asset.responsible_user || '';
                         document.getElementById('detail_unit_b').value = data.asset.unit || '';
+=======
+                        document.getElementById('barcodeImg').src = "../" + (data.asset.barcode_img_path || 'barcodes/placeholder.png');
+                        document.getElementById('qrCodeImg').src = "../" + (data.asset.qr_path || 'qrcodes/placeholder.png');
+                        document.getElementById('detail_tag').textContent = data.asset.inventory_tag || '';
+                        document.getElementById('detail_serial').textContent = data.asset.serial_number || '';
+                        document.getElementById('detail_asset').textContent = data.asset.asset_type || '';
+                        document.getElementById('detail_brand').textContent = data.asset.brand || '';
+                        document.getElementById('detail_responsible').textContent = data.asset.responsible_user || '';
+                        document.getElementById('detail_unit').textContent = data.asset.unit || '';
+>>>>>>> c0eb7cda9e3509a5a4e3af95f6568498a6bd10e8
 
                         // Show modal
                         document.getElementById('barcode_details').classList.add('show');
