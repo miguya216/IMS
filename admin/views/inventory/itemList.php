@@ -8,9 +8,6 @@ function itemList(){
     $inventory = new Inventory($pdo);
     $assets = $inventory->fetchAllAssets();
 ?>
-                <!-- <div class="invt-table-name">
-                    <span>Asset Table</span>
-                </div> -->
                     <div class="invt-table-data">
                         <table class="invt-table-box filterable-table" id="inventoryTable">      
                             <thead>

@@ -4,6 +4,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\class\user\user_handler.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $user = new UpdateUser();
 
+$response_for_this_log = $_POST['name'];
 $user_ID = $_POST['user_ID']; // this is uneditable in front end
 $kld_ID = $_POST['kld_ID'];
 $role = $_POST['role'] ?? null;
@@ -15,6 +16,7 @@ $l_name = $_POST['l_name'];
 $unit = $_POST['unit'];
 
 $response = $user->UpdateUser(
+    $response_for_this_log,
     $user_ID, 
     $kld_ID,
     $role, 

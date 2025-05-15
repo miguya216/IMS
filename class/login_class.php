@@ -11,15 +11,16 @@ class User {
 
     public function login($kld_email, $password, $remember = false) {
         $stmt = $this->pdo->prepare("
-            SELECT 
+           SELECT 
                 a.*, 
                 CONCAT(u.f_name, ' ', u.m_name, ' ', u.l_name) AS full_name, 
-                u.user_status
+                u.user_status,
+                un.unit_name
             FROM account a
             JOIN user u ON a.user_ID = u.user_ID
             JOIN kld k ON u.kld_ID = k.kld_ID
-            WHERE k.kld_email = :kld_email
-        ");
+            LEFT JOIN unit un ON u.unit_ID = un.unit_ID
+            WHERE k.kld_email = :kld_email");
         $stmt->execute(['kld_email' => $kld_email]);
         $user = $stmt->fetch();
 
@@ -28,8 +29,10 @@ class User {
             $_SESSION['account_ID']  = $user['account_ID'];
             $_SESSION['user_ID']     = $user['user_ID'];
             $_SESSION['role_ID']     = $user['role_ID'];
-            $_SESSION['username']    = $kld_email;
+            $_SESSION['kld_email']   = $kld_email;
+            $_SESSION['kld_ID']      = $user['kld_ID'];
             $_SESSION['full_name']   = $user['full_name'];
+            $_SESSION['unit_name']   = $user['unit_name'];
 
             // Remember me functionality
             if ($remember) {

@@ -36,7 +36,7 @@ function userList(){
                                                 echo "<td data-label='Action'>
                                                         <div class='action-buttons'>
                                                         <img id='edit-" . htmlspecialchars($row['user_ID']) . "' class='btn-edit' src='imgs/detail.png' alt='Details' />
-                                                        <img class='btn-delete' data-user='" . htmlspecialchars($row['user_ID']) . "' src='imgs/delete.png' alt='Delete' />
+                                                        <img class='btn-delete' data-kld_id='" . htmlspecialchars($row['kld_ID']) . "' data-user='" . htmlspecialchars($row['user_ID']) . "' src='imgs/delete.png' alt='Delete' />
                                                         </div>
                                                       </td>";
                                                 echo "</tr>";

@@ -207,13 +207,11 @@ $logs = $fetcher->getAllLogs();
 
 <div class="invt-list-container">
     <div class="invt-table-data">
-        <div class="invt-table-name">
-            <span>User Logs</span>
-        </div>
+      
                 <table class="invt-table-box" id="assetTable">      
                     <thead>
                         <tr>
-                            <th>Asset type ID</th>
+                            <th>Log ID</th>
                             <th>User Logs</th>
                         </tr>
                     </thead> 
@@ -222,7 +220,7 @@ $logs = $fetcher->getAllLogs();
                         if ($logs && count($logs) > 0) {
                             foreach ($logs as $row) {
                                 echo "<tr>";
-                                echo "<td hidden>" . $row['log_ID'] . "</td>";
+                                echo "<td>" . $row['log_ID'] . "</td>";
                                 echo "<td>" . $row['log_content'] . "</td>";
                                 // echo "<td>
                                 //         <img 

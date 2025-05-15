@@ -1,71 +1,193 @@
-INSERT INTO asset_type (asset_type) VALUES
-('Laptop'), ('Printer'), ('Monitor'), ('Projector'), ('Router');
+-- Create database
+CREATE DATABASE IF NOT EXISTS IMS;
+USE IMS;
 
-INSERT INTO brand (brand_name, asset_type_ID) VALUES
-('Dell', 1),
-('HP', 2),
-('Canon', 2),
-('Asus', 1),
-('Lenovo', 1),
-('Epson', 2),
-('LG', 3),
-('Acer', 1),
-('BenQ', 4),
-('TP-Link', 5);
+-- Asset Type table
+CREATE TABLE asset_type (
+    asset_type_ID INT AUTO_INCREMENT PRIMARY KEY,
+    asset_type VARCHAR(100) UNIQUE NOT NULL,
+    asset_type_status ENUM('active', 'inactive') DEFAULT 'active'
+);
 
-INSERT INTO unit (unit_name) VALUES
-('IT Department'),
-('Finance'),
-('Human Resources'),
-('Logistics'),
-('Maintenance');
+-- Brand table
+CREATE TABLE brand (
+    brand_ID INT AUTO_INCREMENT PRIMARY KEY,
+    brand_name VARCHAR(300) UNIQUE NOT NULL,
+    asset_type_ID INT,
+    brand_status ENUM('active', 'inactive') DEFAULT 'active',
+    FOREIGN KEY (asset_type_ID) REFERENCES asset_type(asset_type_ID)
+);
 
-INSERT INTO role (role_name) VALUES
-('Admin'),
-('Manager'),
-('Staff'),
-('Clerk');
+-- Barcode table
+CREATE TABLE barcode (
+    barcode_ID INT AUTO_INCREMENT PRIMARY KEY,
+    barcode_image_path VARCHAR(255) NOT NULL
+);
 
-INSERT INTO user (full_name, unit_ID) VALUES
-('Alice Johnson', 1), ('Bob Smith', 2), ('Carol Lee', 3), ('David Martinez', 4), ('Emily Clark', 5),
-('Franklin Torres', 1), ('Grace Lopez', 2), ('Henry Wright', 3), ('Isabel Cruz', 4), ('Jackie Chen', 5),
-('Kevin Reyes', 1), ('Lana Delos', 2), ('Martin Gomez', 3), ('Nina Ocampo', 4), ('Oscar Medina', 5),
-('Paula Enriquez', 1), ('Quincy Navarro', 2), ('Rachel Uy', 3), ('Sam Tan', 4), ('Trisha Lim', 5);
+-- QR Code table
+CREATE TABLE qr_code (
+    qr_ID INT AUTO_INCREMENT PRIMARY KEY,
+    qr_image_path VARCHAR(255) NOT NULL
+);
 
-INSERT INTO account (user_ID, username, password_hash, role_ID) VALUES
-(1, 'alicej', 'hashed1', 1), (2, 'bobsmith', 'hashed2', 2), (3, 'caroll', 'hashed3', 3),
-(4, 'davidm', 'hashed4', 2), (5, 'emilyc', 'hashed5', 3), (6, 'franktorres', 'hashed6', 3),
-(7, 'gracel', 'hashed7', 2), (8, 'henryw', 'hashed8', 4), (9, 'isacruz', 'hashed9', 3),
-(10, 'jackiec', 'hashed10', 2), (11, 'kevinr', 'hashed11', 3), (12, 'lanad', 'hashed12', 2),
-(13, 'marting', 'hashed13', 4), (14, 'ninao', 'hashed14', 3), (15, 'oscarmed', 'hashed15', 3),
-(16, 'paulae', 'hashed16', 2), (17, 'quincyn', 'hashed17', 3), (18, 'rachelu', 'hashed18', 4),
-(19, 'samtan', 'hashed19', 3), (20, 'trishal', 'hashed20', 2);
+-- Role table
+CREATE TABLE role (
+    role_ID INT AUTO_INCREMENT PRIMARY KEY,
+    role_name VARCHAR(50) NOT NULL,
+    role_status ENUM('active', 'inactive') DEFAULT 'active'
+);
 
-INSERT INTO barcode (barcode_image_path) VALUES
-('barcodes/INV-1001.png'), ('barcodes/INV-1002.png'), ('barcodes/INV-1003.png'), ('barcodes/INV-1004.png'), ('barcodes/INV-1005.png'),
-('barcodes/INV-1006.png'), ('barcodes/INV-1007.png'), ('barcodes/INV-1008.png'), ('barcodes/INV-1009.png'), ('barcodes/INV-1010.png'),
-('barcodes/INV-1011.png'), ('barcodes/INV-1012.png'), ('barcodes/INV-1013.png'), ('barcodes/INV-1014.png'), ('barcodes/INV-1015.png'),
-('barcodes/INV-1016.png'), ('barcodes/INV-1017.png'), ('barcodes/INV-1018.png'), ('barcodes/INV-1019.png'), ('barcodes/INV-1020.png');
+-- Unit table
+CREATE TABLE unit (
+    unit_ID INT AUTO_INCREMENT PRIMARY KEY,
+    unit_name VARCHAR(100) UNIQUE NOT NULL,
+    unit_status ENUM('active', 'inactive') DEFAULT 'active'
+);
 
-INSERT INTO asset (brand_ID, asset_type_ID, inventory_tag, serial_number, responsible_user_ID, barcode_image_path_ID) VALUES
-(1, 1, 'INV-1001', 'DL-SN-001', 1, 1),
-(2, 2, 'INV-1002', 'HP-SN-002', 2, 2),
-(3, 2, 'INV-1003', 'CN-SN-003', 3, 3),
-(4, 1, 'INV-1004', 'AS-SN-004', 4, 4),
-(5, 1, 'INV-1005', 'LN-SN-005', 5, 5),
-(6, 2, 'INV-1006', 'EP-SN-006', 6, 6),
-(7, 3, 'INV-1007', 'LG-SN-007', 7, 7),
-(8, 1, 'INV-1008', 'AC-SN-008', 8, 8),
-(9, 4, 'INV-1009', 'BQ-SN-009', 9, 9),
-(10, 5, 'INV-1010', 'TPL-SN-010', 10, 10),
-(1, 1, 'INV-1011', 'DL-SN-011', 11, 11),
-(2, 2, 'INV-1012', 'HP-SN-012', 12, 12),
-(3, 2, 'INV-1013', 'CN-SN-013', 13, 13),
-(4, 1, 'INV-1014', 'AS-SN-014', 14, 14),
-(5, 1, 'INV-1015', 'LN-SN-015', 15, 15),
-(6, 2, 'INV-1016', 'EP-SN-016', 16, 16),
-(7, 3, 'INV-1017', 'LG-SN-017', 17, 17),
-(8, 1, 'INV-1018', 'AC-SN-018', 18, 18),
-(9, 4, 'INV-1019', 'BQ-SN-019', 19, 19),
-(10, 5, 'INV-1020', 'TPL-SN-020', 20, 20);
+-- KLD email table
+CREATE TABLE kld (
+    kld_ID VARCHAR(100) PRIMARY KEY NOT NULL,
+    kld_email VARCHAR(100) UNIQUE NULL,
+    kld_email_status ENUM('active', 'inactive') DEFAULT 'active'
+);
 
+-- Logs table
+CREATE TABLE logs (
+    log_ID INT AUTO_INCREMENT PRIMARY KEY,
+    log_content VARCHAR(500)
+);
+
+-- User table
+CREATE TABLE user (
+    user_ID INT AUTO_INCREMENT PRIMARY KEY,
+    f_name VARCHAR(50) NOT NULL,
+    m_name VARCHAR(50) NULL,
+    l_name VARCHAR(50) NOT NULL,
+    kld_ID VARCHAR(100) NULL,
+    unit_ID INT,
+    user_status ENUM('active', 'inactive') DEFAULT 'active',
+    FOREIGN KEY (kld_ID) REFERENCES kld(kld_ID),
+    FOREIGN KEY (unit_ID) REFERENCES unit(unit_ID)
+);
+
+-- Asset table
+CREATE TABLE asset (
+    asset_ID INT AUTO_INCREMENT PRIMARY KEY,
+    brand_ID INT,
+    asset_type_ID INT,
+    inventory_tag VARCHAR(100) UNIQUE NOT NULL,
+    serial_number VARCHAR(100) UNIQUE NOT NULL,
+    responsible_user_ID INT,
+    barcode_ID INT NOT NULL,
+    qr_ID INT NOT NULL,
+    asset_status ENUM('active', 'inactive') DEFAULT 'active',
+    FOREIGN KEY (brand_ID) REFERENCES brand(brand_ID),
+    FOREIGN KEY (asset_type_ID) REFERENCES asset_type(asset_type_ID),
+    FOREIGN KEY (responsible_user_ID) REFERENCES user(user_ID),
+    FOREIGN KEY (barcode_ID) REFERENCES barcode(barcode_ID),
+    FOREIGN KEY (qr_ID) REFERENCES qr_code(qr_ID)
+);
+
+
+-- Account table
+CREATE TABLE account (
+    account_ID INT AUTO_INCREMENT PRIMARY KEY,
+    user_ID INT,
+    kld_ID VARCHAR(100) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    log_ID INT,
+    role_ID INT,
+    remember_token VARCHAR(255),
+    token_expiry DATETIME,
+    FOREIGN KEY (user_ID) REFERENCES user(user_ID),
+    FOREIGN KEY (log_ID) REFERENCES logs(log_ID),
+    FOREIGN KEY (role_ID) REFERENCES role(role_ID),
+    FOREIGN KEY (kld_ID) REFERENCES kld(kld_ID)
+);
+
+
+-- Return table
+CREATE TABLE returns (
+    return_ID INT AUTO_INCREMENT PRIMARY KEY,
+    asset_ID INT,
+    returned_date DATE,
+    reason_of_return TEXT,
+    remarks TEXT,
+    notes TEXT,
+    FOREIGN KEY (asset_ID) REFERENCES asset(asset_ID)
+);
+
+-- Session table
+CREATE TABLE session (
+    session_ID INT AUTO_INCREMENT PRIMARY KEY,
+    account_ID INT,
+    login_timestamp DATETIME,
+    logout_timestamp DATETIME,
+    FOREIGN KEY (account_ID) REFERENCES account(account_ID)
+);
+
+-- Request table
+CREATE TABLE request_form (
+    request_ID INT AUTO_INCREMENT PRIMARY KEY,
+    borrower_name VARCHAR(50) NOT NULL,
+    kld_ID VARCHAR(100) NOT NULL,
+    request_date DATE NOT NULL,
+    request_time TIME NOT NULL,
+    brand_ID INT NOT NULL,
+    uom VARCHAR(50),
+    quantity INT NOT NULL,
+    unit_ID INT NOT NULL, 
+    purpose TEXT NOT NULL,
+    request_note TEXT,
+    response_status ENUM('approved', 'rejected', 'pending') DEFAULT 'pending',
+    request_status ENUM('active', 'inactive') DEFAULT 'active',
+    FOREIGN KEY (kld_ID) REFERENCES kld(kld_ID), 
+    FOREIGN KEY (brand_ID) REFERENCES brand(brand_ID),
+    FOREIGN KEY (unit_ID) REFERENCES unit(unit_ID)
+);
+
+-- Borrow table
+CREATE TABLE borrow (
+    borrow_ID INT AUTO_INCREMENT PRIMARY KEY,
+    asset_ID INT,
+    borrow_date DATE NOT NULL,
+    borrow_time TIME NOT NULL,
+    due_date DATE NOT NULL,
+    due_time TIME NOT NULL,
+    borrow_status ENUM('active', 'inactive') DEFAULT 'active',
+    FOREIGN KEY (asset_ID) REFERENCES asset(asset_ID)
+);
+
+-- Message table
+CREATE TABLE message (
+    message_ID INT AUTO_INCREMENT PRIMARY KEY,
+    sender_ID INT NOT NULL,
+    receiver_ID INT NOT NULL,              
+    subject VARCHAR(255),                 
+    message_text TEXT NOT NULL,
+    timestamp_sent DATETIME DEFAULT CURRENT_TIMESTAMP,
+    is_read BOOLEAN DEFAULT FALSE,
+    message_status ENUM('active', 'archived') DEFAULT 'active',
+    FOREIGN KEY (sender_ID) REFERENCES user(user_ID),
+    FOREIGN KEY (receiver_ID) REFERENCES user(user_ID)
+);
+
+
+INSERT INTO unit (unit_ID, unit_name) 
+VALUES (1, 'PPSU');
+
+
+INSERT INTO role (role_ID, role_name)
+VALUES (1, 'Admin'),(2, 'Custodian'), (3, 'Borrower');
+ 
+
+INSERT INTO kld (kld_ID, kld_email)
+VALUES (1, 'ppsuAdmin@kld.edu.ph');
+
+
+INSERT INTO user (user_ID, f_name, m_name, l_name, unit_ID, kld_ID, user_status)
+VALUES (1, 'Jen', 'Camille', 'Dominguez', 1, 1, 'active');
+
+
+INSERT INTO account (account_ID, user_ID, kld_ID, password_hash, role_ID)
+VALUES (1, 1, 1, '$2y$10$141uwWCyZkNSJvIFzubJ3OD3QCNscMqM25nZIsjawWqWbtPjAqFNG', 1);

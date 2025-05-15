@@ -3,7 +3,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\class\asset\asset_handler.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $Assets = new UpdateAsset();
-
+    $response_for_this_log = $_POST['name'];
     // Just use posted values directly
     $serial_num = $_POST['serial'];
     $inventory_tag = $_POST['inventory_tag'];
@@ -14,6 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Proceed with update using serial number as the unique ID
     $response = $Assets->updateAssetDetails(
+        $response_for_this_log,
         $serial_num, 
         $asset, 
         $brand, 

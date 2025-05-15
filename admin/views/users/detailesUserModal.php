@@ -7,6 +7,7 @@ function detailesUserModal (){
 <div class="modal-container" id="modal_cont_detail_user">
     <div class="modal">
         <form id="userDetailsForm" method="POST">
+        <input type="hidden" value="<?= htmlspecialchars($_SESSION['full_name']) ?>" name="name">
         <h3>Edit User Information</h3>
             <div class="field-details">
          

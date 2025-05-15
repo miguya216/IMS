@@ -12,6 +12,7 @@ function addModal () {
         <form id="addAssetForm" method="POST">
         <input type="hidden" value="none" name="asset" id="asset_hidden">
         <input type="hidden" value="none" name="unit" id="unit_hidden">
+        <input type="hidden" value="<?= htmlspecialchars($_SESSION['full_name']) ?>" name="name">
         
             <h3>Register New Asset</h3>
      

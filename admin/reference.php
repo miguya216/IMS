@@ -26,7 +26,11 @@ if (file_exists('views\reference\refList.php')) {
     <!-- <div id="inventory" class="header-inventory">
     </div> -->
     <?php head();?>
+                
         <div class="field-inventory">
+        <div class="stats-header">
+                    <h2>Reference Data</h2>
+                </div>
                     <?php refList(); ?>
         </div>
     

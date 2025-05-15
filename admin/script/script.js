@@ -31,7 +31,6 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 // End of Navbar
 
-
 // start of dynamic Searching
 function searchInventory() {
     let input = document.getElementById("searchInput").value.toLowerCase();
@@ -55,6 +54,26 @@ function searchInventory() {
 function searchUser() {
     let input = document.getElementById("searchInputUser").value.toLowerCase();
     let table = document.getElementById("userTable");
+    let rows = table.getElementsByTagName("tr");
+
+    for (let i = 1; i < rows.length; i++) { // Start from 1 to skip the header row
+        let cells = rows[i].getElementsByTagName("td");
+        let match = false;
+
+        for (let j = 0; j < cells.length - 1; j++) { // Exclude the action column
+            if (cells[j].innerText.toLowerCase().includes(input)) {
+                match = true;
+                break;
+            }
+        }
+
+        rows[i].style.display = match ? "" : "none";
+    }
+}
+
+function searchRequest() {
+    let input = document.getElementById("searchInputRequest").value.toLowerCase();
+    let table = document.getElementById("requestable");
     let rows = table.getElementsByTagName("tr");
 
     for (let i = 1; i < rows.length; i++) { // Start from 1 to skip the header row
@@ -174,6 +193,39 @@ function downloadBarcodePDF() {
 }
 // end of barcode tab
 
+// start of receipt tab
+function openReceiptForm(){
+    window.open('/ims/admin/receipt.php', 'Receipt List');
+}
+
+function downloadReceiptPDF() {
+    // Clone the content without scroll
+    const original = document.getElementById('ReceiptContent');
+    const clone = original.cloneNode(true);
+
+    // Create a temporary container
+    const container = document.createElement('div');
+    container.style.position = 'fixed';
+    container.style.top = '-10000px';
+    container.appendChild(clone);
+    document.body.appendChild(container);
+
+    // Generate PDF from the clone
+    const opt = {
+        margin:       0.5,
+        filename:     'Receipt_list.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(clone).save().then(() => {
+        // Clean up
+        document.body.removeChild(container);
+    });
+}
+// end of barcode tab
+
 // start of reusable popup modal
 function showPopup(message, color = '#005a34') {
     const notifModal = document.getElementById('notifModal');
@@ -183,13 +235,76 @@ function showPopup(message, color = '#005a34') {
     notifMessage.style.color = color;
 
     notifModal.style.display = 'block';
+    void notifModal.offsetWidth; // Force reflow
+    notifModal.classList.add('show');
 
     setTimeout(() => {
-        notifModal.style.display = 'none';
-    }, 1500); // 1.5 seconds
+        notifModal.classList.remove('show');
+        setTimeout(() => {
+            notifModal.style.display = 'none';
+        }, 300); // Wait for fade out
+    }, 1500); // Visible for 1.5s
 }
-// start of reusable popup modal
 
+// end of reusable popup modal
+
+// start of reusable confirm modal
+function showConfirmation(message, color = 'black') {
+    return new Promise((resolve) => {
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmationMessage = document.getElementById('confirmationMessage');
+        const confirmYes = document.getElementById('confirmYes');
+        const confirmNo = document.getElementById('confirmNo');
+
+        confirmationMessage.textContent = message;
+        confirmationMessage.style.color = color;
+
+        // Show the modal by adding the class
+        confirmModal.style.display = 'block'; // Ensure it’s not display: none
+        // Force reflow to restart animation (important trick)
+        void confirmModal.offsetWidth;
+        confirmModal.classList.add('show'); // <-- this triggers the animation
+
+        const cleanup = () => {
+            confirmModal.classList.remove('show');
+            setTimeout(() => {
+                confirmModal.style.display = 'none'; // Hide after transition
+            }, 300);
+            confirmYes.removeEventListener('click', onYes);
+            confirmNo.removeEventListener('click', onNo);
+        };
+
+        const onYes = () => {
+            cleanup();
+            resolve(true);
+        };
+
+        const onNo = () => {
+            cleanup();
+            resolve(false);
+        };
+
+        confirmYes.addEventListener('click', onYes);
+        confirmNo.addEventListener('click', onNo);
+    });
+}
+
+// end of reusable confirm modal
+
+// start of logout confirmation
+document.addEventListener('DOMContentLoaded', () => {
+    const logoutLink = document.getElementById('logoutLink');
+    if (logoutLink) {
+        logoutLink.addEventListener('click', async (e) => {
+            e.preventDefault(); // Prevent default navigation
+            const confirmed = await showConfirmation('Are you sure you want to logout?', 'black');
+            if (confirmed) {
+                window.location.href = logoutLink.href; // Proceed with logout
+            }
+        });
+    }
+});
+// end of logout confirmation
 
 // Start of add item modal
 document.addEventListener("DOMContentLoaded", () => {
@@ -339,7 +454,6 @@ document.addEventListener("DOMContentLoaded", () => {
             btn.addEventListener("click", () => {
                 const serial = btn.id.split("-")[1];
 
-                
                 fetch(`/ims/auth/asset/get_asset_by_serial.php?serial=${encodeURIComponent(serial)}`)
                 .then(res => res.json())
                 .then(response => {
@@ -417,10 +531,13 @@ document.addEventListener('DOMContentLoaded', () => {
 // Start of delete asset
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.btn-delete').forEach(button => {
-        button.addEventListener('click', () => {
+        button.addEventListener('click', async () => {
             const serial = button.getAttribute('data-serial');
             if (!serial) return;
-            if (confirm(`Are you sure you want to delete Asset with serial number: ${serial}?`)) {
+            
+            const confirmed = await showConfirmation(`Are you sure you want to delete Asset with serial number: ${serial}?`, 'black');
+            if (!confirmed) return;
+
                 fetch('/ims/auth/asset/deleteAuth.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -436,7 +553,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 })
                 .catch(() => showPopup('Something went wrong.', '#FF0000'));
-            }
+         
         });
     });
 });
@@ -638,11 +755,13 @@ document.addEventListener('DOMContentLoaded', () => {
 // Start of delete users
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.btn-delete').forEach(button => {
-        button.addEventListener('click', () => {
+        button.addEventListener('click', async () => {
             const user = button.getAttribute('data-user');
+            const kld_id = button.getAttribute('data-kld_ID');
             if (!user) return;
-            if (confirm(`Are you sure you want to delete user with User ID: ${user}?`)) {
-                fetch('/ims/auth/users/deleteAuth.php', {
+            const confirmed = await showConfirmation(`Are you sure you want to delete user with KLD ID: ${kld_id}?`, 'black');
+            if (!confirmed) return;    
+            fetch('/ims/auth/users/deleteAuth.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: new URLSearchParams({ user })
@@ -657,136 +776,305 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 })
                 .catch(() => showPopup('Something went wrong.', '#FF0000'));
-            }
+       
         });
     });
 });
 
-// // Field toggle handler
-// function toggleNewField(selectId, inputId, triggerValue) {
-//     const select = document.getElementById(selectId), input = document.getElementById(inputId);
-//     if (!select || !input) return console.warn(`Missing ${selectId} or ${inputId}`);
-//     const toggle = () => {
-//         const match = select.value === triggerValue;
-//         input.style.display = match ? "block" : "none";
-//         input.required = match;
-//         input.disabled = !match;
+// Field toggle handler
+function toggleNewField(selectId, inputId, triggerValue) {
+    const select = document.getElementById(selectId), input = document.getElementById(inputId);
+    if (!select || !input) return console.warn(`Missing ${selectId} or ${inputId}`);
+    const toggle = () => {
+        const match = select.value === triggerValue;
+        input.style.display = match ? "block" : "none";
+        input.required = match;
+        input.disabled = !match;
+    };
+    toggle();
+    select.addEventListener("change", toggle);
+}
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const modal = document.getElementById("editModal");
+    const modalTitle = document.getElementById("modalTitle");
+    const form = document.getElementById("editForm");
+    const responseDiv = document.getElementById("responseMessage");
+    const entityTypeField = document.getElementById("entity_type");
+    const idField = document.getElementById("entity_ID");
+    const nameField = document.getElementById("entity_name");
+
+    const openModal = () => {
+        modal.classList.remove("hidden");
+        setTimeout(() => modal.classList.add("show"), 10);
+    };
+
+    const closeModal = () => {
+        modal.classList.remove("show");
+        setTimeout(() => modal.classList.add("hidden"), 300);
+    };
+
+    const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1);
+
+    document.addEventListener("click", (e) => {
+        if (e.target.classList.contains("btn-edit")) {
+            const { entity, id, name } = e.target.dataset;
+            Object.assign(entityTypeField, { value: entity });
+            Object.assign(idField, { value: id });
+            Object.assign(nameField, { value: name });
+            modalTitle.textContent = `Manage ${capitalize(entity.replace("_", " "))}`;
+            responseDiv.textContent = "";
+            openModal();
+        }
+
+        if (e.target.id === "close_ref") {
+            closeModal();
+            setTimeout(() => location.reload(), 500);
+        }
+    });
+
+    if (form) {
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            try {
+                const res = await fetch("/ims/auth/reference/updateAuth.php", {
+                    method: "POST",
+                    body: new FormData(form)
+                });
+                const text = (await res.text()).trim().toLowerCase();
+                const messages = {
+                    success: ['Success!', '#005a34'],
+                    duplicate: ['No changes detected.', 'orange']
+                };
+                showPopup(...(messages[text] || [text, '#FF0000']));
+            } catch {
+                showPopup("Something went wrong.", "error");
+            }
+        });
+    }
+
+
+// Start of delete reference
+
+document.querySelectorAll('.btn-delete').forEach(button => {
+    button.addEventListener('click', async () => {
+        let type = '';
+        let id = '';
+
+        if (button.hasAttribute('data-role')) {
+            type = 'role';
+            id = button.getAttribute('data-role');
+        } else if (button.hasAttribute('data-unit')) {
+            type = 'unit';
+            id = button.getAttribute('data-unit');
+        } else if (button.hasAttribute('data-asset-type')) {
+            type = 'asset_type';
+            id = button.getAttribute('data-asset-type');
+        } else if (button.hasAttribute('data-brand')) {
+            type = 'brand';
+            id = button.getAttribute('data-brand');
+        }
+
+        if (!type || !id) return;
+        const confirmed = await showConfirmation((`Are you sure you want to delete this ${type.replace('_', ' ')}?`));
+        if (!confirmed) return; 
+            const payload = new URLSearchParams({
+                id,
+                type
+            });
+
+            // Add specific field name required by backend
+            payload.append(`${type}_ID`, id);
+            
+            fetch('/ims/auth/reference/deleteAuth.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: payload
+            })
+            .then(res => res.text())
+            .then(response => {
+                if (response.trim().toLowerCase() === 'success') {
+                    showPopup(`${type.replace('_', ' ')} successfully deleted.`, '#005a34');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showPopup('Error: ' + response, '#FF0000');
+                }
+            })
+            .catch(() => showPopup('Something went wrong.', '#FF0000'));
+    
+    });
+});
+
+});
+
+// Start of asset edit button
+document.addEventListener("DOMContentLoaded", () => {
+    const RequestModal = document.getElementById('modal_cont_detail_request');
+    const closeRequestModal = document.getElementById('close_detail_request');
+
+    if (RequestModal && closeRequestModal) {
+        document.querySelectorAll(".btn-edit").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const request_ID = btn.id.split("-")[1];
+                
+                fetch(`/ims/auth/request/get_request_by_id.php?request_ID=${encodeURIComponent(request_ID)}`)
+                .then(res => res.json())
+                .then(response => {
+                    if (response.status === 'success') {
+                            const data = response.data;
+                            document.getElementById("detail_request_ID").value = data.request_ID;
+                            document.getElementById("detail_kld_ID").value = data.kld_ID;
+                            document.getElementById("detail_kld_email").value = data.kld_email;
+                            document.getElementById("detail_borrower").value = data.borrower_name;
+                            document.getElementById("detail_date").value = data.request_date;
+                            document.getElementById("detail_time").value = data.request_time;
+                            document.getElementById("detail_brand").value = data.brand_name;
+                            document.getElementById("detail_UOM").value = data.uom;
+                            document.getElementById("detail_quantity").value = data.quantity;
+                            document.getElementById("detail_unit").value = data.unit_name;
+                            document.getElementById("detail_purpose").value = data.purpose;
+                            document.getElementById("detail_note").value = data.request_note || '';
+                            document.getElementById("detail_response").value = data.response_status;
+                        
+                        const responseLabel = document.getElementById('repsonse-label');
+                        const approveContainer = document.getElementById('action-button-approve');
+                        const declineContainer = document.getElementById('action-buttons-decline');
+
+                        // Clear existing buttons if any
+                        responseLabel.innerHTML = '';
+                        approveContainer.innerHTML = '';
+                        declineContainer.innerHTML = '';
+
+                        if (data.response_status === 'pending') {
+                            responseLabel.textContent = 'Your Response:';
+                            const approveBtn = document.createElement('button');
+                            approveBtn.className = 'modal-btn';
+                            approveBtn.type = 'button';
+                            approveBtn.innerHTML = `<img src="/ims/admin/imgs/approve.png" alt="Approve">`;
+                            approveBtn.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                handleResponseAction(data.request_ID, 'approved');
+                            });
+
+                            const declineBtn = document.createElement('button');
+                            declineBtn.className = 'modal-btn';
+                            declineBtn.type = 'button';
+                            declineBtn.innerHTML = `<img src="/ims/admin/imgs/decline.png" alt="Approve">`;
+                            declineBtn.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                handleResponseAction(data.request_ID, 'rejected');
+                            });
+
+                            approveContainer.appendChild(approveBtn);
+                            declineContainer.appendChild(declineBtn);
+                        }
+
+
+                            // captureInitialRequestDetails();
+                            RequestModal.classList.add("show");
+                            document.body.style.overflow = "hidden";
+                        } else {
+                            alert(response.message || "request details not found.");
+                        }
+                    })
+                    .catch((err) => { console.error("Fetch error:", err);
+                    alert("Error loading request details.");})
+            });
+        });
+        closeRequestModal.addEventListener("click", e => {
+            e.preventDefault();
+            RequestModal.classList.remove("show");
+            document.body.style.overflow = "auto";
+            setTimeout(() => location.reload(), 500);
+        });
+        }
+});
+
+function handleResponseAction(request_ID, newStatus) {
+    const formData = new FormData();
+    formData.append('request_ID', request_ID);
+    formData.append('response_status', newStatus);
+
+    fetch('/ims/auth/request/updateAuth.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.text())
+    .then(response => {
+        const success = response.trim().toLowerCase() === "success";
+        showPopup(success ? 'Request updated!' : response, success ? '#005a34' : '#FF0000');
+
+        setTimeout(() => {
+            location.reload();
+        }, 1800);
+    })
+    .catch(err => {
+        console.error('Update failed:', err);
+        showPopup('Something went wrong.', '#FF0000');
+    });
+}
+
+
+
+// Start of asset details modal
+// let initialRequestDetails = {};
+// function captureInitialRequestDetails() {
+//     initialRequestDetail = {
+//         request_ID: document.getElementById("detail_request_ID").value,
+//         kld_ID: document.getElementById("detail_kld_ID").value,
+//         kld_email: document.getElementById("detail_kld_email").value,
+//         borrower_name: document.getElementById("detail_borrower").value,
+//         date: document.getElementById("detail_date").value,
+//         time: document.getElementById("detail_time").value,
+//         brand: document.getElementById("detail_brand").value,
+//         UOM: document.getElementById("detail_UOM").value,
+//         quantity: document.getElementById("detail_quantity").value,
+//         unit: document.getElementById("detail_unit").value,
+//         purpose: document.getElementById("detail_purpose").value,
+//         request_note: document.getElementById("detail_note").value,
+//         response_status: document.getElementById("detail_response").value
 //     };
-//     toggle();
-//     select.addEventListener("change", toggle);
 // }
 
 
-// document.addEventListener("DOMContentLoaded", () => {
-//     const modal = document.getElementById("editModal");
-//     const modalTitle = document.getElementById("modalTitle");
-//     const form = document.getElementById("editForm");
-//     const responseDiv = document.getElementById("responseMessage");
-//     const entityTypeField = document.getElementById("entity_type");
-//     const idField = document.getElementById("entity_ID");
-//     const nameField = document.getElementById("entity_name");
 
-//     const openModal = () => {
-//         modal.classList.remove("hidden");
-//         setTimeout(() => modal.classList.add("show"), 10);
-//     };
+// document.addEventListener('DOMContentLoaded', () => {
+//     const RequestUpdate = document.getElementById('RequestDetailsForm');
 
-//     const closeModal = () => {
-//         modal.classList.remove("show");
-//         setTimeout(() => modal.classList.add("hidden"), 300);
-//     };
+//     if (RequestUpdate) {
+//         // document.querySelectorAll('[data-open="details-modal"]').forEach(button => {
+//         //     button.addEventListener('click', () => captureInitialRequestDetails());
+//         // });
 
-//     const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1);
+//         RequestUpdate.addEventListener('submit', function (e) {
+//             // e.preventDefault();
+//             // const current = {
+//             //     request_ID: document.getElementById("detail_request_ID").value,
+//             //     kld_ID: document.getElementById("detail_kld_ID").value,
+//             //     kld_email: document.getElementById("detail_kld_email").value,
+//             //     borrower_name: document.getElementById("detail_borrower").value,
+//             //     date: document.getElementById("detail_date").value,
+//             //     time: document.getElementById("detail_time").value,
+//             //     brand: document.getElementById("detail_brand").value,
+//             //     UOM: document.getElementById("detail_UOM").value,
+//             //     quantity: document.getElementById("detail_quantity").value,
+//             //     unit: document.getElementById("detail_unit").value,
+//             //     purpose: document.getElementById("detail_purpose").value,
+//             //     request_note: document.getElementById("detail_note").value,
+//             //     response_status: document.getElementById("detail_response").value
+//             // };
 
-//     document.addEventListener("click", (e) => {
-//         if (e.target.classList.contains("btn-edit")) {
-//             const { entity, id, name } = e.target.dataset;
-//             Object.assign(entityTypeField, { value: entity });
-//             Object.assign(idField, { value: id });
-//             Object.assign(nameField, { value: name });
-//             modalTitle.textContent = `Manage ${capitalize(entity.replace("_", " "))}`;
-//             responseDiv.textContent = "";
-//             openModal();
-//         }
+//             // const changed = Object.keys(current).some(key => current[key] !== initialRequestDetails[key]);
+//             // if (!changed) return showPopup("No changes detected.", 'orange');
 
-//         if (e.target.id === "close_ref") {
-//             closeModal();
-//             setTimeout(() => location.reload(), 500);
-//         }
-//     });
-
-//     if (form) {
-//         form.addEventListener("submit", async (e) => {
-//             e.preventDefault();
-//             try {
-//                 const res = await fetch("/ims/auth/reference/updateAuth.php", {
-//                     method: "POST",
-//                     body: new FormData(form)
-//                 });
-//                 const text = (await res.text()).trim().toLowerCase();
-//                 const messages = {
-//                     success: ['Success!', '#005a34'],
-//                     duplicate: ['No changes detected.', 'orange']
-//                 };
-//                 showPopup(...(messages[text] || [text, '#FF0000']));
-//             } catch {
-//                 showPopup("Something went wrong.", "error");
-//             }
+//             const RequestUpdate = new FormData(RequestUpdate);
+//             fetch('/ims/auth/asset/updateAuth.php', { method: 'POST', body: formData })
+//                 .then(res => res.text())
+//                 .then(response => showPopup(response.trim().toLowerCase() === "success" ? 'Success!' : response, response.trim().toLowerCase() === "success" ? '#005a34' : '#FF0000'))
+//                 .catch(() => showPopup('Something went wrong.', '#FF0000'));
 //         });
 //     }
-
-
-// // Start of delete reference
-
-// document.querySelectorAll('.btn-delete').forEach(button => {
-//     button.addEventListener('click', () => {
-//         let type = '';
-//         let id = '';
-
-//         if (button.hasAttribute('data-role')) {
-//             type = 'role';
-//             id = button.getAttribute('data-role');
-//         } else if (button.hasAttribute('data-unit')) {
-//             type = 'unit';
-//             id = button.getAttribute('data-unit');
-//         } else if (button.hasAttribute('data-asset-type')) {
-//             type = 'asset_type';
-//             id = button.getAttribute('data-asset-type');
-//         } else if (button.hasAttribute('data-brand')) {
-//             type = 'brand';
-//             id = button.getAttribute('data-brand');
-//         }
-
-//         if (!type || !id) return;
-
-//         if (confirm(`Are you sure you want to delete this ${type.replace('_', ' ')}?`)) {
-//             const payload = new URLSearchParams({
-//                 id,
-//                 type
-//             });
-
-//             // Add specific field name required by backend
-//             payload.append(`${type}_ID`, id);
-            
-//             fetch('/ims/auth/reference/deleteAuth.php', {
-//                 method: 'POST',
-//                 headers: {
-//                     'Content-Type': 'application/x-www-form-urlencoded'
-//                 },
-//                 body: payload
-//             })
-//             .then(res => res.text())
-//             .then(response => {
-//                 if (response.trim().toLowerCase() === 'success') {
-//                     showPopup(`${type.replace('_', ' ')} successfully deleted.`, '#005a34');
-//                     setTimeout(() => location.reload(), 1500);
-//                 } else {
-//                     showPopup('Error: ' + response, '#FF0000');
-//                 }
-//             })
-//             .catch(() => showPopup('Something went wrong.', '#FF0000'));
-//         }
-//     });
-// });
-
 // });

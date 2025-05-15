@@ -2,34 +2,56 @@
 if (!defined('IN_APP')) {
     die("Access Denied");
 }
-require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\admin\views\home\getdata.php';
 function StatsOverview() { ?>
-<div class="card-container">
+
     <div class="card">
-        <span>Total Assets</span>
+        <span class="card-title">Total Assets</span>
         <div class="card-content">
-            <div id="stat-total-assets"></div>
+            <div id="total_assets"></div>
         </div>
     </div>
 
     <div class="card">
-        <span>Active/Inactive Assets</span>
+        <span class="card-title">Total Inactive Assets</span>
         <div class="card-content">
-            <div id="stat-asset-status"></div>
+            <div id="inactive_assets"></div>
         </div>
     </div>
 
     <div class="card">
-        <span>Total Units</span>
+        <span class="card-title">Active Users</span>
         <div class="card-content">
-            <div id="stat-users-unit"></div>
+            <div id="active_users"></div>
         </div>
     </div>
-</div>
 
+    <div class="card">
+        <span class="card-title">Total Borrowed</span>
+        <div class="card-content">
+            <div id="borrowed_items"></div>
+        </div>
+    </div>
 
-<!-- Link the external JS -->
-<script src="/IMS/admin/script/chart.js"></script>
-<script src="/IMS/admin/script/stats.js"></script>
+    <div class="card">
+        <span class="card-title">Total Returned</span>
+        <div class="card-content">
+            <div id="returned_items"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <span class="card-title">Pending Request</span>
+        <div class="card-content">
+            <div id="pending_requests"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <span class="card-title">Total Messages</span>
+        <div class="card-content">
+            <div id="total_messages"></div>
+        </div>
+    </div>
+
 <?php }
     

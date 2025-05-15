@@ -31,7 +31,6 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 // End of Navbar
 
-
 // start of dynamic Searching
 function searchInventory() {
     let input = document.getElementById("searchInput").value.toLowerCase();
@@ -77,41 +76,60 @@ function searchUser() {
 document.addEventListener("DOMContentLoaded", function () {
     const mainFilter = document.getElementById("mainFilter");
     const subFilter = document.getElementById("subFilter");
-    const table = document.querySelector(".filterable-table");
-    const rows = table.querySelectorAll("tbody tr");
 
-    mainFilter.addEventListener("change", () => {
-        const colIndex = parseInt(mainFilter.value, 10);
-        subFilter.innerHTML = `<option value="">Select a value</option>`;
-        subFilter.disabled = true;
+    // Function to initialize filtering when the table is visible
+    function initializeTableFiltering() {
+        const table = document.querySelector(".filterable-table");
+        if (!table) return; // Return early if the table is not found
 
-        if (!isNaN(colIndex)) {
-            const uniqueValues = new Set();
-            rows.forEach(row => {
-                const text = row.cells[colIndex].textContent.trim();
-                if (text) uniqueValues.add(text);
-            });
+        const rows = table.querySelectorAll("tbody tr");
 
-            [...uniqueValues].sort().forEach(val => {
-                const option = document.createElement("option");
-                option.value = val;
-                option.textContent = val;
-                subFilter.appendChild(option);
-            });
+        mainFilter.addEventListener("change", () => {
+            const colIndex = parseInt(mainFilter.value, 10);
+            subFilter.innerHTML = `<option value="">Select a value</option>`;
+            subFilter.disabled = true;
 
-            subFilter.disabled = false;
-        }
-    });
+            if (!isNaN(colIndex)) {
+                const uniqueValues = new Set();
+                rows.forEach(row => {
+                    const text = row.cells[colIndex].textContent.trim();
+                    if (text) uniqueValues.add(text);
+                });
 
-    subFilter.addEventListener("change", () => {
-        const colIndex = parseInt(mainFilter.value, 10);
-        const selected = subFilter.value.toLowerCase();
+                [...uniqueValues].sort().forEach(val => {
+                    const option = document.createElement("option");
+                    option.value = val;
+                    option.textContent = val;
+                    subFilter.appendChild(option);
+                });
 
-        rows.forEach(row => {
-            const cellText = row.cells[colIndex].textContent.toLowerCase();
-            row.style.display = !selected || cellText === selected ? "" : "none";
+                subFilter.disabled = false;
+            }
         });
-    });
+
+        subFilter.addEventListener("change", () => {
+            const colIndex = parseInt(mainFilter.value, 10);
+            const selected = subFilter.value.toLowerCase();
+
+            rows.forEach(row => {
+                const cellText = row.cells[colIndex].textContent.toLowerCase();
+                row.style.display = !selected || cellText === selected ? "" : "none";
+            });
+        });
+    }
+
+    // You could trigger this initialization when the table tab is shown (if using tabbed navigation)
+    const tableTab = document.getElementById("tableTab"); // Assume you have an ID for the tab with the table
+
+    // Example: Listen for tab change event if using Bootstrap tabs or similar
+    if (tableTab) {
+        tableTab.addEventListener("shown.bs.tab", () => {
+            initializeTableFiltering();
+        });
+    } else {
+        // If not using tabs, you can simply initialize the filter on DOMContentLoaded
+        initializeTableFiltering();
+    }
 });
 
 // end of dynamic populate filter
@@ -155,6 +173,39 @@ function downloadBarcodePDF() {
 }
 // end of barcode tab
 
+// start of receipt tab
+function openReceiptForm(){
+    window.open('/ims/admin/receipt.php', 'Receipt List');
+}
+
+function downloadReceiptPDF() {
+    // Clone the content without scroll
+    const original = document.getElementById('ReceiptContent');
+    const clone = original.cloneNode(true);
+
+    // Create a temporary container
+    const container = document.createElement('div');
+    container.style.position = 'fixed';
+    container.style.top = '-10000px';
+    container.appendChild(clone);
+    document.body.appendChild(container);
+
+    // Generate PDF from the clone
+    const opt = {
+        margin:       0.5,
+        filename:     'Receipt_list.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(clone).save().then(() => {
+        // Clean up
+        document.body.removeChild(container);
+    });
+}
+// end of barcode tab
+
 // start of reusable popup modal
 function showPopup(message, color = '#005a34') {
     const notifModal = document.getElementById('notifModal');
@@ -164,13 +215,76 @@ function showPopup(message, color = '#005a34') {
     notifMessage.style.color = color;
 
     notifModal.style.display = 'block';
+    void notifModal.offsetWidth; // Force reflow
+    notifModal.classList.add('show');
 
     setTimeout(() => {
-        notifModal.style.display = 'none';
-    }, 1500); // 1.5 seconds
+        notifModal.classList.remove('show');
+        setTimeout(() => {
+            notifModal.style.display = 'none';
+        }, 300); // Wait for fade out
+    }, 1500); // Visible for 1.5s
 }
-// start of reusable popup modal
 
+// end of reusable popup modal
+
+// start of reusable confirm modal
+function showConfirmation(message, color = 'black') {
+    return new Promise((resolve) => {
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmationMessage = document.getElementById('confirmationMessage');
+        const confirmYes = document.getElementById('confirmYes');
+        const confirmNo = document.getElementById('confirmNo');
+
+        confirmationMessage.textContent = message;
+        confirmationMessage.style.color = color;
+
+        // Show the modal by adding the class
+        confirmModal.style.display = 'block'; // Ensure it’s not display: none
+        // Force reflow to restart animation (important trick)
+        void confirmModal.offsetWidth;
+        confirmModal.classList.add('show'); // <-- this triggers the animation
+
+        const cleanup = () => {
+            confirmModal.classList.remove('show');
+            setTimeout(() => {
+                confirmModal.style.display = 'none'; // Hide after transition
+            }, 300);
+            confirmYes.removeEventListener('click', onYes);
+            confirmNo.removeEventListener('click', onNo);
+        };
+
+        const onYes = () => {
+            cleanup();
+            resolve(true);
+        };
+
+        const onNo = () => {
+            cleanup();
+            resolve(false);
+        };
+
+        confirmYes.addEventListener('click', onYes);
+        confirmNo.addEventListener('click', onNo);
+    });
+}
+
+// end of reusable confirm modal
+
+// start of logout confirmation
+document.addEventListener('DOMContentLoaded', () => {
+    const logoutLink = document.getElementById('logoutLink');
+    if (logoutLink) {
+        logoutLink.addEventListener('click', async (e) => {
+            e.preventDefault(); // Prevent default navigation
+            const confirmed = await showConfirmation('Are you sure you want to logout?', 'black');
+            if (confirmed) {
+                window.location.href = logoutLink.href; // Proceed with logout
+            }
+        });
+    }
+});
+// end of logout confirmation
 
 // Start of add item modal
 document.addEventListener("DOMContentLoaded", () => {
@@ -216,7 +330,9 @@ document.addEventListener("DOMContentLoaded", () => {
             // Initialize 'Add new...' input fields
             toggleNewField("asset", "new_asset", "__new_asset_type__");
             toggleNewField("brand", "new_brand", "__new_brand__");
-            toggleNewField("responsibleTo", "new_responsibleTo", "__new_responsibleTo__");
+            toggleNewField("responsibleTo", "new_responsibleTo_f", "__new_responsibleTo__");
+            toggleNewField("responsibleTo", "new_responsibleTo_m", "__new_responsibleTo__" , false);
+            toggleNewField("responsibleTo", "new_responsibleTo_l", "__new_responsibleTo__");
             toggleNewField("unit", "new_unit", "__new_unit__");
         });
 
@@ -257,7 +373,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-function toggleNewField(selectId, inputId, triggerValue) {
+function toggleNewField(selectId, inputId, triggerValue = true) {
     const select = document.getElementById(selectId);
     const input = document.getElementById(inputId);
 
@@ -317,26 +433,33 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll(".btn-edit").forEach(btn => {
             btn.addEventListener("click", () => {
                 const serial = btn.id.split("-")[1];
+
+                
                 fetch(`/ims/auth/asset/get_asset_by_serial.php?serial=${encodeURIComponent(serial)}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data) {
-                            document.getElementById("barcodeImg").src = '/ims/' + data.barcode_image_path;
+                .then(res => res.json())
+                .then(response => {
+                    if (response.status === 'success') {
+                            const data = response.data;
+                            document.getElementById("qrCodeImg").src = '/ims/' + data.qr_path;
+                            document.getElementById("barcodeImg").src = '/ims/' +  data.barcode_path;
+                    
                             document.getElementById("detail_tag").value = data.inventory_tag;
                             document.getElementById("detail_serial").value = data.serial_number;
-                            document.getElementById("detail_asset").value = data.asset_type || "";
-                            document.getElementById("detail_brand").value = data.brand_name || "";
-                            document.getElementById("detail_responsible").value = data.responsible_user || "";
-                            document.getElementById("detail_unit").value = data.user_unit || "";
-
+                    
+                            document.getElementById("detail_asset").value = data.asset_type_ID;
+                            document.getElementById("detail_brand").value = data.brand_ID;
+                            document.getElementById("detail_responsible").value = data.responsible_user;
+                            document.getElementById("detail_unit").value = data.unit_ID;
+                    
                             captureInitialDetails();
                             modalDetails.classList.add("show");
                             document.body.style.overflow = "hidden";
                         } else {
-                            alert("Asset details not found.");
+                            alert(response.message || "Asset details not found.");
                         }
                     })
-                    .catch(() => alert("Error loading asset details."));
+                    .catch((err) => { console.error("Fetch error:", err);
+                    alert("Error loading asset details.");})
             });
         });
 
@@ -346,6 +469,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Start of asset details modal
 let initialDetails = {};
+function captureInitialDetails() {
+    initialDetails = {
+        tag: document.getElementById('detail_tag').value,
+        asset: document.getElementById('detail_asset').value,
+        brand: document.getElementById('detail_brand').value,
+        responsible: document.getElementById('detail_responsible').value,
+        unit: document.getElementById('detail_unit').value
+    };
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     const formUpdate = document.getElementById('updateForm');
@@ -377,23 +509,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-function captureInitialDetails() {
-    initialDetails = {
-        tag: document.getElementById('detail_tag').value,
-        asset: document.getElementById('detail_asset').value,
-        brand: document.getElementById('detail_brand').value,
-        responsible: document.getElementById('detail_responsible').value,
-        unit: document.getElementById('detail_unit').value
-    };
-}
-
 // Start of delete asset
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.btn-delete').forEach(button => {
-        button.addEventListener('click', () => {
+        button.addEventListener('click', async () => {
             const serial = button.getAttribute('data-serial');
             if (!serial) return;
-            if (confirm(`Are you sure you want to delete Asset with serial number: ${serial}?`)) {
+            
+            const confirmed = await showConfirmation(`Are you sure you want to delete Asset with serial number: ${serial}?`, 'black');
+            if (!confirmed) return;
+
                 fetch('/ims/auth/asset/deleteAuth.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -409,65 +534,71 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 })
                 .catch(() => showPopup('Something went wrong.', '#FF0000'));
-            }
+         
         });
     });
 });
 
 document.addEventListener("DOMContentLoaded", () => {
     const get = id => document.getElementById(id);
-    const toggleFields = (toggle, fields, forceRequired = true) => {
+
+    const toggleFields = (toggle, className = "account-field", forceRequired = true) => {
         const show = toggle.checked;
-        fields.forEach(f => {
-            if (!f) return;
-            f.parentElement.style.display = show ? "flex" : "none";
-            f.disabled = !show;
-            f.required = forceRequired && show;
+        document.querySelectorAll(`.${className}`).forEach(box => {
+            box.style.display = show ? "flex" : "none";
+            box.querySelectorAll("input, select").forEach(input => {
+                input.disabled = !show;
+                input.required = forceRequired && show;
+            });
         });
     };
-
-    const addUserBtn = get("addUserBtn"), modalAdd = get("modal_cont_add_user"),
-          closeAdd = get("close_add_user"), addUserForm = get("addUserForm"),
-          toggleAccount = get("toggle_account_fields"),
-          role = get("role"), username = get("username"), password = get("password");
-
+    
+    const addUserBtn = get("addUserBtn"),
+          modalAdd = get("modal_cont_add_user"),
+          closeAdd = get("close_add_user"),
+          addUserForm = get("addUserForm"),
+          toggleAccount = get("toggle_account_fields");
+    
     if (addUserBtn && modalAdd && closeAdd && addUserForm && toggleAccount) {
-        toggleFields({checked:false}, [role, username, password]);
-
-        toggleAccount.addEventListener("change", () => toggleFields(toggleAccount, [role, username, password]));
-
+        toggleFields(toggleAccount);
+    
+        toggleAccount.addEventListener("change", () => toggleFields(toggleAccount));
+    
         addUserBtn.addEventListener("click", () => {
             modalAdd.classList.add("show");
             document.body.style.overflow = "hidden";
             ["unit", "role"].forEach(f => toggleNewField(f, `new_${f}`, `__new_${f}__`));
         });
-
+    
         closeAdd.addEventListener("click", () => {
             modalAdd.classList.remove("show");
             document.body.style.overflow = "auto";
             addUserForm.reset();
             ["new_unit", "new_role"].forEach(id => {
                 const el = get(id);
-                if (el) Object.assign(el.style, {display:"none"}), el.disabled = true, el.required = false;
+                if (el) Object.assign(el.style, { display: "none" }), el.disabled = true, el.required = false;
             });
             toggleAccount.checked = false;
-            toggleFields({checked:false}, [role, username, password]);
+            toggleFields({ checked: false });
             setTimeout(() => location.reload(), 500);
         });
-
+    
         addUserForm.addEventListener("submit", e => {
             e.preventDefault();
             const data = new FormData(addUserForm);
-            if (!toggleAccount.checked) ["role", "username", "password"].forEach(k => data.set(k, ""));
+            if (!toggleAccount.checked) ["role", "kld_id", "kld_email", "password"].forEach(k => data.set(k, ""));
             fetch('/ims/auth/users/InsertAuth.php', { method: 'POST', body: data })
                 .then(res => res.text())
-                .then(res => showPopup(res.trim().toLowerCase() === "success" ? "User successfully added." : res, res.trim().toLowerCase() === "success" ? "#005a34" : "#FF0000"))
+                .then(res => showPopup(
+                    res.trim().toLowerCase() === "success" ? "User successfully added." : res,
+                    res.trim().toLowerCase() === "success" ? "#005a34" : "#FF0000"
+                ))
                 .catch(() => showPopup('Something went wrong.', '#FF0000'));
         });
     }
 
-    // User Detail Modal
-    const userModal = get('modal_cont_detail_user'), closeDetail = get('close_detail_user');
+    const userModal = document.getElementById('modal_cont_detail_user');
+    const closeDetail = document.getElementById('close_detail_user');
     if (userModal && closeDetail) {
         document.querySelectorAll(".btn-edit").forEach(btn => {
             btn.addEventListener("click", () => {
@@ -475,40 +606,62 @@ document.addEventListener("DOMContentLoaded", () => {
                     .then(res => res.json())
                     .then(d => {
                         if (!d) return alert("User details not found.");
-                        get("user_detail_id").value = d.user_ID || "";
-                        get("user_detail_fullname").value = d.full_name || "";
-                        get("user_detail_username").value = d.username || "";
-                        get("user_detail_password").value = "";
+                        // Set user details into modal
+                        document.getElementById("user_detail_user_ID").value = d.user_ID || "";
+                        document.getElementById("user_detail_kld_ID").value = d.kld_ID || "";
+                        document.getElementById("user_detail_f_name").value = d.f_name || "";
+                        document.getElementById("user_detail_m_name").value = d.m_name || "";
+                        document.getElementById("user_detail_l_name").value = d.l_name || "";
+                        document.getElementById("user_detail_kld_email").value = d.kld_email || "";
+                        document.getElementById("user_detail_password").value = "";
+                        
+
+                        // Populate select fields (role, unit)
                         ["role", "unit"].forEach(f => {
                             const s = get(`user_detail_${f}`);
                             Array.from(s.options).forEach(opt => opt.selected = opt.text === d[`${f}_name`]);
                         });
 
                         const toggleDetails = get("toggle_account_fields_details"),
-                              detailRole = get("user_detail_role"),
-                              detailUsername = get("user_detail_username"),
-                              detailPassword = get("user_detail_password");
-                        
-                        if (d.username) {
-                            // Has account
-                            toggleDetails.checked = true;
-                            toggleFields(toggleDetails, [detailRole, detailUsername], true);
-                            toggleFields(toggleDetails, [detailPassword], false); // Password NOT required when editing
+                            detailRole = get("user_detail_role"),
+                            detailUsername = get("user_detail_kld_email"),
+                            detailPassword = get("user_detail_password");
+
+                        const toggleAccountFields = (enabled, passwordRequired = true) => {
+                            // Toggle visibility and enable/disable fields
+                            [detailRole, detailUsername].forEach(f => {
+                                const wrapper = f.closest(".account-field") || f.parentElement;
+                                if (wrapper) wrapper.style.display = enabled ? "flex" : "none";
+                                f.disabled = !enabled;
+                                f.required = enabled;
+                            });
+
+                            const pwdWrapper = detailPassword.closest(".account-field") || detailPassword.parentElement;
+                            if (pwdWrapper) pwdWrapper.style.display = enabled ? "flex" : "none";
+                            detailPassword.disabled = !enabled;
+                            detailPassword.required = enabled && passwordRequired;
+                        };
+
+                        // If user has account details (role, email), show account fields
+                        const hasAccount = d.kld_email && d.role_name;
+                        if (hasAccount) {
+                            toggleDetails.checked = true; // Checkbox on
+                            toggleAccountFields(true, false); // Account fields enabled, password not required
                         } else {
-                            // No account
-                            toggleDetails.checked = false;
-                            toggleFields({checked:false}, [detailRole, detailUsername, detailPassword]);
+                            toggleDetails.checked = false; // Checkbox off
+                            toggleAccountFields(false); // Account fields hidden
                         }
 
+                        // Toggle the account fields visibility when checkbox is changed
                         toggleDetails.addEventListener("change", () => {
                             if (toggleDetails.checked) {
-                                toggleFields(toggleDetails, [detailRole, detailUsername], true);
-                                toggleFields(toggleDetails, [detailPassword], true);
+                                toggleAccountFields(true, true); // Password required when checkbox is checked
                             } else {
-                                toggleFields({checked:false}, [detailRole, detailUsername, detailPassword]);
+                                toggleAccountFields(false); // Hide account fields when unchecked
                             }
                         });
-
+                        captureInitialUserDetails();
+                        // Show modal
                         userModal.classList.add("show");
                         document.body.style.overflow = "hidden";
                     })
@@ -523,41 +676,73 @@ document.addEventListener("DOMContentLoaded", () => {
             setTimeout(() => location.reload(), 500);
         });
     }
+});
 
-    // Edit Form
-    const detailForm = get("userDetailsForm");
-    if (detailForm) {
-        let initial = {};
-        document.querySelectorAll('[data-open="details-modal"]').forEach(btn => btn.addEventListener("click", () => {
-            ["role", "user_ID", "username", "password", "full_name", "user_unit"].forEach(k => initial[k] = get(`user_detail_${k}`)?.value || "");
-        }));
+// Start of user details modal form submission
+let initialUserDetails = {};
+function captureInitialUserDetails() {
+    initialUserDetails = {
+        user_ID: document.getElementById('user_detail_user_ID').value,
+        kld_ID: document.getElementById('user_detail_kld_ID').value,
+        f_name: document.getElementById('user_detail_f_name').value,
+        m_name: document.getElementById('user_detail_m_name').value,
+        l_name: document.getElementById('user_detail_l_name').value,
+        kld_email: document.getElementById('user_detail_kld_email').value,
+        role: document.getElementById('user_detail_role').value,
+        unit: document.getElementById('user_detail_unit').value,
+        password: document.getElementById("user_detail_password").value
+    };
+}
 
-        detailForm.addEventListener("submit", e => {
+document.addEventListener('DOMContentLoaded', () => {
+    const formUpdateUser = document.getElementById('userDetailsForm');
+
+    if (formUpdateUser) {
+        formUpdateUser.addEventListener('submit', function (e) {
             e.preventDefault();
-            const current = {};
-            ["role", "user_ID", "username", "password", "full_name", "user_unit"].forEach(k => current[k] = get(`user_detail_${k}`)?.value || "");
-            if (!Object.keys(current).some(k => current[k] !== initial[k])) return showPopup("No changes detected.", 'orange');
+            const currentU = {
+                user_ID: document.getElementById('user_detail_user_ID').value,
+                kld_ID: document.getElementById('user_detail_kld_ID').value,
+                f_name: document.getElementById('user_detail_f_name').value,
+                m_name: document.getElementById('user_detail_m_name').value,
+                l_name: document.getElementById('user_detail_l_name').value,
+                kld_email: document.getElementById('user_detail_kld_email').value,
+                role: document.getElementById('user_detail_role').value,
+                unit: document.getElementById('user_detail_unit').value,
+                password: document.getElementById("user_detail_password").value
+            };
 
-            fetch("/ims/auth/users/updateAuth.php", { method: "POST", body: new FormData(detailForm) })
+            const changed = Object.keys(currentU).some(key => currentU[key] !== initialUserDetails[key]);
+            if (!changed) return showPopup("No changes detected.", 'orange');
+
+            const formData = new FormData(formUpdateUser);
+            fetch('/ims/auth/users/updateAuth.php', { method: 'POST', body: formData })
                 .then(res => res.text())
-                .then(r => {
-                    const resp = r.trim().toLowerCase();
-                    showPopup(resp === "success" ? "Success!" : resp === "duplicate" ? "No changes detected." : r, resp === "success" ? "#005a34" : "orange");
-                    if (resp === "success") initial = {...current};
+                .then(response => {
+                    console.log(response); // Log the response from the backend
+                    showPopup(response.trim().toLowerCase() === "success" ? 'Success!' : response, response.trim().toLowerCase() === "success" ? '#005a34' : '#FF0000');
                 })
                 .catch(() => showPopup('Something went wrong.', '#FF0000'));
         });
+
+        // Capture initial user details on modal open
+        document.querySelectorAll('[data-open="user-details-modal"]').forEach(button => {
+            button.addEventListener('click', () => captureInitialUserDetails());
+        });
     }
+
 });
 
 // Start of delete users
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.btn-delete').forEach(button => {
-        button.addEventListener('click', () => {
+        button.addEventListener('click', async () => {
             const user = button.getAttribute('data-user');
+            const kld_id = button.getAttribute('data-kld_ID');
             if (!user) return;
-            if (confirm(`Are you sure you want to delete user with User ID: ${user}?`)) {
-                fetch('/ims/auth/users/deleteAuth.php', {
+            const confirmed = await showConfirmation(`Are you sure you want to delete user with KLD ID: ${kld_id}?`, 'black');
+            if (!confirmed) return;    
+            fetch('/ims/auth/users/deleteAuth.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: new URLSearchParams({ user })
@@ -572,7 +757,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 })
                 .catch(() => showPopup('Something went wrong.', '#FF0000'));
-            }
+       
         });
     });
 });
@@ -654,7 +839,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // Start of delete reference
 
 document.querySelectorAll('.btn-delete').forEach(button => {
-    button.addEventListener('click', () => {
+    button.addEventListener('click', async () => {
         let type = '';
         let id = '';
 
@@ -673,8 +858,8 @@ document.querySelectorAll('.btn-delete').forEach(button => {
         }
 
         if (!type || !id) return;
-
-        if (confirm(`Are you sure you want to delete this ${type.replace('_', ' ')}?`)) {
+        const confirmed = await showConfirmation((`Are you sure you want to delete this ${type.replace('_', ' ')}?`));
+        if (!confirmed) return; 
             const payload = new URLSearchParams({
                 id,
                 type
@@ -700,7 +885,7 @@ document.querySelectorAll('.btn-delete').forEach(button => {
                 }
             })
             .catch(() => showPopup('Something went wrong.', '#FF0000'));
-        }
+    
     });
 });
 

@@ -2,7 +2,6 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\auth\web_protector.php';
 if (file_exists('views/home/StatsOverview.php')) {
     define('IN_APP', true); 
-    // include ('detailsPopUp.php');
     include ('head.php');
     include ('views/home/StatsOverview.php');
 } else {
@@ -20,18 +19,13 @@ if (file_exists('views/home/StatsOverview.php')) {
     <link rel="stylesheet" href="\ims\css\style.css">
 </head>
 <body> 
-<!--     
-<div id="inventory" class="header-inventory">
-</div> -->
-<<<<<<< HEAD
-=======
-<?php include 'barcode.php';?>
->>>>>>> c0eb7cda9e3509a5a4e3af95f6568498a6bd10e8
 <?php head();?>
-<!-- <?php  detailsPopUp();  ?> -->
 
 <input type="text" id="barcode_input" style="display: none;" />
 <div class="field-inventory">
+        <div class="stats-header">
+            <h2>Dashboard</h2>
+        </div>
         <div class="card-container">
                 <?php StatsOverview(); ?>
         </div>
@@ -40,16 +34,8 @@ if (file_exists('views/home/StatsOverview.php')) {
             <?php include ('navbar.php'); ?>
         </div>
 </div>
-<!-- 
-    JavaScript -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
-    
     <script src="script/script.js"></script>
-<<<<<<< HEAD
     <script src="script/importCsv.js"></script>
-=======
-    <!-- <script src="script/barcodeScanner.js"></script> -->
->>>>>>> c0eb7cda9e3509a5a4e3af95f6568498a6bd10e8
+    <script src="script/stats.js"></script>
 </body>
 </html>

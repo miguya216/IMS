@@ -21,10 +21,13 @@ if (file_exists('views/checkedOut-item/checkedOutlist.php')) {
 <body>
     <?php head(); ?>
     <div class="field-inventory">
+    <div class="stats-header">
+            <h2>Check-out items</h2>
+        </div>
         <form id="searchForm">
             <div class="invt-input-details">
                 <div class="invt-input-box">
-                    <img type="button" onclick="openRequestForm()" src="imgs/add.png" alt="Add Request" class="button-add">
+                    <img type="button" onclick="openReceiptForm()" src="imgs/add.png" alt="Add Request" class="button-add">
                     <input type="text" class="search-bar" id="searchInput" placeholder = "Search Checked-out item" onkeyup="searchInput()">
                     <!-- <label>Sort:</label>
                     <select class="dropdown-filter" data-column="1">
@@ -42,7 +45,7 @@ if (file_exists('views/checkedOut-item/checkedOutlist.php')) {
                 </div>
             </div>
         </form>
-
+    
         <div class="invt-list-container">
             <?php checkedOuts(); ?>
         </div>
@@ -50,8 +53,7 @@ if (file_exists('views/checkedOut-item/checkedOutlist.php')) {
     </div>
         
     <?php include ('navbar.php'); ?>
-    <!-- JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script src="script/script.js"></script>
 
 </body>

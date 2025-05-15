@@ -1,10 +1,10 @@
 <?php
-    require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\class\uni_fetch.php';
+  require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\class\uni_fetch.php';
+   require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\auth\web_protector.php';
     $fetcher = new DataFetcher();
-    $assetTypes = $fetcher->getAllAssetTypes();
-    $brands = $fetcher->getAllBrands();
+    $brands = $fetcher->getAllBrandsWithAsset();
     $units = $fetcher->getAllUnits();
-    $users = $fetcher->getAllUsers(); // for Responsible To
+    $users = $fetcher->getAllUsers(); 
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -17,55 +17,39 @@
     <link rel="stylesheet" href="\ims\css\style.css">
 </head>
 <body class = "request-body">
-
 <div class="d-flex justify-content-center align-items-center min-vh-100">
   <div class="bg-light border rounded p-4" style="max-width: 700px; width: 100%;">
+    <div id="notifModal" class="notif-modal">
+        <div id="responseMessage"></div>
+    </div>
     <h3 class="mb-4 text-center">EQUIPMENT RESERVATION FORM</h3>
 
-    <form>
+    <form id="requestForm">
       <!-- Text Input -->
       <div class="row mb-3 align-items-center">
-        <label for="borrower" class="col-sm-3 col-form-label text-start">Borrower's Name</label>
+        <label for="borrower" class="col-sm-3 col-form-label text-start">KLD ID</label>
         <div class="col-sm-9">
-          <input type="text" class="form-control" id="borrower" name="borrower"placeholder="Enter borrower's name" required>
-        </div>
-      </div>
-
-      <!-- Date Input -->
-      <div class="row mb-3 align-items-center">
-        <label for="date" class="col-sm-3 col-form-label text-start">Date:</label>
-        <div class="col-sm-9">
-          <input type="date" class="form-control" id="date" name="date" required>
-        </div>
-      </div>
-
-      <!-- Date Input -->
-      <div class="row mb-3 align-items-center">
-        <label for="time" class="col-sm-3 col-form-label text-start">Time:</label>
-        <div class="col-sm-9">
-          <input type="time" class="form-control" id="time" name="time" require>
+          <input type="text" value="<?= htmlspecialchars($_SESSION['kld_ID']) ?>"  class="form-control" id="request_kld_id" name="request_kld_id" readonly>
         </div>
       </div>
 
       <div class="row mb-3 align-items-center">
-        <label for="purpose" class="col-sm-3 col-form-label text-start">Purpose:</label>
+        <label for="borrower" class="col-sm-3 col-form-label text-start">KLD email</label>
         <div class="col-sm-9">
-          <textarea type="textarea" class="form-control" id="purpose" name="purpose" placeholder="Enter purpose" required></textarea>
+          <input type="text" value="<?= htmlspecialchars($_SESSION['kld_email']) ?>" class="form-control" id="request_kld_email" name="request_kld_email" readonly>
         </div>
       </div>
 
-
-        <!-- Select Dropdown -->
       <div class="row mb-3 align-items-center">
       <label for="asset" class="col-sm-3 col-form-label text-start">Item Description</label>
       <div class="col-sm-9">
-        <select class="form-select" id="asset" required>
-        <option value="" selected disabled>Select Item Description</option>
-        <?php foreach ($assetTypes as $type): ?>
-            <option value="<?= htmlspecialchars($type['asset_type']) ?>">
-                <?= htmlspecialchars($type['asset_type']) ?>
+        <select name="request_brand_ID" class="form-select" id="brand_ID" required>
+          <option value="" selected disabled>Select Item Description</option>
+          <?php foreach ($brands as $brand): ?>
+            <option value="<?= htmlspecialchars($brand['brand_ID']) ?>">
+              <?= htmlspecialchars($brand['brand_name'] . ' / ' . $brand['asset_type']) ?>
             </option>
-        <?php endforeach; ?>
+          <?php endforeach; ?>
         </select>
       </div>
     </div>
@@ -73,7 +57,7 @@
     <div class="row mb-3 align-items-center">
         <label for="UOM" class="col-sm-3 col-form-label text-start">UOM:</label>
         <div class="col-sm-9">
-          <input type="text" class="form-control" id="UOM" placeholder="Enter UOM" required>
+          <input type="text" class="form-control" id="request_UOM" name="request_UOM" placeholder="Enter UOM" required>
         </div>
       </div>
     
@@ -81,17 +65,23 @@
       <div class="row mb-3 align-items-center">
         <label for="quantity" class="col-sm-3 col-form-label text-start">Quantity</label>
         <div class="col-sm-9">
-          <input type="number" class="form-control" id="quantity" placeholder="Enter quantity" required>
+          <input type="number" class="form-control" id="request_quantity" name="request_quantity" placeholder="Enter quantity" required>
         </div>
       </div>
 
+    <div class="row mb-3 align-items-center">
+          <label for="purpose" class="col-sm-3 col-form-label text-start">Purpose:</label>
+            <div class="col-sm-9">
+              <textarea type="textarea" class="form-control" id="request_purpose" name="request_purpose" placeholder="Enter purpose" required></textarea>
+            </div>
+    </div>
         <div class="text-center">
-          <button type="submit" class="btn">Submit Request</button>
+          <button type="submit" id="request_submit" class="btn">Submit Request</button>
+          <button type="button" class="btn" onclick="history.back()">Back</button>
         </div>
-      
     </form>
   </div>
 </div>
-
 </body>
+<script src="script/requestForm.js"></script>
 </html>

@@ -17,6 +17,19 @@ class DataFetcher {
         return $this->fetchAll("SELECT * FROM brand WHERE brand_status = 'active'");
     }
 
+     public function getAllBrandsWithAsset() {
+        $sql = "SELECT b.brand_ID, b.brand_name, a.asset_type 
+                FROM brand b 
+                JOIN asset_type a ON b.asset_type_ID = a.asset_type_ID 
+                WHERE b.brand_status = 'active' AND a.asset_type_status = 'active'";
+        
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
+
     public function getAllUnits() {
         return $this->fetchAll("SELECT * FROM unit WHERE unit_status = 'active'");
     }

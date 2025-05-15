@@ -6,10 +6,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $remember = isset($_POST['remember_me']);
     
     if ($user->login($_POST["kld_email"], $_POST["password"], $remember)) {
-        header("Location: admin/home.php");
+        if ($role == 1 || $role == 2) {
+            header("Location: admin/home.php");
+        } elseif ($role == 3) {
+            header("Location: admin/borrower.php");
+        } else {
+            // fallback if role is unknown
+            header("Location: login.php");
+        }
         exit();
     } else {
-        $error = "Invalid username or password.";
+        $error = "Invalid KLD email or password";
     }
 }
 ?>

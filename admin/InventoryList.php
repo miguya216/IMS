@@ -24,11 +24,16 @@ if (file_exists('views/inventory/itemList.php')) {
 <body> 
 
         <?php head();?>
-
+       
         <div class="field-inventory">
+        <div class="stats-header">
+            <h2>Registered Assets</h2>
+        </div>
                 <form id="searchForm">
                     <div class="invt-field-details">
                             <div class="invt-input-box">
+                                <img type="button" onclick="importCsvFile()" src="imgs/import.png" alt="Import file" class="button-add">
+                                <input type="file" id="csvFileInput" accept=".csv" style="display: none;">  
                                 <img type="button" onclick="openBarcode()" src="imgs/print-barcode.png" alt="Download Barcode PDF" class="button-add">
                                 <img type="button" id="addItemBtn" src="imgs/add.png" alt="Add Items" class="button-add">
                                 <input type="text" class="search-bar" id="searchInput" placeholder="Search Asset" onkeyup="searchInventory()">
@@ -46,7 +51,6 @@ if (file_exists('views/inventory/itemList.php')) {
                             </div>
                     </div>
                 </form>
-
                 <div class="invt-list-container">
                         <?php itemList(); ?>
                 </div>
@@ -57,9 +61,9 @@ if (file_exists('views/inventory/itemList.php')) {
         <?php details();?>
         <?php addModal();?>
     
+
 <script src="script/html2pdf.bundle.min.js"></script>
 <script src="script/script.js"></script>
-
-
+<script src="script/importCsv.js"></script>
 </body>
 </html>

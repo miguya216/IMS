@@ -4,6 +4,7 @@ if (file_exists('views\request\requestList.php')) {
     define('IN_APP', true); 
     include ('head.php');
     include ('views\request\requestList.php'); 
+    include ('views\request\requestDetails.php');
 } else {
     echo "Error: StatsOverview file not found!";
 }
@@ -23,41 +24,39 @@ if (file_exists('views\request\requestList.php')) {
     <?php head(); ?>
     
     <div class="field-inventory">
+    <div class="stats-header">
+        <h2>Request Log</h2>
+    </div>
         <form id = "searchForm">
             <div class="invt-field-details">
                 <div class="invt-input-box">
                     <img type="button" onclick="openRequestForm()" src="imgs/add.png" alt="Add Request" class="button-add">
-                    <input type="text" class="search-bar" id="searchInput" placeholder = "Search Request" onkeyup="searchInput()">
-                    <!-- <label>Sort:</label>
-                    <select class="dropdown-filter" data-column="1">
-                        <option value="">by name</option>
-                    </select> 
-                    <select class="dropdown-filter" data-column="2">
-                        <option value="">by unit</option>
-                    </select> 
-                    <select class="dropdown-filter" data-column="3">
-                        <option value="">by username</option>
-                    </select> 
-                    <select class="dropdown-filter" data-column="4">
-                        <option value="">by role</option>
-                    </select>  -->
+                    <input type="text" class="search-bar" id="searchInputRequest" placeholder = "Search Request" onkeyup="searchRequest()">
+                    <select id="mainFilter" class="dropdown-filter">
+                        <option value="">Filter by...</option>
+                        <option value="1">KLD ID</option>
+                        <option value="2">Borrower's Name</option>
+                        <option value="3">Responsible To</option>
+                        <option value="4">Unit</option>
+                        <option value="5">Date</option>
+                        <option value="6">Status</option>
+                    </select>
+
+                    <select id="subFilter" class="dropdown-filter" disabled>
+                    <option value="">Select a value</option>
+                    </select>
                 </div>
             </div>
         </form>
-
+        
         <div class="invt-list-container">
             <?php requestList(); ?>
         </div>
     </div>
-    
-    
+    <?php detailsRequest(); ?>
     <?php include ('navbar.php'); ?>
 
-
-
     <!-- JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script/script.js"></script>
-
 </body>
 </html>

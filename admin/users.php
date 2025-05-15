@@ -27,6 +27,9 @@ if (file_exists('views/users/userList.php')) {
 </div> -->
 <?php head();?>
        <div class="field-inventory">
+       <div class="stats-header">
+            <h2>Member List</h2>
+        </div>
                 <form id="searchForm">
                     <div class="invt-field-details">
                         <!-- <div class="invt-field-header">
@@ -38,12 +41,12 @@ if (file_exists('views/users/userList.php')) {
                                     <option value="">Filter by...</option>
                                     <option value="1">name</option>
                                     <option value="2">unit</option>
-                                    <option value="3">username</option>
+                                    <option value="3">KLD email</option>
                                     <option value="4">role</option>
                                 </select>
 
                                 <select id="subFilter" class="dropdown-filter" disabled>
-                                <option value="">Select a value</option>
+                                    <option value="">Select a value</option>
                                 </select>
                             </div>
                     </div>
@@ -72,8 +75,6 @@ if (file_exists('views/users/userList.php')) {
     </div>
       
     <!-- JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script/script.js"></script>
-
 </body>
 </html>

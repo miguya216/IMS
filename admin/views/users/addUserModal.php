@@ -8,7 +8,7 @@ function addUserModal () {
 <div class="modal-container" id="modal_cont_add_user">
     <div class="modal">
         <form id="addUserForm" method="POST">
-
+            <input type="hidden" value="<?= htmlspecialchars($_SESSION['full_name']) ?>" name="name">
             <h3>Register New User</h3>
           
             <div class="field-details">

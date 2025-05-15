@@ -14,7 +14,7 @@ class Asset {
         $this->pdo = $pdo;
     }
 
-    public function insertAsset($inventory_tag, $serial_num, $asset_type, $brand, $responsibleTo, $f_name, $m_name, $l_name, $unit) {
+    public function insertAsset($response_for_this_log, $inventory_tag, $serial_num, $asset_type, $brand, $responsibleTo, $f_name, $m_name, $l_name, $unit) {
         try {
             // Check for duplicates
             $checkStmt = $this->pdo->prepare("SELECT * FROM asset WHERE inventory_tag = ? OR serial_number = ?");
@@ -95,7 +95,13 @@ class Asset {
             // === Insert Asset ===
             $stmt = $this->pdo->prepare("INSERT INTO asset (brand_ID, asset_type_ID, inventory_tag, serial_number, responsible_user_ID, barcode_ID, qr_ID) VALUES (?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([$brand_id, $asset_type_id, $inventory_tag, $serial_num, $user_id, $barcode_id, $qr_id]);
-    
+      
+            // === Insert Log ===
+            $timestamp = date("Y-m-d H:i:s");
+            $logMessage = "$response_for_this_log added a new asset with Inventory Tag: '$inventory_tag' and Serial Number: '$serial_num' on $timestamp";
+            $stmt = $this->pdo->prepare("INSERT INTO logs (log_content) VALUES (?)");
+            $stmt->execute([$logMessage]);
+
             return true;
     
         } catch (PDOException $e) {
@@ -103,6 +109,122 @@ class Asset {
         }
     }    
 }
+
+class ImportCSV {
+    private $pdo;
+
+    public function __construct() {
+        global $pdo;
+        $this->pdo = $pdo;
+    }
+
+   public function importFromCSV($csvFilePath) {
+    $handle = fopen($csvFilePath, 'r');
+    if (!$handle) {
+        return "Failed to open file.";
+    }
+
+    // Skip header row
+    fgetcsv($handle);
+
+    while (($row = fgetcsv($handle)) !== false) {
+        // Trim and sanitize all fields
+        $row = array_map('trim', $row);
+        [$serial_num, $inventory_tag, $brand, $asset_type, $f_name, $m_name, $l_name, $unit] = $row;
+
+        try {
+            // Skip if duplicate asset
+            $checkStmt = $this->pdo->prepare("SELECT * FROM asset WHERE inventory_tag = ? OR serial_number = ?");
+            $checkStmt->execute([$inventory_tag, $serial_num]);
+            if ($checkStmt->rowCount() > 0) {
+                continue;
+            }
+
+            // Normalize for case-insensitive match
+            $normalizedAssetType = strtolower($asset_type);
+            $normalizedBrand = strtolower($brand);
+            $normalizedUnit = strtolower($unit);
+
+            // Handle Asset Type
+            $stmt = $this->pdo->prepare("SELECT asset_type_ID FROM asset_type WHERE LOWER(asset_type) = ?");
+            $stmt->execute([$normalizedAssetType]);
+            if ($stmt->rowCount() > 0) {
+                $asset_type_id = $stmt->fetch()['asset_type_ID'];
+            } else {
+                $insert = $this->pdo->prepare("INSERT INTO asset_type (asset_type) VALUES (?)");
+                $insert->execute([$asset_type]);
+                $asset_type_id = $this->pdo->lastInsertId();
+            }
+
+            // Handle Brand
+            $stmt = $this->pdo->prepare("SELECT brand_ID FROM brand WHERE LOWER(brand_name) = ? AND asset_type_id = ?");
+            $stmt->execute([$normalizedBrand, $asset_type_id]);
+            if ($stmt->rowCount() > 0) {
+                $brand_id = $stmt->fetch()['brand_ID'];
+            } else {
+                $insert = $this->pdo->prepare("INSERT INTO brand (brand_name, asset_type_id) VALUES (?, ?)");
+                $insert->execute([$brand, $asset_type_id]);
+                $brand_id = $this->pdo->lastInsertId();
+            }
+
+            // Handle Unit
+            $stmt = $this->pdo->prepare("SELECT unit_ID FROM unit WHERE LOWER(unit_name) = ?");
+            $stmt->execute([$normalizedUnit]);
+            if ($stmt->rowCount() > 0) {
+                $unit_id = $stmt->fetch()['unit_ID'];
+            } else {
+                $insert = $this->pdo->prepare("INSERT INTO unit (unit_name) VALUES (?)");
+                $insert->execute([$unit]);
+                $unit_id = $this->pdo->lastInsertId();
+            }
+
+            // Handle User
+            $stmt = $this->pdo->prepare("SELECT user_ID FROM user WHERE f_name = ? AND m_name = ? AND l_name = ? AND unit_ID = ?");
+            $stmt->execute([$f_name, $m_name, $l_name, $unit_id]);
+            if ($stmt->rowCount() > 0) {
+                $user_id = $stmt->fetch()['user_ID'];
+            } else {
+                $insert = $this->pdo->prepare("INSERT INTO user (f_name, m_name, l_name, unit_ID) VALUES (?, ?, ?, ?)");
+                $insert->execute([$f_name, $m_name, $l_name, $unit_id]);
+                $user_id = $this->pdo->lastInsertId();
+            }
+
+            // Barcode Generation
+            $generator = new BarcodeGeneratorPNG();
+            $barcodeData = $generator->getBarcode($inventory_tag, $generator::TYPE_CODE_128);
+            $barcodeFilename = uniqid('barcode_') . '.png';
+            $barcodePath = 'barcodes/' . $barcodeFilename;
+            file_put_contents($_SERVER['DOCUMENT_ROOT'] . '/ims/' . $barcodePath, $barcodeData);
+
+            $stmt = $this->pdo->prepare("INSERT INTO barcode (barcode_image_path) VALUES (?)");
+            $stmt->execute([$barcodePath]);
+            $barcode_id = $this->pdo->lastInsertId();
+
+            // QR Code Generation
+            $qrCode = new QrCode($inventory_tag);
+            $qrWriter = new PngWriter();
+            $qrFilename = uniqid('qr_') . '.png';
+            $qrPath = 'qrcodes/' . $qrFilename;
+            $qrData = $qrWriter->write($qrCode);
+            file_put_contents($_SERVER['DOCUMENT_ROOT'] . '/ims/' . $qrPath, $qrData->getString());
+
+            $stmt = $this->pdo->prepare("INSERT INTO qr_code (qr_image_path) VALUES (?)");
+            $stmt->execute([$qrPath]);
+            $qr_id = $this->pdo->lastInsertId();
+
+            // Insert into asset table
+            $stmt = $this->pdo->prepare("INSERT INTO asset (brand_ID, asset_type_ID, inventory_tag, serial_number, responsible_user_ID, barcode_ID, qr_ID) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$brand_id, $asset_type_id, $inventory_tag, $serial_num, $user_id, $barcode_id, $qr_id]);
+        } catch (PDOException $e) {
+            continue; // skip problematic row
+        }
+    }
+
+    fclose($handle);
+    return true;
+}
+}
+
 
 class UpdateAsset {
     private $pdo;
@@ -112,7 +234,7 @@ class UpdateAsset {
         $this->pdo = $pdo;
     }
 
-    public function updateAssetDetails($serial_num, $asset_type, $brand, $responsible_to, $unit) {
+    public function updateAssetDetails($response_for_this_log, $serial_num, $asset_type, $brand, $responsible_to, $unit) {
         try {
             // Check if the asset exists
             $stmt = $this->pdo->prepare("SELECT asset_ID FROM asset WHERE serial_number = ?");
@@ -137,6 +259,12 @@ class UpdateAsset {
                 SET unit_ID = ? 
                 WHERE user_ID = ?");
             $updateUserStmt->execute([$unit, $responsible_to]);
+            
+             // === Insert Log ===
+            $timestamp = date("Y-m-d H:i:s");
+            $logMessage = "$response_for_this_log update an asset with Serial Number: '$serial_num' on $timestamp";
+            $stmt = $this->pdo->prepare("INSERT INTO logs (log_content) VALUES (?)");
+            $stmt->execute([$logMessage]);
 
             // Commit transaction
             $this->pdo->commit();
@@ -159,14 +287,20 @@ class DeleteAsset {
         $this->pdo = $pdo;
     }
 
-    public function deleteAssetDetails($serial_number) {
+    public function deleteAssetDetails($response_for_this_log, $serial_number) {
         try {
             $stmt = $this->pdo->prepare("UPDATE asset SET asset_status = 'inactive' WHERE serial_number = ?");
             if ($stmt->execute([$serial_number])) {
+                // === Insert Log ===
+                $timestamp = date("Y-m-d H:i:s");
+                $logMessage = "$response_for_this_log deleted asset with Serial Number: '$serial_number' on $timestamp";
+                $stmt = $this->pdo->prepare("INSERT INTO logs (log_content) VALUES (?)");
+                $stmt->execute([$logMessage]);
                 return "success";
             } else {
                 return "failed to delete";
             }
+            
         } catch (PDOException $e) {
             return $e->getMessage();
         }

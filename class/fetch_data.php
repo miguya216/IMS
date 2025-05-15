@@ -211,4 +211,67 @@ class Brand {
     }
 }
 
+class Request {
+    private $pdo;
+
+    public function __construct($pdo) {
+        $this->pdo = $pdo;
+    }
+
+    // Fetch all requests
+    public function fetchAllRequest() {
+        $sql = "
+            SELECT 
+                r.request_ID,
+                r.borrower_name,
+                r.kld_ID,
+                r.request_date,
+                r.request_time,
+                b.brand_name,
+                r.uom,
+                r.quantity,
+                u.unit_name,
+                r.purpose,
+                r.request_note,
+                r.response_status,
+                r.request_status
+            FROM request_form r
+            JOIN brand b ON r.brand_ID = b.brand_ID
+            JOIN unit u ON r.unit_ID = u.unit_ID
+            ORDER BY r.request_date DESC, r.request_time DESC
+        ";
+
+        $stmt = $this->pdo->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Fetch request by request_ID
+    public function fetchRequestByID($request_ID) {
+        $stmt = $this->pdo->prepare("SELECT 
+                r.request_ID,
+                r.borrower_name,
+                r.kld_ID,
+                k.kld_email,
+                r.request_date,
+                r.request_time,
+                b.brand_name,
+                r.uom,
+                r.quantity,
+                u.unit_name,
+                r.purpose,
+                r.request_note,
+                r.response_status,
+                r.request_status
+            FROM request_form r
+            JOIN brand b ON r.brand_ID = b.brand_ID
+            JOIN unit u ON r.unit_ID = u.unit_ID
+            JOIN kld k ON r.kld_ID = k.kld_ID
+            WHERE r.request_ID = :request_ID
+            LIMIT 1;");
+        $stmt->execute(['request_ID' => $request_ID]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+} 
+
+
 ?>

@@ -10,7 +10,7 @@ function details() {
 <div class="modal-container" id="modal_cont_details">
     <div class="modal">
         <form method="POST" id="updateForm">
-            
+            <input type="hidden" value="<?= htmlspecialchars($_SESSION['full_name']) ?>" name="name">
         <h3>Edit Asset Details</h3>
              
                 <div class="field-details">

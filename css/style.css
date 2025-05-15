@@ -27,7 +27,7 @@ body {
     background-repeat: no-repeat;
 }
 
-/* Start of Navrbar */
+/* Start of Navbar */
 .sidebar {
     background-image: 
         linear-gradient(to bottom right, #005a34, #006705),
@@ -41,23 +41,25 @@ body {
     position: fixed;
     top: 0;
     left: 0;
-    height: 100vh;
+    height: 100%;
     width: 250px;
     backdrop-filter: blur(10px);
     transition: width 0.3s ease-in-out;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: flex-start; /* Align items to the left by default */
     justify-content: flex-start;
     z-index: 10;
+    padding: 30px 0; /* Added padding to avoid extra space on the left */
 }
 
 /* Sidebar Header */
 .sidebar-header {
     display: flex;
-    align-items: center;
-    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center; /* Center the header */
     padding: 15px;
     width: 100%;
     border-bottom: 2px solid rgba(255, 255, 255, 0.2);
@@ -71,6 +73,12 @@ body {
     color: white;
     transition: font-size 0.3s ease-in-out, opacity 0.3s ease-in-out;
 }
+.sidebar-email {
+    font-size: 14px; /* Smaller than 18px */
+    color: rgb(225, 225, 225);  /* Optional: make it slightly dimmer */
+    font-weight: normal;
+}
+
 
 /* Sidebar Links */
 .sidebar a {
@@ -82,14 +90,15 @@ body {
     font-size: 16px;
     transition: 0.3s;
     white-space: nowrap;
+    width: 250px; /* Ensure the link fills the sidebar */
+    justify-content: flex-start; /* Align icons and text to the left */
 }
 
 .sidebar a:hover {
     background: linear-gradient(to bottom right, #00482a, #007806); 
     color: white;
-    font-size: 18px;
+    font-size: 20px;
     box-shadow: black;
-    width: 200px;
 }
 
 /* Icons */
@@ -99,51 +108,39 @@ body {
     margin-right: 10px;
     transition: width 0.3s ease-in-out, height 0.3s ease-in-out;
 }
-.sidebar.shrink .sidebar-header {
-    border-bottom: none;
-}
 
 /* Shrinking Sidebar */
-.sidebar.shrink{
+.sidebar.shrink {
+    margin-right: 30px;
     width: 70px;
-}
-
-.sidebar.shrink a:hover{
-    width: 0px;
-}
-/* Hide logo and text when sidebar shrinks */
-.sidebar.shrink .sidebar-logo,
-.sidebar.shrink .sidebar-title,
-.sidebar.shrink span {
-    width: 0;
-    height: 0;
-    opacity: 0;
-    margin: 0;
-    display: none;
+    padding-top: 20px;
+    align-items: center; /* Center the content when shrunk */
 }
 
 /* Keep icons visible when shrunk */
 .sidebar.shrink .nav-icon {
-    width: 0;
-    height: 0;
-    opacity: 0;
-    margin: 0;
-    display: none;
+    width: 30px;
+    height: 30px;
 }
 
-/* Hide text when sidebar shrinks */
+/* Sidebar shrink support */
 .sidebar.shrink a {
+    width: 100%;
     font-size: 0;
     padding: 12px;
 }
-/* 
-.sidebar a.logout-link {
-    color: red !important;
+
+/* Hide logo and text when sidebar shrinks */
+.sidebar.shrink .sidebar-title,
+.sidebar.shrink span {
+    display: none;
+    opacity: 0;
 }
 
-.sidebar a.logout-link:hover {
-    color: rgb(255, 0, 0) !important; 
-} */
+/* Center icons and text in the shrinking sidebar */
+.sidebar.shrink a {
+    justify-content: center; /* Center icons and text when the sidebar is shrunk */
+}
 
 /* Menu Button */
 #menu-btn {
@@ -166,7 +163,6 @@ body {
     height: 40px;
 }
 
-
 /* Content Area */
 .content {
     margin-left: 250px;
@@ -176,16 +172,16 @@ body {
 
 /* Adjust Content When Sidebar Shrinks */
 .content.shrink {
-    margin-left: 50px;
+    margin-left: 70px;
 }
-
 
 /* Sidebar shrink support */
 .sidebar.shrink ~ .modal-container {
     width: calc(100vw - 70px);
 }
 
-/* end of Navrbar */
+/* End of Navbar */
+
 
 /* start of modal */
 .modal-container {
@@ -213,7 +209,29 @@ body {
     pointer-events: auto;
     transform: scale(1);
 }
+.modal-btn {
+    border: none;       
+    outline: none; 
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    border-radius: 50%;
+    background: transparent;
+}
+.modal-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+}
 
+.modal-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 5px rgb(120, 120, 120);
+    background: rgba(255, 255, 255, 0.2);
+}
 /* Modal Box */
 .modal {
     display: block;
@@ -256,21 +274,59 @@ body {
     margin: 20px;
 }
 
-/* Notification */
+
+/* Notification Modal Base Style */
 .notif-modal {
-    display: none; /* Hidden by default */
+    width: 300px;
+    height: auto;
+    display: none;
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%); /* Center perfectly */
+    transform: translate(-50%, -50%) scale(0.95);
     background: rgb(235, 235, 235);
-    padding: 20px 40px;
+    padding: 30px 30px;
     border-radius: 8px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    z-index: 9999;
-    font-size: 16px;
+    z-index: 9998;
+    font-size: 20px;
     font-weight: bold;
     text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+.modal-image {
+    border-radius: 80px;
+    width: 120px;
+    height: auto;
+    margin-bottom: 10px;
+}
+/* Smooth bounce + fade in */
+@keyframes fadeBounceIn {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    50% {
+        opacity: 0.8;
+        transform: translate(-50%, -50%) scale(1.05);
+    }
+    75% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.98);
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+/* Show state with fadeBounceIn animation */
+.notif-modal.show {
+    display: block;
+    opacity: 1;
+    pointer-events: auto;
+    animation: fadeBounceIn 0.45s ease forwards;
 }
 
 
@@ -317,6 +373,16 @@ body {
 }
 
 /* Input group */
+.reponse-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
 .input-box {
     display: flex;
     align-items: center;
@@ -411,76 +477,63 @@ body {
 
 /* end of modal
 
+
 /* Dashboard Cards */
-/* Container for all cards */
-.card-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px;
-  justify-content: flex-start;
-  align-items: stretch;
-  padding: 16px;
-  width: 100%;
+.stats-header {
+    padding: 0 16px;
+    margin-top: 12px;
 }
 
-/* Shared card base style */
+.stats-header h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 8px;
+}
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    padding: 2rem;
+}
+
 .card {
-  height: 360px;
-  flex: 1 1 300px;
-  max-width: 360px;
-  background: linear-gradient(to bottom right, #f9f9f9, #f1f1f1);
-  border-radius: 12px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  padding: 16px;
-  transition: transform 0.2s ease, box-shadow 0.3s ease;
-  overflow: hidden;
+    background-color: #ffffff;
+    border-left: 6px solid #28a745; /* Professional green accent */
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    padding: 1.5rem;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    height: 100%;
+    width: 100%;
+    max-width: 400px;
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: auto;
 }
 
 .card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
 }
 
-.card span {
-    font-size: 0.95rem;
+.card-title {
+    font-size: 1.1rem;
     font-weight: 600;
-    margin-bottom: 8px;
-    color: #333;
+    color: #343a40; /* Dark gray for readability */
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
 }
 
 .card-content {
-    flex-grow: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px;
-    overflow: hidden;
-}
-
-/* NEW: Make the content inside (.card-content) scale down automatically */
-.card-content > * {
-    width: 100%;
-    height: auto;
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-}
-
-/* Responsive tweaks */
-@media (max-width: 900px) {
-    .card {
-        flex: 1 1 45%;
-        max-width: 100%;
-    }
+    font-size: 2rem;
+    font-weight: 700;
+    color: #d4df08;
 }
 
 @media (max-width: 600px) {
-    .card {
-        flex: 1 1 100%;
-        max-width: 100%;
-        min-height: 130px; /* optional: smaller card */
+    .card-content {
+        font-size: 1.5rem;
     }
 }
 
@@ -499,6 +552,7 @@ body {
 
 
 .left-head {
+    color: #2d3748;
     margin-left: 15px;
     display: flex;
     align-items: center;
@@ -682,7 +736,6 @@ body {
 }
 
 .invt-table-name {
-    /* background: rgb(0, 90, 52); */
     font-size: 13px;
     text-align: center;
     font-weight: bold;
@@ -698,8 +751,8 @@ body {
 .invt-table-data {
     scroll-snap-type: y mandatory;
     border-collapse: collapse;
-    max-height: 550px;
-    height: 550px;
+    max-height: 100vh;
+    height: 475px;
     overflow-y: auto; 
     position: relative;
     overflow-x: auto;
@@ -868,9 +921,17 @@ thead th {
     background-color: rgb(251, 234, 200);
     border-radius: 3px;
 }
-
+.pending {
+    color: rgb(149, 153, 28);
+    font-weight: bold;
+}
 .inactive {
     color: red;
+    font-weight: bold;
+}
+
+.rejected {
+     color: red;
     font-weight: bold;
 }
 

@@ -1,51 +1,38 @@
 <?php
-// getData.php
 require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\class\conn.php';
 
-// Make sure database connection is $pdo
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+try {
+    $stats = [];
 
-$action = $_GET['action'] ?? '';
+    // 1. Total Assets
+    $stmt = $pdo->query("SELECT COUNT(*) AS total_assets FROM asset");
+    $stats['total_assets'] = $stmt->fetch()['total_assets'];
 
-if ($action === 'assets') {
-    // Total Assets per Asset Type
-    $sql = "
-        SELECT at.asset_type, COUNT(a.asset_ID) AS total_assets
-        FROM asset a
-        JOIN asset_type at ON a.asset_type_ID = at.asset_type_ID
-        GROUP BY a.asset_type_ID
-    ";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    echo json_encode($data);
+    // 2. Active Users
+    $stmt = $pdo->query("SELECT COUNT(*) AS active_users FROM user WHERE user_status = 'active'");
+    $stats['active_users'] = $stmt->fetch()['active_users'];
 
-} elseif ($action === 'status') {
-    // Active vs Inactive Assets
-    $sql = "
-        SELECT asset_status, COUNT(*) AS total
-        FROM asset
-        GROUP BY asset_status
-    ";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    echo json_encode($data);
+    // 3. Total Borrowed Items
+    $stmt = $pdo->query("SELECT COUNT(*) AS total_borrowed FROM borrow WHERE borrow_status = 'active'");
+    $stats['total_borrowed'] = $stmt->fetch()['total_borrowed'];
 
-} elseif ($action === 'users_per_unit') {
-    // Users per Unit
-    $sql = "
-        SELECT u.unit_name, COUNT(us.user_ID) AS total_users
-        FROM user us
-        JOIN unit u ON us.unit_ID = u.unit_ID
-        GROUP BY u.unit_ID
-    ";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    echo json_encode($data);
+    // 4. Total Returned Items
+    $stmt = $pdo->query("SELECT COUNT(*) AS total_returned FROM returns");
+    $stats['total_returned'] = $stmt->fetch()['total_returned'];
 
-} else {
-  //  echo json_encode(['error' => 'Invalid action']);
+    // 5. Pending Requests
+    $stmt = $pdo->query("SELECT COUNT(*) AS pending_requests FROM request_form WHERE response_status = 'pending'");
+    $stats['pending_requests'] = $stmt->fetch()['pending_requests'];
+
+    // 6. Total Messages Sent
+    $stmt = $pdo->query("SELECT COUNT(*) AS total_messages FROM message");
+    $stats['total_messages'] = $stmt->fetch()['total_messages'];
+
+     // 7. Total Inactive Assets
+    $stmt = $pdo->query("SELECT COUNT(*) AS inactive_assets FROM asset where asset_status = 'inactive'");
+    $stats['inactive_assets'] = $stmt->fetch()['inactive_assets'];
+
+    echo json_encode($stats);
+} catch (PDOException $e) {
+    echo json_encode(['error' => $e->getMessage()]);
 }
-?>

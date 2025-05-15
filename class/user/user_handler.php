@@ -10,7 +10,7 @@ class User {
         $this->pdo = $pdo;
     }
 
-    public function insertNewUser($role, $kld_email, $password, $kld_id, $firstName, $middleName, $lastName, $unit) {
+    public function insertNewUser($response_for_this_log, $role, $kld_email, $password, $kld_id, $firstName, $middleName, $lastName, $unit) {
         try {
             $this->pdo->beginTransaction();
     
@@ -90,6 +90,12 @@ class User {
                 ");
                 $stmt->execute([$userId, $kld_id, $hashedPassword, $role_id]);
             }
+
+            // === Insert Log ===
+            $timestamp = date("Y-m-d H:i:s");
+            $logMessage = "$response_for_this_log Registered a new user with KLD ID: '$kld_id' and KLD email: '$kld_email' on $timestamp";
+            $stmt = $this->pdo->prepare("INSERT INTO logs (log_content) VALUES (?)");
+            $stmt->execute([$logMessage]);
     
             $this->pdo->commit();
             return true;
@@ -110,7 +116,7 @@ class UpdateUser {
         $this->pdo = $pdo;
     }
 
-    public function UpdateUser($user_ID, $kld_ID, $role, $kld_email, $password, $f_name, $m_name, $l_name, $unit) {
+    public function UpdateUser($response_for_this_log, $user_ID, $kld_ID, $role, $kld_email, $password, $f_name, $m_name, $l_name, $unit) {
         try {
             $this->pdo->beginTransaction();
     
@@ -246,6 +252,12 @@ class UpdateUser {
                     ]);
                 }
             }
+
+            // === Insert Log ===
+            $timestamp = date("Y-m-d H:i:s");
+            $logMessage = "$response_for_this_log Update user details with KLD ID: '$kld_ID' and KLD email: '$kld_email' on $timestamp";
+            $stmt = $this->pdo->prepare("INSERT INTO logs (log_content) VALUES (?)");
+            $stmt->execute([$logMessage]);
     
             $this->pdo->commit();
             return true;
@@ -258,8 +270,7 @@ class UpdateUser {
     
 }
 
-
-class DeleteUser{
+class DeleteUser {
     private $pdo;
 
     public function __construct() {
@@ -267,18 +278,47 @@ class DeleteUser{
         $this->pdo = $pdo;
     }
 
-    public function deleteUserDetails($user_ID){
-        try{
+    public function deleteUserDetails($response_for_this_log, $user_ID) {
+        try {
+            // Correctly fetch full name, kld_ID and kld_email using proper joins
+            $stmt = $this->pdo->prepare("
+                SELECT 
+                    CONCAT(u.f_name, ' ', u.l_name) AS full_name,
+                    u.kld_ID,
+                    k.kld_email
+                FROM user u
+                LEFT JOIN kld k ON u.kld_ID = k.kld_ID
+                WHERE u.user_ID = ?
+            ");
+            $stmt->execute([$user_ID]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$user) {
+                return "User not found.";
+            }
+
+            $fullName = $user['full_name'] ?? '?';
+            $kld_ID = !empty($user['kld_ID']) ? $user['kld_ID'] : '?';
+            $kld_email = !empty($user['kld_email']) ? $user['kld_email'] : '?';
+
+            // Inactivate the user
             $stmt = $this->pdo->prepare("UPDATE user SET user_status = 'inactive' WHERE user_ID = ?");
-            if($stmt->execute([$user_ID])){
+            if ($stmt->execute([$user_ID])) {
+                // Log the deletion
+                $timestamp = date("Y-m-d H:i:s");
+                $logMessage = "$response_for_this_log deleted user: Name = '$fullName', KLD ID = '$kld_ID', Email = '$kld_email' at $timestamp";
+                $stmt = $this->pdo->prepare("INSERT INTO logs (log_content) VALUES (?)");
+                $stmt->execute([$logMessage]);
+
                 return "success";
+            } else {
+                return "Failed to delete.";
             }
-            else{
-                return "failed to delete";
-            }
+
         } catch (PDOException $e) {
             return $e->getMessage();
         }
     }
 }
+
 ?>

@@ -4,6 +4,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '\ims\class\asset\asset_handler.php';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $Assets = new Asset();
 
+    $response_for_this_log = $_POST['name'];
     // Handle new or existing values
     $brand = ($_POST['brand'] ?? '') === '__new_brand__' ? ($_POST['new_brand'] ?? null) : ($_POST['brand'] ?? null);
     $responsibleTo = ($_POST['responsibleTo'] ?? '') === '__new_responsibleTo__' ? null : ($_POST['responsibleTo'] ?? null);
@@ -20,6 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Insert asset (with existing or new user)
     $response = $Assets->insertAsset(
+        $response_for_this_log,
         $_POST['inventory_tag'], 
         $_POST['serial_num'], 
         $asset, 

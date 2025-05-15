@@ -41,19 +41,22 @@
     </div>
 
     <?php while ($row = $stmt->fetch()) { ?>
-        <div class="row mb-4 align-items-start border-bottom pb-3">
-            <div class="col-sm-4">
-                <img src="../barcodes/<?php echo htmlspecialchars(basename($row['barcode_image_path'])); ?>" alt="Barcode" style="max-width: 100%; margin-bottom: 10px">
-                <img src="../qrcodes/<?php echo htmlspecialchars(basename($row['qr_image_path'])); ?>" alt="Barcode" style="max-width: 100%;">
-            </div>
-            <div class="col-sm-8">
-                <p><strong>Tag:</strong> <?php echo htmlspecialchars($row['inventory_tag']); ?></p>
-                <p><strong>Serial:</strong> <?php echo htmlspecialchars($row['serial_number']); ?></p>
-                <p><strong>Type:</strong> <?php echo htmlspecialchars($row['asset_type']); ?></p>
-                <p><strong>Brand:</strong> <?php echo htmlspecialchars($row['brand_name']); ?></p>
-            </div>
+    <div class="row align-items-start border-bottom pb-3" style="margin-bottom: 16px;">
+        <div class="col-sm-4">
+            <img src="../barcodes/<?php echo htmlspecialchars(basename($row['barcode_image_path'])); ?>" alt="Barcode" style="width: 180px; margin-bottom: 10px;">
+            <img src="../qrcodes/<?php echo htmlspecialchars(basename($row['qr_image_path'])); ?>" alt="QR code" style="width: 80px; height: 80px;">
         </div>
-    <?php } ?>
+        <div class="col-sm-8">
+            <p style="margin-bottom: 0;">
+                <strong>Tag:</strong> <?php echo htmlspecialchars($row['inventory_tag']); ?> |
+                <strong>Serial:</strong> <?php echo htmlspecialchars($row['serial_number']); ?> |
+                <strong>Type:</strong> <?php echo htmlspecialchars($row['asset_type']); ?> |
+                <strong>Brand:</strong> <?php echo htmlspecialchars($row['brand_name']); ?>
+            </p>
+        </div>
+    </div>
+<?php } ?>
+
 </div>
     </div>
 </div>

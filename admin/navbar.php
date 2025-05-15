@@ -4,6 +4,24 @@
     <div id="responseMessage"></div>
 </div>
 
+<div id="confirmModal" class="notif-modal">
+<div id="confirmationMessage"></div>
+    <div style="margin-top: 10px;">
+        <button class="btn" id="confirmYes">Yes</button>
+        <button class="btn" id="confirmNo">No</button>
+    </div>
+</div>
+
+<!-- Loading + Success Modal -->
+<div id="ImportnotifModal" class="notif-modal">
+  <div id="ImportpopupContent">
+    <img id="ImportloadingGif" class="modal-image" src="imgs/loading.gif" alt="loading" style="display: none;">
+    <p id="ImportresponseMessage"></p>
+    <button id="ImportnotifCloseBtn" class="btn" style="display: none;">Okay</button>
+  </div>
+</div>
+
+
   <nav> 
   <div class="content">
     <ul class="sidebar shrink">
@@ -16,6 +34,7 @@
 
         <li class="sidebar-header">
             <span class="sidebar-title"><?= htmlspecialchars($_SESSION['full_name']) ?></span>
+            <span class="sidebar-email"><?= htmlspecialchars($_SESSION['kld_email']) ?></span>
         </li>
         
         <li>
@@ -56,11 +75,12 @@
         </li>
 
         <li>
-            <a href="../logout.php" class="logout-link">
+            <a href="../logout.php" id="logoutLink">
                 <img src="imgs/logout.png" alt="Logout" class="nav-icon">
                 <span>Logout</span>
             </a>
         </li>
+
     </ul>
     </div>
 </nav>
