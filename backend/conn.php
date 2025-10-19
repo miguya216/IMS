@@ -1,8 +1,8 @@
 <?php
-$host = 'localhost';
-$db   = 'IMS';
-$user = 'root';
-$pass = '';
+$host = 'sql210.infinityfree.com';
+$db   = 'if0_39940134_IMS';
+$user = 'if0_39940134';
+$pass = 'Apnengcnnn216';
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
@@ -18,7 +18,7 @@ try {
 }
 
 // Change only this when moving from local → hosting
-define("BASE_STORAGE_PATH", $_SERVER['DOCUMENT_ROOT'] . '/IMS-REACT/frontend/public/');
-// define("BASE_STORAGE_PATH", $_SERVER['DOCUMENT_ROOT'] . '/'); // for hosting
+// define("BASE_STORAGE_PATH", $_SERVER['DOCUMENT_ROOT'] . '/IMS-REACT/frontend/public/');
+define("BASE_STORAGE_PATH", $_SERVER['DOCUMENT_ROOT'] . '/'); // for hosting
 
 ?>
