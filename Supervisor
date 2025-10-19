@@ -1,0 +1,7 @@
+[program:websocket]
+command=php /var/www/myapp/backend/server.php
+directory=/var/www/myapp/backend
+autostart=true
+autorestart=true
+stderr_logfile=/var/log/websocket.err.log
+stdout_logfile=/var/log/websocket.out.log

@@ -1,0 +1,1976 @@
+<?php
+require_once $_SERVER['DOCUMENT_ROOT'] . '/IMS-REACT/backend/conn.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/IMS-REACT/vendor/autoload.php';
+
+// Decode incoming JSON
+$input = json_decode(file_get_contents("php://input"), true);
+
+if (!$input) {
+    echo json_encode(["message" => "Invalid JSON input."]);
+    exit();
+}
+
+// Map variables from JSON payload
+$asset = new Asset();
+
+$response = $asset->insertAsset($input);
+
+
+// Send response
+if ($response === true) {
+    echo json_encode(["success" => true, "message" => "Asset added successfully."]);
+} elseif ($response === "duplicate") {
+    echo json_encode(["success" => false, "message" => "Asset already exists (duplicate inventory tag or serial number)."]);
+} else {
+    echo json_encode(["success" => false, "message" => $response]);
+}
+
+use Picqer\Barcode\BarcodeGeneratorPNG;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
+
+class Asset {
+    private $pdo;
+
+    public function __construct() {
+        global $pdo;
+        $this->pdo = $pdo;
+    }
+
+public function insertAsset($data) {
+    try {
+        $kld_property_tag = $data['kld_property_tag'];
+        $serial_num = $data['property_tag'];
+        $log_user = $data['response_for_this_log'] ?? 'Unknown';
+
+        // 1. Check duplicates
+        $checkStmt = $this->pdo->prepare("SELECT * FROM asset WHERE kld_property_tag = ? OR property_tag = ?");
+        $checkStmt->execute([$kld_property_tag, $serial_num]);
+        if ($checkStmt->rowCount() > 0) return "duplicate";
+
+       // 2. Handle asset type + brand logic
+        $brand_data = $data['brand'];
+        $asset_type_data = $data['asset_type'];
+
+        $brand_id = null;
+        $asset_type_id = null;
+
+        if (is_numeric($brand_data['existing_id'])) {
+            // 🟢 CASE 1: Existing brand — fetch its asset_type
+            $stmt = $this->pdo->prepare("SELECT asset_type_ID FROM brand WHERE brand_ID = ?");
+            $stmt->execute([$brand_data['existing_id']]);
+            $row = $stmt->fetch();
+            if ($row) {
+                $brand_id = $brand_data['existing_id'];
+                $asset_type_id = $row['asset_type_ID'];
+            } else {
+                return "Selected brand does not exist.";
+            }
+        } else {
+            // 🟢 CASE 2 or 3: New brand (check if asset_type is existing or new)
+            $new_brand = trim($brand_data['new_value']);
+
+            if (is_numeric($asset_type_data['existing_id'])) {
+                // Case 2: New brand + existing asset type
+                $asset_type_id = $asset_type_data['existing_id'];
+            } else {
+                // Case 3: New brand + new asset type
+                $new_asset_type = trim($asset_type_data['new_value']);
+                if (empty($new_asset_type)) {
+                    return "Asset type is required when creating a new brand.";
+                }
+
+                // Check if asset type already exists
+                $stmt = $this->pdo->prepare("SELECT asset_type_ID FROM asset_type WHERE asset_type = ?");
+                $stmt->execute([$new_asset_type]);
+                $row = $stmt->fetch();
+                if ($row) {
+                    $asset_type_id = $row['asset_type_ID'];
+                } else {
+                    // Insert new asset type
+                    $stmt = $this->pdo->prepare("INSERT INTO asset_type (asset_type) VALUES (?)");
+                    $stmt->execute([$new_asset_type]);
+                    $asset_type_id = $this->pdo->lastInsertId();
+                }
+            }
+
+            if (empty($new_brand)) {
+                return "Brand name is required.";
+            }
+
+            // Insert or fetch brand
+            $stmt = $this->pdo->prepare("SELECT brand_ID FROM brand WHERE brand_name = ? AND asset_type_ID = ?");
+            $stmt->execute([$new_brand, $asset_type_id]);
+            $row = $stmt->fetch();
+            if ($row) {
+                $brand_id = $row['brand_ID'];
+            } else {
+                $stmt = $this->pdo->prepare("INSERT INTO brand (brand_name, asset_type_ID) VALUES (?, ?)");
+                $stmt->execute([$new_brand, $asset_type_id]);
+                $brand_id = $this->pdo->lastInsertId();
+            }
+        }
+
+            // 6. Handle Responsible (User) and Unit
+            $responsible = $data['responsible'];
+            $responsible_id = null;
+            $unit_id = null;
+
+            if (is_numeric($responsible['existing_id'])) {
+                // Case A: Existing user
+                $responsible_id = $responsible['existing_id'];
+            } else {
+                // New user - get names
+                $first = trim($responsible['new_value']['first_name']);
+                $middle = trim($responsible['new_value']['middle_name']);
+                $last = trim($responsible['new_value']['last_name']);
+
+                if (empty($first) || empty($last)) {
+                    return "Responsible person's first and last name are required.";
+                }
+
+                // Handle unit
+                $unit = $data['unit'];
+                if (is_numeric($unit['existing_id'])) {
+                    // Case B: Unit exists
+                    $unit_id = $unit['existing_id'];
+                } elseif (!empty($unit['new_value'])) {
+                    // Case C: New unit
+                    $new_unit = trim($unit['new_value']);
+
+                    // Check for duplicate unit
+                    $stmt = $this->pdo->prepare("SELECT unit_ID FROM unit WHERE unit_name = ?");
+                    $stmt->execute([$new_unit]);
+                    $row = $stmt->fetch();
+                    if ($row) {
+                        $unit_id = $row['unit_ID'];
+                    } else {
+                        $stmt = $this->pdo->prepare("INSERT INTO unit (unit_name) VALUES (?)");
+                        $stmt->execute([$new_unit]);
+                        $unit_id = $this->pdo->lastInsertId();
+                    }
+                } else {
+                    return "Unit is required when creating a new responsible user.";
+                }
+
+                // Now insert user
+                $stmt = $this->pdo->prepare("
+                    INSERT INTO user (f_name, m_name, l_name, unit_ID)
+                    VALUES (?, ?, ?, ?)
+                ");
+                $stmt->execute([$first, $middle, $last, $unit_id]);
+                $responsible_id = $this->pdo->lastInsertId();
+            }
+
+
+        // 7. Handle room
+        $room_data = $data['room'];
+        if (is_numeric($room_data['existing_id'])) {
+            $room_id = $room_data['existing_id'];
+        } else {
+            $roomNumber = strtoupper(trim($room_data['new_value']));
+            $stmt = $this->pdo->prepare("SELECT room_ID FROM room WHERE room_number = ? AND room_status = 'active'");
+            $stmt->execute([$roomNumber]);
+            $existingRoom = $stmt->fetch();
+            if ($existingRoom) {
+                $room_id = $existingRoom['room_ID'];
+            } else {
+                // Inside else for new room creation
+                $stmt = $this->pdo->prepare("INSERT INTO qr_code (qr_image_path) VALUES ('pending')");
+                $stmt->execute();
+                $qr_code_id = $this->pdo->lastInsertId();
+
+                // Generate room_qr_value first
+                $qr_value = $roomNumber . strtoupper(bin2hex(random_bytes(2)));
+
+                // Save room with generated qr_value and placeholder qr_code_ID
+                $stmt = $this->pdo->prepare("INSERT INTO room (room_number, room_qr_value, room_qr_ID) VALUES (?, ?, ?)");
+                $stmt->execute([$roomNumber, $qr_value, $qr_code_id]);
+                $room_id = $this->pdo->lastInsertId();
+
+                // Now generate QR image using room_qr_value (not ROOM_ID)
+                $qr = new QrCode($qr_value); // ✅ QR encodes the correct value
+                $writer = new PngWriter();
+                $qrFilename = uniqid("qr_room_") . ".png";
+                $qrPath = "qrcodes/$qrFilename";
+                file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/ims-react/frontend/" . $qrPath, $writer->write($qr)->getString());
+
+                // Update the qr_code table with correct image path
+                $stmt = $this->pdo->prepare("UPDATE qr_code SET qr_image_path = ? WHERE qr_ID = ?");
+                $stmt->execute([$qrPath, $qr_code_id]);
+
+            }
+        }
+
+        // 9. Handle asset condition
+        $cond_data = $data['asset_condition'];
+        if (is_numeric($cond_data['existing_id'])) {
+            $asset_condition_id = $cond_data['existing_id'];
+        } else {
+            $stmt = $this->pdo->prepare("SELECT asset_condition_ID FROM asset_condition WHERE condition_name = ?");
+            $stmt->execute([$cond_data['new_value']]);
+            $row = $stmt->fetch();
+            if ($row) {
+                $asset_condition_id = $row['asset_condition_ID'];
+            } else {
+                $stmt = $this->pdo->prepare("INSERT INTO asset_condition (condition_name) VALUES (?)");
+                $stmt->execute([$cond_data['new_value']]);
+                $asset_condition_id = $this->pdo->lastInsertId();
+            }
+        }
+
+        // 10. Handle acquisition source
+        $source_data = $data['acquisition_source'];
+        $a_source_id = null;
+
+        if (is_numeric($source_data['existing_id'])) {
+            // Existing acquisition source
+            $a_source_id = $source_data['existing_id'];
+        } else {
+            // New acquisition source
+            $new_source = trim($source_data['new_value']);
+            if (empty($new_source)) {
+                return "Acquisition source is required.";
+            }
+            // Check if already exists
+            $stmt = $this->pdo->prepare("SELECT a_source_ID FROM acquisition_source WHERE a_source_name = ?");
+            $stmt->execute([$new_source]);
+            $row = $stmt->fetch();
+            if ($row) {
+                $a_source_id = $row['a_source_ID'];
+            } else {
+                $stmt = $this->pdo->prepare("INSERT INTO acquisition_source (a_source_name) VALUES (?)");
+                $stmt->execute([$new_source]);
+                $a_source_id = $this->pdo->lastInsertId();
+            }
+        }
+        
+        // 11. Barcode & QR
+        $barcode = new BarcodeGeneratorPNG();
+        $barcodeData = $barcode->getBarcode($kld_property_tag, $barcode::TYPE_CODE_128);
+        $barcodeFilename = uniqid("barcode_") . ".png";
+        $barcodePath = "barcodes/$barcodeFilename";
+        file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/ims-react/frontend/" . $barcodePath, $barcodeData);
+        $stmt = $this->pdo->prepare("INSERT INTO barcode (barcode_image_path) VALUES (?)");
+        $stmt->execute([$barcodePath]);
+        $barcode_id = $this->pdo->lastInsertId();
+
+        $qr = new QrCode($kld_property_tag);
+        $writer = new PngWriter();
+        $qrFilename = uniqid("qr_asset_") . ".png";
+        $qrPath = "qrcodes/$qrFilename";
+        file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/ims-react/frontend/" . $qrPath, $writer->write($qr)->getString());
+        $stmt = $this->pdo->prepare("INSERT INTO qr_code (qr_image_path) VALUES (?)");
+        $stmt->execute([$qrPath]);
+        $qr_id = $this->pdo->lastInsertId();
+
+        // 12. Final asset insert
+        $stmt = $this->pdo->prepare("
+            INSERT INTO asset (
+                brand_ID, asset_type_ID, kld_property_tag, property_tag,
+                responsible_user_ID, barcode_ID, qr_ID, room_ID,
+                asset_condition_ID, a_source_ID, date_acquired, serviceable_year, price_amount
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->execute([
+            $brand_id, $asset_type_id, $kld_property_tag, $serial_num,
+            $responsible_id, $barcode_id, $qr_id, $room_id, $asset_condition_id,
+            $a_source_id, $data['date_acquired'], $data['serviceable_year'], $data['price_amount']
+        ]);
+
+        $asset_id = $this->pdo->lastInsertId();
+
+        // 12.1 Create property card linked to this asset
+        $stmt = $this->pdo->prepare("INSERT INTO property_card (asset_ID) VALUES (?)");
+        $stmt->execute([$asset_id]);
+        $property_card_id = $this->pdo->lastInsertId();
+
+        // 12.2 Insert initial record into property_card_record
+        $stmt = $this->pdo->prepare("
+            INSERT INTO property_card_record (
+                property_card_ID, reference_type, reference_ID,
+                officer_user_ID, price_amount, remarks
+            ) VALUES (?, ?, ?, ?, ?, ?)
+        ");
+
+        // You can adjust reference_type/ID depending on your workflow. 
+        // Here we’ll log it as 'CSV' (newly added from CSV/encoding) with the asset tag as reference.
+        $stmt->execute([
+            $property_card_id,
+            'Manual Input',                 // initial reference type
+            'REF-INIT-1',                // use inventory tag as reference_ID
+            $responsible_id,                  // officer in charge
+            $data['price_amount'],            // same price amount as acquisition
+            'Initial record upon asset creation'
+        ]);
+
+        // 13. Logging
+        $stmt = $this->pdo->prepare("INSERT INTO logs (log_content) VALUES (?)");
+        $stmt->execute(["$log_user added a new asset with Inventory Tag: '$kld_property_tag' and Serial Number: '$serial_num' on " . date("Y-m-d H:i:s")]);
+
+        return true;
+    } catch (PDOException $e) {
+        return $e->getMessage();
+    }
+}
+}
+
+?>
+
+
+
+// AssetForm.jsx
+import React, { useState, useEffect } from "react";
+import Popups from "/src/components/Popups.jsx";
+import AssetOptionHandler from "/src/pages/Super-admin/forms/functions/AssetOptionHandler.jsx";
+
+const AssetForm = ({ fetchAssets }) => {
+  const [showLoading, setShowLoading] = useState(false);
+  const [showResponse, setShowResponse] = useState(false);
+  const [responseMessage, setResponseMessage] = useState("");
+  const [brandLocked, setBrandLocked] = useState(false);
+  const [responsibleLocked, setResponsibleLocked] = useState(false);
+
+  const [formData, setFormData] = useState({
+    kld_property_tag: "", property_tag: "",
+    asset_condition: "", new_asset_condition: "",
+    brand: "", new_brand: "",
+    asset_type: "", new_asset_type: "",
+    acquisition_source: "", new_acquisition_source: "",
+    room: "", new_room: "",
+    responsible: "", first_name: "", middle_name: "", last_name: "",
+    unit: "", new_unit: "",
+    date_acquired: "",
+    serviceable_year: "",  
+    price_amount: "" 
+  });
+
+  const [showNew, setShowNew] = useState({
+    asset_condition: false,
+    brand: false,
+    asset_type: false,
+    acquisition_source: false, // ✅ Added
+    room: false,
+    responsible: false,
+    unit: false,
+  });
+
+  const [dropdownOptions, setDropdownOptions] = useState({
+    asset_conditions: [],
+    brands: [],
+    asset_types: [],
+    acquisition_sources: [], // ✅ Added
+    rooms: [],
+    users: [],
+    units: [],
+  });
+
+  const { handleDropdownChange, handleAddNewClick } = AssetOptionHandler({
+    setFormData,
+    setShowNew,
+    setBrandLocked,
+    setResponsibleLocked,
+  });
+
+  useEffect(() => {
+    fetch("/api/dropdown_fetch.php")
+      .then((res) => res.json())
+      .then((data) => {
+        setDropdownOptions({
+          asset_conditions: data?.asset_conditions || [],
+          brands: data?.brands || [],
+          asset_types: data?.asset_types || [],
+          acquisition_sources: data?.acquisition_sources || [],
+          rooms: data?.rooms || [],
+          users: data?.users || [],
+          units: data?.units || [],
+        });
+      })
+      .catch((error) => {
+        console.error("Dropdown fetch failed:", error);
+        setDropdownOptions({
+          asset_conditions: [],
+          brands: [],
+          asset_types: [],
+          acquisition_sources: [],
+          rooms: [],
+          users: [],
+          units: [],
+        });
+      });
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setShowLoading(true);
+
+    const prepareField = (field) => ({
+      existing_id: formData[field],
+      new_value: formData[`new_${field}`]?.trim() || ""
+    });
+
+    const responsibleField = {
+      existing_id: formData.responsible,
+      new_value: {
+        first_name: formData.first_name.trim(),
+        middle_name: formData.middle_name.trim(),
+        last_name: formData.last_name.trim()
+      }
+    };
+
+    const payload = {
+      kld_property_tag: formData.kld_property_tag.trim(),
+      property_tag: formData.property_tag.trim(),
+      asset_condition: prepareField("asset_condition"),
+      brand: prepareField("brand"),
+      asset_type: prepareField("asset_type"),
+      acquisition_source: prepareField("acquisition_source"),
+      room: prepareField("room"),
+      unit: prepareField("unit"),
+      responsible: responsibleField,
+      date_acquired: formData.date_acquired,
+      serviceable_year: formData.serviceable_year, 
+      price_amount: formData.price_amount,   
+      response_for_this_log: "Admin"
+    };
+
+
+    fetch("/api/Assets-Handlers/insert_asset.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setShowLoading(false);
+        setResponseMessage(data.message || "Successfully submitted.");
+        setShowResponse(true);
+        fetchAssets();
+      })
+      .catch((error) => {
+        setShowLoading(false);
+        setResponseMessage("Submission failed: " + error.message);
+        setShowResponse(true);
+      });
+  };
+
+  const dropdownFields = [
+    {
+      label: "Asset Condition",
+      field: "asset_condition",
+      options: dropdownOptions.asset_conditions,
+      valueKey: "asset_condition_ID",
+      labelKey: "condition_name",
+    },
+    {
+      label: "Brand",
+      field: "brand",
+      options: dropdownOptions.brands,
+      valueKey: "brand_ID",
+      labelKey: "brand_name",
+    },
+    {
+      label: "Asset Type",
+      field: "asset_type",
+      options: dropdownOptions.asset_types,
+      valueKey: "asset_type_ID",
+      labelKey: "asset_type",
+      disabled: brandLocked,
+    },
+    {
+      label: "Acquisition Source", 
+      field: "acquisition_source",
+      options: dropdownOptions.acquisition_sources,
+      valueKey: "a_source_ID",
+      labelKey: "a_source_name",
+    },
+    {
+      label: "Room Assigned",
+      field: "room",
+      options: dropdownOptions.rooms,
+      valueKey: "room_ID",
+      labelKey: "room_number",
+    },
+    {
+      label: "Accounted to",
+      field: "responsible",
+      options: dropdownOptions.users,
+      valueKey: "user_ID",
+      labelKey: "full_name",
+    },
+    {
+      label: "Unit / Institute",
+      field: "unit",
+      options: dropdownOptions.units,
+      valueKey: "unit_ID",
+      labelKey: "unit_name",
+      disabled: responsibleLocked,
+    },
+  ];
+
+  const renderNewInput = (field, label) => {
+    if (!showNew[field]) return null;
+
+    if (field === "responsible") {
+      return (
+        <>
+          <input type="text" name="first_name" className="form-control mt-2" placeholder="First Name" value={formData.first_name} onChange={handleChange} />
+          <input type="text" name="middle_name" className="form-control mt-2" placeholder="Middle Name" value={formData.middle_name} onChange={handleChange} />
+          <input type="text" name="last_name" className="form-control mt-2" placeholder="Last Name" value={formData.last_name} onChange={handleChange} />
+        </>
+      );
+    }
+
+    return (
+      <input
+        type="text"
+        className="form-control mt-2"
+        placeholder={`New ${label}`}
+        name={`new_${field}`}
+        value={formData[`new_${field}`]}
+        onChange={handleChange}
+      />
+    );
+  };
+
+  return (
+    <>
+      <form onSubmit={handleSubmit}>
+        <div className="row g-3">
+          <div className="col-md-4">
+            <label className="form-label">KLD Property Tag</label>
+            <input type="text" className="form-control" name="kld_property_tag" value={formData.kld_property_tag} onChange={handleChange} required />
+          </div>
+
+          <div className="col-md-4">
+            <label className="form-label">Property Tag</label>
+            <input type="text" className="form-control" name="property_tag" value={formData.property_tag} onChange={handleChange} required />
+          </div>
+
+          {dropdownFields.map(({ label, field, options, valueKey, labelKey, disabled }) => (
+            <div key={field} className="col-md-4">
+              <label className="form-label">{label}</label>
+              <div className="d-flex gap-2">
+                <select
+                  className="form-select"
+                  name={field}
+                  value={formData[field]}
+                  onChange={(e) => handleDropdownChange(e, field)}
+                  disabled={disabled}
+                  required={!showNew[field]}
+                >
+                  <option value="">Select</option>
+                  {Array.isArray(options) && options.length > 0 ? (
+                    options.map((opt) => (
+                      <option key={opt[valueKey]} value={opt[valueKey]}>
+                        {opt[labelKey]}
+                      </option>
+                    ))
+                  ) : (
+                    <option disabled value="">No options available</option>
+                  )}
+                </select>
+                <button
+                  type="button"
+                  className="btn btn-form-green"
+                  onClick={() => handleAddNewClick(field)}
+                  disabled={disabled}
+                >
+                  +
+                </button>
+              </div>
+              {renderNewInput(field, label)}
+            </div>
+          ))}
+
+        <div className="col-md-4">
+          <label className="form-label">Date Acquired</label>
+          <input
+            type="date"
+            className="form-control"
+            name="date_acquired"
+            value={formData.date_acquired}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div className="col-md-4">
+          <label className="form-label">Serviceable Year</label>
+          <input
+            type="date"
+            className="form-control"
+            name="serviceable_year"
+            value={formData.serviceable_year}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div className="col-md-4">
+          <label className="form-label">Price Amount</label>
+          <input
+            type="number"
+            step="0.01"
+            className="form-control"
+            name="price_amount"
+            value={formData.price_amount}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        </div>
+
+        <div className="d-flex justify-content-end gap-2 mt-4">
+          <button type="submit" className="btn btn-form-green">Save</button>
+        </div>
+      </form>
+
+      <Popups
+        showLoading={showLoading}
+        showResponse={showResponse}
+        responseMessage={responseMessage}
+        onCloseResponse={() => {
+          setShowResponse(false);
+          if (fetchAssets) fetchAssets();                  
+        }}
+      />
+    </>
+  );
+};
+
+export default AssetForm;
+
+
+
+import React, { useEffect, useState, useRef } from "react";
+import TableControls from "/src/components/TableControls";
+import ConsumableImport from "/src/pages/Super-admin/forms/functions/ConsumableImport.jsx";
+import Modalbigger from "/src/components/Modal-bigger";
+import Modal from "/src/components/Modal"; 
+import Popups from "/src/components/Popups";
+import ConsumableForm from "/src/pages/Super-admin/forms/ConsumableForm.jsx";
+import ConsumableDetails from "/src/pages/Super-admin/forms/ConsumableDetails.jsx";
+import { generateConsumablePDF } from "/src/pages/Super-admin/forms/functions/GenerateSC.jsx";
+
+const Consumables = () => {
+  const [consumables, setConsumables] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [pdfModalOpen, setPdfModalOpen] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState(null);
+  const [pdfFilename, setPdfFilename] = useState("");
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [selectedConsumableId, setSelectedConsumableId] = useState(null);
+  const [showConfirmYesNo, setShowConfirmYesNo] = useState(false);
+  const [consumableToDelete, setConsumableToDelete] = useState(null);
+  const [showResponse, setShowResponse] = useState(false);
+  const [responseMessage, setResponseMessage] = useState("");
+
+  // NEW: state for Add modal
+  const [addModalOpen, setAddModalOpen] = useState(false);
+
+  const importRef = useRef();
+
+  useEffect(() => {
+    fetchConsumables();
+  }, []);
+
+  const fetchConsumables = async () => {
+    try {
+      const response = await fetch("/api/Consumable-Handlers/fetch_consumables.php");
+      const data = await response.json();
+      if (data.status === "success") {
+        setConsumables(data.data);
+      } else {
+        console.error("Error fetching consumables:", data.message);
+      }
+    } catch (error) {
+      console.error("Fetch error:", error);
+    }
+  };
+
+  const filteredConsumables = consumables.filter((c) =>
+    c.kld_property_tag.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    c.consumable_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (c.description || "").toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleAdd = () => {
+    setAddModalOpen(true); // open modal instead of just console.log
+  };
+
+  const handleDelete = (id) => {
+    setConsumableToDelete(id);
+    setShowConfirmYesNo(true);
+  };
+
+  const confirmDelete = () => {
+    setShowConfirmYesNo(false);
+
+    fetch(`/api/Consumable-Handlers/delete_consumable.php?id=${consumableToDelete}`, {
+      method: "DELETE",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        setResponseMessage(data.message || "Consumable deleted successfully.");
+        setShowResponse(true);
+        fetchConsumables(); // Reload data from server
+      })
+      .catch((err) => {
+        console.error("Delete failed:", err);
+        setResponseMessage("Failed to delete asset.");
+        setShowResponse(true);
+      });
+  };
+
+
+  const cancelDelete = () => {
+    setConsumableToDelete(null);
+    setShowConfirmYesNo(false);
+  };
+
+  const handleDetail = (id) => {
+    setSelectedConsumableId(id);
+    setDetailModalOpen(true);
+  };
+
+  const handleExport = () => {
+    console.log("Export consumables clicked");
+  };
+
+  const handleImport = () => {
+    importRef.current?.importCsv();
+  };
+
+  const handlePDFPreview = async (id) => {
+    if (pdfUrl) URL.revokeObjectURL(pdfUrl); // cleanup
+    const result = await generateConsumablePDF(id);
+    if (result) {
+      setPdfUrl(result.url);
+      setPdfFilename(result.filename);
+      setPdfModalOpen(true);
+    } else {
+      console.error("Failed to generate consumable PDF");
+    }
+  };
+
+  return (
+    <div className="container-fluid">
+      <TableControls
+        title="Consumables"
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        onAdd={handleAdd}
+        onExport={handleExport}
+        onImport={handleImport}
+        showImportButton={true}
+        searchPlaceholder="Search consumables..."
+      />
+
+      <ConsumableImport ref={importRef} onImportSuccess={fetchConsumables} />
+
+      {/* Table */}
+      <div className="custom-table-wrapper">
+        <table className="custom-table">
+          <thead>
+            <tr>
+              <th>KLD Property Tag</th>
+              <th>Name</th>
+              <th>Description</th>
+              <th>UOM</th>
+              <th>Qty</th>
+              <th>Price Amount</th>
+              <th>Date Acquired</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredConsumables.length > 0 ? (
+              filteredConsumables.map((c) => (
+                <tr key={c.consumable_ID}>
+                  <td data-label="KLD Property Tag">{c.kld_property_tag}</td>
+                  <td data-label="Name">{c.consumable_name}</td>
+                  <td data-label="Description">{c.description || "-"}</td>
+                  <td data-label="UOM">{c.unit_of_measure}</td>
+                  <td data-label="Quantity">{c.total_quantity}</td>
+                  <td data-label="Amount">
+                    {c.price_amount ? parseFloat(c.price_amount).toFixed(2) : "-"}
+                  </td>
+                  <td data-label="Date Acquired">{c.date_acquired || "-"}</td>
+                  <td data-label="Action">
+                    <div className="action-btn-group">
+                      <button
+                        className="action-btn"
+                        onClick={() => handleDetail(c.consumable_ID)}
+                      >
+                        <img
+                          src="/resources/imgs/detail.png"
+                          alt="More"
+                          className="action-icon"
+                        />
+                      </button>
+
+                      <button 
+                        className="action-btn"
+                        onClick={() => handleDelete(c.consumable_ID)}
+                      >
+                        <img
+                          src="/resources/imgs/delete.png"
+                          alt="Delete"
+                          className="action-icon"
+                        />
+                      </button>
+                      <button
+                        className="action-btn"
+                        alt="PDF"
+                        onClick={() => handlePDFPreview(c.consumable_ID)}
+                      >
+                        <img
+                          src="/resources/imgs/pdf-icon.png"
+                          alt="Download PDF"
+                          className="action-icon"
+                        />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="8" style={{ textAlign: "center" }}>
+                  No consumables found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Add Consumable Modal */}
+      <Modal
+        isOpen={addModalOpen}
+        onClose={() => setAddModalOpen(false)}
+        title="Add New Consumable"
+      >
+        <ConsumableForm fetchConsumables={fetchConsumables}/>
+      </Modal>
+
+      <Modal
+        isOpen={detailModalOpen}
+        onClose={() => setDetailModalOpen(false)}
+        title="Consumable Details"
+      >
+        <ConsumableDetails consumableId={selectedConsumableId} />
+      </Modal>
+
+
+      {/* PDF Preview Modal */}
+      <Modalbigger
+        isOpen={pdfModalOpen}
+        onClose={() => setPdfModalOpen(false)}
+        title="Consumable PDF Preview"
+        footer={
+          <button
+            className="btn btn-form-green"
+            onClick={() => {
+              const link = document.createElement("a");
+              link.href = pdfUrl;
+              link.download = pdfFilename;
+              link.click();
+            }}
+          >
+            Download PDF
+          </button>
+        }
+      >
+        <div style={{ height: "80vh" }}>
+          {pdfUrl && (
+            <iframe
+              src={pdfUrl}
+              title="Consumable PDF Preview"
+              width="100%"
+              height="100%"
+              style={{ border: "none" }}
+            />
+          )}
+        </div>
+      </Modalbigger>
+      <Popups
+        showConfirmYesNo={showConfirmYesNo}
+        confirmYesNoTitle="Delete Consumable"
+        confirmYesNoBody="Are you sure you want to archive this consumable?"
+        confirmYesLabel="Yes, Delete"
+        confirmNoLabel="Cancel"
+        onConfirmYes={confirmDelete}
+        onConfirmNo={cancelDelete}
+
+        showResponse={showResponse}
+        responseMessage={responseMessage}
+        onCloseResponse={() => setShowResponse(false)}
+      />
+    </div>
+  );
+};
+
+export default Consumables;
+
+
+import React, { useEffect, useState, useRef } from "react";
+import TableControls from "/src/components/TableControls";
+import ConsumableImport from "/src/pages/Super-admin/forms/functions/ConsumableImport.jsx";
+import Modalbigger from "/src/components/Modal-bigger";
+import Modal from "/src/components/Modal"; 
+import Popups from "/src/components/Popups";
+import ConsumableForm from "/src/pages/Super-admin/forms/ConsumableForm.jsx";
+import ConsumableDetails from "/src/pages/Super-admin/forms/ConsumableDetails.jsx";
+import { generateConsumablePDF } from "/src/pages/Super-admin/forms/functions/GenerateSC.jsx";
+
+const Consumables = () => {
+  const [consumables, setConsumables] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [pdfModalOpen, setPdfModalOpen] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState(null);
+  const [pdfFilename, setPdfFilename] = useState("");
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [selectedConsumableId, setSelectedConsumableId] = useState(null);
+  const [showConfirmYesNo, setShowConfirmYesNo] = useState(false);
+  const [consumableToDelete, setConsumableToDelete] = useState(null);
+  const [showResponse, setShowResponse] = useState(false);
+  const [responseMessage, setResponseMessage] = useState("");
+
+  // NEW: state for Add modal
+  const [addModalOpen, setAddModalOpen] = useState(false);
+
+  const importRef = useRef();
+
+  useEffect(() => {
+    fetchConsumables();
+  }, []);
+
+  const fetchConsumables = async () => {
+    try {
+      const response = await fetch("/api/Consumable-Handlers/fetch_consumables_archive.php");
+      const data = await response.json();
+      if (data.status === "success") {
+        setConsumables(data.data);
+      } else {
+        console.error("Error fetching consumables:", data.message);
+      }
+    } catch (error) {
+      console.error("Fetch error:", error);
+    }
+  };
+
+  const filteredConsumables = consumables.filter((c) =>
+    c.kld_property_tag.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    c.consumable_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (c.description || "").toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleDelete = (id) => {
+    setConsumableToDelete(id);
+    setShowConfirmYesNo(true);
+  };
+
+  const confirmDelete = () => {
+    setShowConfirmYesNo(false);
+
+    fetch(`/api/Consumable-Handlers/restore_consumable.php?id=${consumableToDelete}`, {
+      method: "DELETE",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        setResponseMessage(data.message || "Consumable Restored sucessfully.");
+        setShowResponse(true);
+        fetchConsumables(); // Reload data from server
+      })
+      .catch((err) => {
+        console.error("Delete failed:", err);
+        setResponseMessage("Failed to delete asset.");
+        setShowResponse(true);
+      });
+  };
+
+
+  const cancelDelete = () => {
+    setConsumableToDelete(null);
+    setShowConfirmYesNo(false);
+  };
+
+  const handleDetail = (id) => {
+    setSelectedConsumableId(id);
+    setDetailModalOpen(true);
+  };
+
+  const handlePDFPreview = async (id) => {
+    if (pdfUrl) URL.revokeObjectURL(pdfUrl); // cleanup
+    const result = await generateConsumablePDF(id);
+    if (result) {
+      setPdfUrl(result.url);
+      setPdfFilename(result.filename);
+      setPdfModalOpen(true);
+    } else {
+      console.error("Failed to generate consumable PDF");
+    }
+  };
+
+  return (
+    <div className="container-fluid">
+      <TableControls
+        title="Consumables"
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        searchPlaceholder="Search consumables..."
+      />
+
+      <ConsumableImport ref={importRef} onImportSuccess={fetchConsumables} />
+
+      {/* Table */}
+      <div className="custom-table-wrapper">
+        <table className="custom-table">
+          <thead>
+            <tr>
+              <th>KLD Property Tag</th>
+              <th>Name</th>
+              <th>Description</th>
+              <th>UOM</th>
+              <th>Qty</th>
+              <th>Price Amount</th>
+              <th>Date Acquired</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredConsumables.length > 0 ? (
+              filteredConsumables.map((c) => (
+                <tr key={c.consumable_ID}>
+                  <td data-label="KLD Property Tag">{c.kld_property_tag}</td>
+                  <td data-label="Name">{c.consumable_name}</td>
+                  <td data-label="Description">{c.description || "-"}</td>
+                  <td data-label="UOM">{c.unit_of_measure}</td>
+                  <td data-label="Quantity">{c.total_quantity}</td>
+                  <td data-label="Amount">
+                    {c.price_amount ? parseFloat(c.price_amount).toFixed(2) : "-"}
+                  </td>
+                  <td data-label="Date Acquired">{c.date_acquired || "-"}</td>
+                  <td data-label="Action">
+                    <div className="action-btn-group">
+                      <button
+                        className="action-btn"
+                        onClick={() => handleDetail(c.consumable_ID)}
+                      >
+                        <img
+                          src="/resources/imgs/detail.png"
+                          alt="More"
+                          className="action-icon"
+                        />
+                      </button>
+
+                      <button 
+                        className="action-btn"
+                        onClick={() => handleDelete(c.consumable_ID)}
+                      >
+                        <img
+                          src="/resources/imgs/restore.png"
+                          alt="Delete"
+                          className="action-icon"
+                        />
+                      </button>
+                      <button
+                        className="action-btn"
+                        alt="PDF"
+                        onClick={() => handlePDFPreview(c.consumable_ID)}
+                      >
+                        <img
+                          src="/resources/imgs/pdf-icon.png"
+                          alt="Download PDF"
+                          className="action-icon"
+                        />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="8" style={{ textAlign: "center" }}>
+                  No consumables found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Add Consumable Modal */}
+      <Modal
+        isOpen={addModalOpen}
+        onClose={() => setAddModalOpen(false)}
+        title="Add New Consumable"
+      >
+        <ConsumableForm fetchConsumables={fetchConsumables}/>
+      </Modal>
+
+      <Modal
+        isOpen={detailModalOpen}
+        onClose={() => setDetailModalOpen(false)}
+        title="Consumable Details"
+      >
+        <ConsumableDetails consumableId={selectedConsumableId} />
+      </Modal>
+
+
+      {/* PDF Preview Modal */}
+      <Modalbigger
+        isOpen={pdfModalOpen}
+        onClose={() => setPdfModalOpen(false)}
+        title="Consumable PDF Preview"
+        footer={
+          <button
+            className="btn btn-form-green"
+            onClick={() => {
+              const link = document.createElement("a");
+              link.href = pdfUrl;
+              link.download = pdfFilename;
+              link.click();
+            }}
+          >
+            Download PDF
+          </button>
+        }
+      >
+        <div style={{ height: "80vh" }}>
+          {pdfUrl && (
+            <iframe
+              src={pdfUrl}
+              title="Consumable PDF Preview"
+              width="100%"
+              height="100%"
+              style={{ border: "none" }}
+            />
+          )}
+        </div>
+      </Modalbigger>
+      <Popups
+        showConfirmYesNo={showConfirmYesNo}
+        confirmYesNoTitle="Restore Consumable"
+        confirmYesNoBody="Are you sure you want to restore this consumable?"
+        confirmYesLabel="Yes, Restore"
+        confirmNoLabel="Cancel"
+        onConfirmYes={confirmDelete}
+        onConfirmNo={cancelDelete}
+
+        showResponse={showResponse}
+        responseMessage={responseMessage}
+        onCloseResponse={() => setShowResponse(false)}
+      />
+    </div>
+  );
+};
+
+export default Consumables;
+
+
+
+
+
+
+
+
+<?php
+header("Content-Type: application/json");
+require_once __DIR__ . '/../conn.php';
+
+try {
+    // Ensure PDO throws exceptions (in case conn.php doesn't already)
+    if (isset($pdo)) {
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    }
+
+    $input = json_decode(file_get_contents("php://input"), true);
+
+    if (
+        !$input ||
+        !isset($input['user_ID']) ||
+        !isset($input['assets']) ||
+        !is_array($input['assets'])
+    ) {
+        echo json_encode(["success" => false, "message" => "Invalid input"]);
+        exit;
+    }
+
+    $user_ID = intval($input['user_ID']);
+    $assets  = $input['assets'];
+
+    $pdo->beginTransaction();
+
+    // Generate iir_no (e.g., IIR-2025-1)
+    $stmt = $pdo->query("SELECT COUNT(*) AS count FROM inventory_inspection_report");
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    $count = $row ? intval($row['count']) + 1 : 1;
+    $iir_no = "IIR-" . date("Y") . "-" . $count;
+
+    // Insert into inventory_inspection_report
+    $stmt = $pdo->prepare("
+        INSERT INTO inventory_inspection_report (iir_no, user_ID)
+        VALUES (:iir_no, :user_ID)
+    ");
+    $stmt->execute([
+        ':iir_no'  => $iir_no,
+        ':user_ID' => $user_ID
+    ]);
+
+    $iir_ID = $pdo->lastInsertId();
+
+    // Prepare insert for assets into iir_asset
+    $stmtIIRAsset = $pdo->prepare("
+        INSERT INTO iir_asset (
+            iir_ID, asset_ID, quantity, total_cost,
+            accumulated_depreciation, accumulated_impairment_losses, carrying_amount,
+            sale, transfer, destruction, others
+        ) VALUES (
+            :iir_ID, :asset_ID, :quantity, :total_cost,
+            :accumulated_depreciation, :accumulated_impairment_losses, :carrying_amount,
+            :sale, :transfer, :destruction, :others
+        )
+    ");
+
+    // Prepare update for asset condition + price amount
+    $stmtUpdateAsset = $pdo->prepare("
+        UPDATE asset 
+        SET asset_condition_ID = :condition_ID,
+            price_amount = :carrying_amount
+        WHERE asset_ID = :asset_ID
+    ");
+
+    // Find asset_ID + responsible_user_ID by kld_property_tag
+    $stmtFindAsset = $pdo->prepare("
+        SELECT asset_ID, responsible_user_ID
+        FROM asset
+        WHERE kld_property_tag = ?
+    ");
+
+    // Property card helpers
+    $stmtGetPropertyCard = $pdo->prepare("
+        SELECT property_card_ID
+        FROM property_card
+        WHERE asset_ID = :asset_ID
+    ");
+    $stmtCreatePropertyCard = $pdo->prepare("
+        INSERT INTO property_card (asset_ID)
+        VALUES (:asset_ID)
+    ");
+
+    // Condition name lookup (if not provided by payload)
+    $stmtGetConditionName = $pdo->prepare("
+        SELECT condition_name
+        FROM asset_condition
+        WHERE asset_condition_ID = :condition_ID
+    ");
+
+    // Insert into property_card_record
+    $stmtInsertPCR = $pdo->prepare("
+        INSERT INTO property_card_record
+            (property_card_ID, reference_type, reference_ID, officer_user_ID, price_amount, remarks)
+        VALUES
+            (:property_card_ID, 'IIR', :reference_ID, :officer_user_ID, :price_amount, :remarks)
+    ");
+
+    foreach ($assets as $a) {
+        if (empty($a['kld_property_tag'])) {
+            throw new Exception("Missing kld_property_tag in one of the assets");
+        }
+
+        // Lookup asset_ID & officer (responsible user)
+        $stmtFindAsset->execute([$a['kld_property_tag']]);
+        $assetRow = $stmtFindAsset->fetch(PDO::FETCH_ASSOC);
+        if (!$assetRow) {
+            throw new Exception("Asset not found: " . $a['kld_property_tag']);
+        }
+
+        $asset_ID            = (int)$assetRow['asset_ID'];
+        $officer_user_ID     = !empty($assetRow['responsible_user_ID']) ? (int)$assetRow['responsible_user_ID'] : null;
+        $quantity            = (int)($a['quantity'] ?? 0);
+        $totalCost           = (float)($a['totalCost'] ?? 0);
+        $accumDep            = (float)($a['accumulatedDepreciation'] ?? 0);
+        $accumImp            = (float)($a['accumulatedImpairment'] ?? 0);
+        $carryingAmount      = (float)($a['carryingAmount'] ?? 0);
+        $sale                = (int)($a['sale'] ?? 0);
+        $transfer            = (int)($a['transfer'] ?? 0);
+        $destruction         = (int)($a['destruction'] ?? 0);
+        // iir_asset.others is VARCHAR(50) NULL per your latest schema
+        $others              = isset($a['others']) && $a['others'] !== '' ? (string)$a['others'] : null;
+
+        // Insert into iir_asset
+        $stmtIIRAsset->execute([
+            ':iir_ID'                        => $iir_ID,
+            ':asset_ID'                      => $asset_ID,
+            ':quantity'                      => $quantity,
+            ':total_cost'                    => $totalCost,
+            ':accumulated_depreciation'      => $accumDep,
+            ':accumulated_impairment_losses' => $accumImp,
+            ':carrying_amount'               => $carryingAmount,
+            ':sale'                          => $sale,
+            ':transfer'                      => $transfer,
+            ':destruction'                   => $destruction,
+            ':others'                        => $others
+        ]);
+
+        // Update the asset’s condition and price_amount
+        $condition_ID = isset($a['condition']) && $a['condition'] !== '' ? (int)$a['condition'] : 0;
+        if ($condition_ID > 0) {
+            $stmtUpdateAsset->execute([
+                ':condition_ID'    => $condition_ID,
+                ':carrying_amount' => $carryingAmount,
+                ':asset_ID'        => $asset_ID
+            ]);
+        } else {
+            // Even if condition not provided, you may still want to update price_amount
+            // If you DON'T want this behavior, comment this block.
+            $pdo->prepare("
+                UPDATE asset SET price_amount = :carrying_amount
+                WHERE asset_ID = :asset_ID
+            ")->execute([
+                ':carrying_amount' => $carryingAmount,
+                ':asset_ID'        => $asset_ID
+            ]);
+        }
+
+        // Ensure a property_card exists for this asset
+        $stmtGetPropertyCard->execute([':asset_ID' => $asset_ID]);
+        $pc = $stmtGetPropertyCard->fetch(PDO::FETCH_ASSOC);
+        if ($pc) {
+            $property_card_ID = (int)$pc['property_card_ID'];
+        } else {
+            $stmtCreatePropertyCard->execute([':asset_ID' => $asset_ID]);
+            $property_card_ID = (int)$pdo->lastInsertId();
+        }
+
+        // Determine remarks (condition name)
+        // Prefer the payload's conditionName if present, otherwise fetch by condition_ID
+        $remarks = '';
+        if (!empty($a['conditionName'])) {
+            $remarks = (string)$a['conditionName'];
+        } elseif ($condition_ID > 0) {
+            $stmtGetConditionName->execute([':condition_ID' => $condition_ID]);
+            $cn = $stmtGetConditionName->fetch(PDO::FETCH_ASSOC);
+            $remarks = $cn ? (string)$cn['condition_name'] : '';
+        }
+
+        // Insert property card record (audit trail)
+        $stmtInsertPCR->execute([
+            ':property_card_ID' => $property_card_ID,
+            ':reference_ID'     => $iir_no,
+            ':officer_user_ID'  => $officer_user_ID,   // may be NULL if asset has no responsible_user_ID
+            ':price_amount'     => $carryingAmount,
+            ':remarks'          => $remarks
+        ]);
+    }
+
+    $pdo->commit();
+
+    echo json_encode([
+        "success" => true,
+        "message" => "Inspection report saved successfully; assets & property card updated",
+        "iir_ID"  => $iir_ID,
+        "iir_no"  => $iir_no
+    ]);
+
+} catch (Throwable $e) {
+    if (isset($pdo) && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+    // Important: return JSON only (avoid HTML notices that break JSON parsing)
+    http_response_code(500);
+    echo json_encode([
+        "success" => false,
+        "message" => $e->getMessage()
+    ]);
+}
+?>
+
+import { useState, useEffect } from "react";
+import "bootstrap/js/dist/collapse";
+import Popups from "/src/components/Popups.jsx";
+import Modalbigger from "/src/components/Modal-bigger";
+import { generateIIRPDF } from "/src/pages/Super-admin/forms/functions/generateIIRPDF.jsx";
+import Select from "react-select";
+import QRScannerModal from "/src/components/QRScannerModal";
+
+const InventoryInspectionReport = () => {
+  const [users, setUsers] = useState([]);
+  const [rooms, setRooms] = useState([]);
+  const [selectedUser, setSelectedUser] = useState("");
+  const [selectedRoom, setSelectedRoom] = useState("");
+  const [assets, setAssets] = useState([]);
+  const [conditions, setConditions] = useState([]);
+  const [userUnit, setUserUnit] = useState("");
+
+  // Popup States
+  const [showConfirmYesNo, setShowConfirmYesNo] = useState(false);
+  const [showLoading, setShowLoading] = useState(false);
+  const [showResponse, setShowResponse] = useState(false);
+  const [responseMessage, setResponseMessage] = useState("");
+
+  // PDF preview states
+  const [showPdfPreview, setShowPdfPreview] = useState(false);
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState(null);
+  const [selectedPDFName, setSelectedPDFName] = useState("");
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [showQRScanner, setShowQRScanner] = useState(false);
+
+
+  // Fetch users & asset conditions only on mount
+  useEffect(() => {
+    fetch("/api/dropdown_fetch.php")
+      .then((res) => res.json())
+      .then((data) => {
+        setUsers(data.users || []);
+        setConditions(data.asset_conditions || []);
+      });
+  }, []);
+
+  // Fetch rooms when user is selected
+  useEffect(() => {
+    if (selectedUser) {
+      fetch(`/api/Inventory-Inspection-Hanlders/getRoomsByUser.php?user=${selectedUser}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setRooms(data || []);
+          setSelectedRoom("");
+          if (data && data.length > 0) {
+            setUserUnit(data[0].unit_name || "");
+          } else {
+            setUserUnit("");
+          }
+        });
+    } else {
+      setRooms([]);
+      setSelectedRoom("");
+      setUserUnit("");
+    }
+  }, [selectedUser]);
+
+  // Fetch assets when user & room selected
+  useEffect(() => {
+    if (selectedUser && selectedRoom) {
+      fetch(`/api/Inventory-Inspection-Hanlders/getAssetsByUserRoom.php?user=${selectedUser}&room=${selectedRoom}`)
+        .then((res) => res.json())
+        .then((data) => {
+          const preparedAssets = data.map((a) => ({
+            ...a,
+            quantity: a.quantity || 1,
+            unitCostInput: a.unit_cost || 0,
+            totalCostInput: a.unit_cost || 0,
+            accumulatedDepreciation: a.accumulated_depreciation || 0,
+            accumulatedImpairment: a.accumulated_impairment || 0,
+            carryingAmount: a.carrying_amount || 0,
+            selectedCondition: a.asset_condition_ID?.toString() || "",
+            conditionName: conditions.find(c => c.asset_condition_ID === a.asset_condition_ID)?.condition_name || "",
+            sale: a.sale || 0,
+            transfer: a.transfer || 0,
+            destruction: a.destruction || 0,
+            others: a.others || "",
+          }));
+          setAssets(preparedAssets);
+        });
+    } else {
+      setAssets([]);
+    }
+  }, [selectedUser, selectedRoom]);
+
+const handleChange = (idx, field, value) => {
+  setAssets((prevAssets) => {
+    const updatedAssets = [...prevAssets];
+    if (
+      [
+        "quantity",
+        "unitCostInput",
+        "totalCostInput",
+        "accumulatedDepreciation",
+        "accumulatedImpairment",
+        "sale",
+        "transfer",
+        "destruction",
+      ].includes(field)
+    ) {
+      updatedAssets[idx][field] = parseFloat(value) || 0;
+    } else if (field === "others") {
+      updatedAssets[idx][field] = value.trim() === "" ? "N/A" : value;
+    } else {
+      updatedAssets[idx][field] = value;
+    }
+
+    // Always recalc total cost if qty or unit cost changes
+    if (field === "quantity" || field === "unitCostInput") {
+      updatedAssets[idx].totalCostInput =
+        updatedAssets[idx].quantity * updatedAssets[idx].unitCostInput;
+    }
+
+    // Always recalc carrying amount
+    const totalCost = updatedAssets[idx].totalCostInput || 0;
+    const depreciation = updatedAssets[idx].accumulatedDepreciation || 0;
+    const impairment = updatedAssets[idx].accumulatedImpairment || 0;
+
+    updatedAssets[idx].carryingAmount = Math.max(
+      0,
+      totalCost - (depreciation + impairment)
+    );
+
+    return updatedAssets;
+  });
+};
+
+  const handleSaveConfirmed = async () => {
+    setShowConfirmYesNo(false);
+
+    // Do the download here
+    const link = document.createElement("a");
+    link.href = pdfPreviewUrl;
+    link.download = selectedPDFName;
+    link.click();
+
+    // Then proceed with saving
+    setShowLoading(true);
+
+    const payload = {
+      user_ID: selectedUser,
+      room_ID: selectedRoom,
+      unit: userUnit,
+      assets: assets.map((a) => ({
+        kld_property_tag: a.kld_property_tag,
+        quantity: a.quantity,
+        unitCost: a.unitCostInput,
+        totalCost: a.totalCostInput,
+        accumulatedDepreciation: a.accumulatedDepreciation,
+        accumulatedImpairment: a.accumulatedImpairment,
+        carryingAmount: Math.max(
+          0,
+          (a.totalCostInput || 0) -
+            ((a.accumulatedDepreciation || 0) + (a.accumulatedImpairment || 0))
+        ),
+        condition: a.selectedCondition,
+        sale: a.sale,
+        transfer: a.transfer,
+        destruction: a.destruction,
+        others: a.others,
+      })),
+    };
+
+    try {
+      const res = await fetch(
+        "/api/Inventory-Inspection-Hanlders/saveInspectionReport.php",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await res.json();
+      setShowLoading(false);
+
+      if (data.success) {
+        setResponseMessage("Inspection Report saved successfully!");
+        setShowPdfPreview(false); // close modal only on success
+      } else {
+        setResponseMessage("Error saving report: " + data.message);
+      }
+      setShowResponse(true);
+    } catch (err) {
+      console.error("Save failed:", err);
+      setShowLoading(false);
+      setResponseMessage("Something went wrong while saving.");
+      setShowResponse(true);
+    }
+  };
+
+const handlePDFPreview = async () => {
+  try {
+    // Revoke old URL if exists
+    if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl);
+
+    const selectedEmployee = users.find(u => u.user_ID === parseInt(selectedUser));
+
+    const result = await generateIIRPDF({
+      employeeName: selectedEmployee?.full_name || "",
+      role: selectedEmployee?.role_name || "",
+      room: rooms.find(r => r.room_ID === parseInt(selectedRoom))?.room_number || "",
+      unit: userUnit,
+      assets
+    });
+
+    if (result) {
+      setPdfPreviewUrl(result.url); //  use blob URL directly
+      setSelectedPDFName(result.filename);
+      setShowPdfPreview(true);
+    } else {
+      console.error("Failed to generate PDF");
+    }
+  } catch (err) {
+    console.error("PDF preview error:", err);
+  }
+};
+
+  const filteredAssets = assets.filter((a) =>
+    `${a.kld_property_tag} ${a.asset_type} ${a.brand_name}`
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
+  );
+
+  const handleQRSuccess = (decodedText) => {
+    setSearchTerm(decodedText);   
+    setShowQRScanner(false);
+    setResponseMessage(`QR Code scanned successfully: ${decodedText}`);
+    setShowResponse(true);      
+  };
+
+  const handleQRError = (errorMessage) => {
+    console.error("QR Scan error:", errorMessage);
+  };
+
+
+return (
+    <>
+      {/* Controls */}
+      <h2>Inventory and Inspection Report</h2>
+      <div className="container-fluid p-3 rounded shadow-sm" style={{ backgroundColor: "#f2f2f2ff" }}>
+        <div className="row g-3 align-items-end">
+          <div title="Pick an employee from the list" className="col-md-3">
+            <label className="form-label fw-semibold d-none d-md-block">Select Employee:</label>
+            <Select
+              options={users.map((u) => ({
+                value: u.user_ID,
+                label: u.full_name,
+              }))}
+              value={
+                selectedUser
+                  ? {
+                      value: selectedUser,
+                      label: users.find((u) => u.user_ID === parseInt(selectedUser))
+                        ?.full_name,
+                    }
+                  : null
+              }
+              onChange={(opt) => setSelectedUser(opt ? opt.value : "")}
+              placeholder="Select Employee"
+              isClearable
+            />
+          </div>
+
+          <div className="col-md-2">
+            <label className="form-label d-none d-md-block">Unit</label>
+            <input type="text" className="form-control" value={userUnit} readOnly style={{ height: "36px" }} />
+          </div>
+
+          <div title="Choose the room assigned of employee's asset" className="col-md-2">
+            <label className="form-label fw-semibold d-none d-md-block">Select Room Assigned:</label>
+            <Select
+              options={rooms.map((r) => ({
+                value: r.room_ID,
+                label: r.room_number,
+              }))}
+              value={
+                selectedRoom
+                  ? {
+                      value: selectedRoom,
+                      label: rooms.find((r) => r.room_ID === parseInt(selectedRoom))
+                        ?.room_number,
+                    }
+                  : null
+              }
+              onChange={(opt) => setSelectedRoom(opt ? opt.value : "")}
+              placeholder="Select Room"
+              isDisabled={!selectedUser}
+              isClearable
+            />
+          </div>
+
+          {/* Search Bar */}
+          <div className="col-md-2">
+            <div className="position-relative">
+              <input
+                title="Search by Property Tag, Type, or Brand..."
+                type="text"
+                className="form-control pe-5" // padding for the clear button
+                placeholder="Search Asset"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              {searchTerm && (
+                <button
+                  title="Clear"
+                  type="button"
+                  className="btn btn-sm btn-light position-absolute top-50 end-0 translate-middle-y me-1"
+                  style={{ border: "none" }}
+                  onClick={() => setSearchTerm("")}
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          </div>
+
+
+          <div className="col-auto">
+            <button
+              title="Scan asset QR codes"
+              type="button"
+              className="btn btn-form-yellow"
+              onClick={() => setShowQRScanner(true)}
+            >
+              Scan QR
+            </button>
+          </div>
+
+          <div className="col-auto">
+           <button
+              title="Preview the PDF"
+              className="btn btn-form-green"
+              onClick={handlePDFPreview}
+              disabled={!selectedUser || !selectedRoom}
+            >
+              Commit
+            </button>
+
+          </div>
+        </div>
+      </div>
+
+      <QRScannerModal
+        isOpen={showQRScanner}
+        onClose={() => setShowQRScanner(false)}
+        onScanSuccess={handleQRSuccess}
+        onScanError={handleQRError}
+      />
+
+       {/* Accordion with Filtered Assets */}
+      <div className="accordion" id="assetsAccordion">
+        {filteredAssets.length > 0 ? (
+          filteredAssets.map((asset, idx) => (
+            <div
+              className="accordion-item"
+              key={asset.kld_property_tag || idx}
+            >
+              <h2 className="accordion-header" id={`heading-${idx}`}>
+                <button
+                  className={`accordion-button collapsed fw-bold ${
+                    asset.markedDone ? "done-accordion" : ""
+                  }`}
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target={`#collapse-${idx}`}
+                  aria-expanded="false"
+                  aria-controls={`collapse-${idx}`}
+                  style={{
+                    background: asset.markedDone ? "#006705" : "white",
+                    color: asset.markedDone ? "#fff" : "inherit",
+                  }}
+                >
+                  {idx + 1}. {asset.kld_property_tag} / {asset.asset_type}{" "}
+                  {asset.brand_name}
+                </button>
+              </h2>
+              <div
+                id={`collapse-${idx}`}
+                className="accordion-collapse collapse"
+                aria-labelledby={`heading-${idx}`}
+                data-bs-parent="#assetsAccordion"
+              >
+                <div
+                  className="accordion-body"
+                  style={{ backgroundColor: "#fdff71" }}
+                >
+                  {/* --- Inventory Section --- */}
+                  <h6 className="fw-bold mb-3">Inventory</h6>
+                  
+                  <div className="row g-2 align-items-end mb-3">
+                    <div className="col-md-2">
+                      <label className="form-label fw-semibold">Date Acquired</label>
+                      <input type="text" className="form-control" value={asset.date_acquired} readOnly />
+                    </div>
+                    <div className="col-md-3">
+                      <label className="form-label fw-semibold">Description</label>
+                      <input type="text" className="form-control" value={`${asset.asset_type} / ${asset.brand_name}`} readOnly />
+                    </div>
+                    <div className="col-md-2">
+                      <label className="form-label fw-semibold">Property No.</label>
+                      <input type="text" className="form-control" value={asset.kld_property_tag} readOnly />
+                    </div>
+                    <div className="col-md-1">
+                      <label className="form-label fw-semibold">Quantity</label>
+                      <input type="number" className="form-control" value={asset.quantity} onChange={(e) => handleChange(idx, "quantity", e.target.value)} />
+                    </div>
+                    <div className="col-md-2">
+                      <label className="form-label fw-semibold">Unit Cost</label>
+                      <input type="number" className="form-control" value={asset.unitCostInput} readOnly />
+                    </div>
+                    <div className="col-md-2">
+                      <label className="form-label fw-semibold">Total Cost</label>
+                      <input type="number" className="form-control" value={asset.totalCostInput} readOnly />
+                    </div>
+
+                    <div className="col-md-2">
+                      <label className="form-label fw-semibold">Accumulated Depreciation</label>
+                      <input type="number" className="form-control" value={asset.accumulatedDepreciation} onChange={(e) => handleChange(idx, "accumulatedDepreciation", e.target.value)} />
+                    </div>
+                    <div className="col-md-2">
+                      <label className="form-label fw-semibold">Accumulated Impairment Losses</label>
+                      <input type="number" className="form-control" value={asset.accumulatedImpairment} onChange={(e) => handleChange(idx, "accumulatedImpairment", e.target.value)} />
+                    </div>
+                    <div className="col-md-2">
+                      <label className="form-label fw-semibold">Carrying Amount</label>
+                      <input
+                        type="number"
+                        className="form-control"
+                        value={asset.carryingAmount}
+                        readOnly
+                      />
+                    </div>
+                    <div className="col-md-2">
+                      <label className="form-label fw-semibold">Condition</label>
+                      <select
+                        className="form-select"
+                        value={asset.selectedCondition || ""}
+                        onChange={(e) => handleChange(idx, "selectedCondition", e.target.value)}
+                      >
+                        <option value="">-- Select Condition --</option>
+                        {conditions.map((cond) => (
+                          <option key={cond.asset_condition_ID} value={cond.asset_condition_ID.toString()}>
+                            {cond.condition_name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <hr />
+
+                  {/* --- Inspection and Disposal Section --- */}
+                  <h6 className="fw-bold mb-3">Inspection and Disposal</h6>
+                  <div className="row g-2 align-items-end">
+                    {["Sale", "Transfer", "Destruction", "Others"].map((field) => (
+                        <div className="col-md-2" key={field}>
+                          <label className="form-label fw-semibold">{field}</label>
+                          <input
+                            type={field === "Others" ? "text" : "number"}   //  text for Others
+                            className="form-control"
+                            value={asset[field.toLowerCase()]}
+                            onChange={(e) => handleChange(idx, field.toLowerCase(), e.target.value)}
+                          />
+                        </div>
+                      ))}
+                  {/*  Checkbox for Mark as Done */}
+                  <div className="form-check col-md-2 ms-3">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id={`done-${idx}`}
+                      checked={asset.markedDone || false}
+                      onChange={(e) =>
+                        setAssets((prev) =>
+                          prev.map((item) =>
+                            item.kld_property_tag === asset.kld_property_tag
+                              ? { ...item, markedDone: e.target.checked }
+                              : item
+                          ))}
+                    />
+                    <label title="Helps track assets that have already been inspected" className="form-check-label fw-semibold" htmlFor={`done-${idx}`}>
+                      Mark as done
+                    </label>
+                  </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p className="text-muted">No assets found.</p>
+        )}
+      </div>
+
+       {/* Popups Integration */}
+      <Modalbigger
+        isOpen={showPdfPreview}
+        onClose={() => setShowPdfPreview(false)}
+        title="Inventory Inspection PDF Preview"
+        footer={
+          <button
+            className="btn btn-form-green"
+            onClick={() => {
+              // 🔹 Just ask for confirmation (don’t close modal, don’t download yet)
+              setShowConfirmYesNo(true);
+            }}
+          >
+            Download & Save
+          </button>
+        }
+      >
+        <div style={{ height: "80vh" }}>
+          {pdfPreviewUrl && (
+            <iframe
+              src={pdfPreviewUrl}
+              title="Inventory PDF Preview"
+              width="100%"
+              height="100%"
+              style={{ border: "none" }}
+            />
+          )}
+        </div>
+      </Modalbigger>
+
+        <Popups
+          showConfirmYesNo={showConfirmYesNo}
+          confirmYesNoTitle="Confirm Save"
+          confirmYesNoBody="Are you sure you want to save this inspection report?"
+          confirmYesLabel="Yes, Save"
+          confirmNoLabel="Cancel"
+          onConfirmYes={handleSaveConfirmed}
+          onConfirmNo={() => setShowConfirmYesNo(false)}
+          showLoading={showLoading}
+          loadingText="Saving inspection report..."
+          showResponse={showResponse}
+          responseTitle="System Message"
+          responseMessage={responseMessage}
+          onCloseResponse={() => setShowResponse(false)}
+        />
+    </>
+  );
+};
+
+export default InventoryInspectionReport;
+
+
+
+
+
+now create me php logic for check asset's room
+
+that logic need the room ID and the aseet ID
+
+so the condition is select asset where asset id = value and room id = value
+
+if 
+
+
+
+
+
+
+may madali naman na process
+
+1. Si mam nag assign na ng assets sa custodian, so yung asset custodian na bahala
+2. Gagagawa ako "Borrowable Item Manageer" para yung custodian is mag set ng asset na pwedeng mahiram, desisyon na nila yun, basta yung asset lang na handle nila ang pwede nila i assign as borrowable, and then yung mga inassign nila as borrowable, naka bukod na lalagyan para madali makita pag chineck out
+3. ngayon may new column sa asset table, "is_borrowable" boolean, ngayon sa request form lahat ng asset na borrowable yun lang lalabas sa option. 
+4. tas yun na asset scanning, self check out and in (for return).
+5. balak ko rin wag na mag receipt tinatamad ako since may history naman.
+

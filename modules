@@ -1,0 +1,88 @@
+================================== HTACCESS=======================================
+RewriteEngine On
+
+# --- Handle /api/ requests ---
+RewriteCond %{REQUEST_URI} ^/api/
+RewriteRule ^api/(.*)$ backend/$1 [L]
+
+# --- React Router support (for /login, /users/home, etc.) ---
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ dist/index.html [L]
+
+# --- CORS (if needed, kasi may credentials: include ka) ---
+<IfModule mod_headers.c>
+    SetEnvIf Origin "http(s)?://(.+)" ORIGIN=$0
+    Header always set Access-Control-Allow-Origin "%{ORIGIN}e" env=ORIGIN
+    Header always set Access-Control-Allow-Credentials "true"
+    Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS, PUT, DELETE"
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
+</IfModule>
+
+# --- Handle OPTIONS (preflight for CORS) ---
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^(.*)$ $1 [R=200,L]
+
+================================== HTACCESS=======================================
+
+
+Modules For Roadmap:
+
+Admin View:
+    1. Dashboard or Statistics
+    2. CRUD page for overall items/assets
+    3. Archive page for overall inactive items/assets
+    4. CRUD page for overall users (custodians and borrowers)
+    5. Archive page for overalll inactive users (custodians and borrowers)
+    6. CRUD page for Reference Datas (Role, Unit, Brand, Assets types, Room)
+    7. Archive page for inactive Reference Datas
+    8. Request Pages - overseeing the transaction between custodians and borrowers
+
+Custodians View:
+    1. Dasboard or statics
+    2. Table list of the active and inactive assets/items that they are hanlding
+    3. Request Table list from borrowers
+    4. Request Table details - where Approval and Rejection is happening
+    5. Check-out items - table list where all borrowed item is displayed
+    6. Settings - to allow user to modify their personal and security related information
+
+Borrower view:
+    1. Home page - minimal statistics with applications icon buttons
+    2. Asset Hunt - it is a system feature where borrower can identify which asset it belong to the specific room
+    3. Request Form - it's a page where the form for borrowing an item is located.
+    4. Request History - page dedicated for list of all request that made by the user
+    5. Borrowed Items - it displays data such date of borrowed items and when does it returned
+    6. Settings - to allow user to modify their personal and security related information
+
+
+Active Assets > Serviceable Assets - done
+Remove Transfer in Add Assets - done
+Add Text Description to Hover Buttons - done
+Property Tag in city should be included in asset sticker - done
+Date Format should be - dd/mm/yyyy - done
+Can create new consumable that matches existing record  - done
+Zero (number) should be displayed in forms (RIS)  - done
+Notification not working - done
+Requisition and Issuance should be at top - done
+Serviceable Years should only be Years - done
+Inventory and Inspection Report: change destruction to disposal, add damage - done
+Add Disposed Assets in Asset Bar Nav - done
+Activity Logs should include Room Transfer - done
+Room Assignation Request - wag na toh
+
+
+TASK PENDING:
+
+update and delete multi asset, specify what is being updated and what kld tag in activity logs
+also the look ups, inserting new look ups in forms(asset, user) should logged too..
+in user credentials
+put position because role is only for accounts
+sort function para sa tables
+put also select in consumables
+barcode scanning
+
+
+I need to do before testing:
+PDF adjusments (put gap for header and
+footer and limit the number of items)
+Barcode scanning
