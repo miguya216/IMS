@@ -1,0 +1,304 @@
+.custom-table-wrapper {
+  overflow-x: auto;
+  padding: 1rem;
+  border-radius: 0.75rem;
+}
+
+.custom-table {
+  width: 100%;
+  /* table-layout: fixed;  */
+  border-collapse: separate; /* ← change this */
+  border-spacing: 0;         /* optional: no space between cells */
+  border: 1px solid rgb(49, 49, 49);   /* this will now show */
+  border-radius: 0.25rem;
+  overflow: hidden;
+  border: 1px solid black;
+}
+
+.custom-table th {
+  background: none !important;
+  color: #fff;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 0.75rem;
+  font-size: 0.85rem;
+  border: none;
+}
+
+.custom-table thead tr {
+  background: linear-gradient(to bottom right, #005a34, #006705, #008707);
+}
+
+.custom-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+  font-size: 0.95rem;
+
+  /* new for truncation */
+  max-width: 200px;       /* adjust width depending on your layout */
+  white-space: nowrap;    
+  overflow: hidden;       
+  text-overflow: ellipsis;
+}
+
+.custom-table td img {
+  align-items: center !;
+}
+
+/* Hover effect */
+.custom-table tbody {
+  background-color: white;
+  cursor: pointer;
+}
+
+.custom-table tbody tr:not(.selected-row):hover {
+  background-color: #7dff86;
+  cursor: pointer;
+}
+
+.custom-table tbody tr.selected-row,
+.custom-table tbody tr.selected-row:hover {
+  background-color: #53ff5e !important;
+}
+
+.card-room:hover {
+  background-color: #7dff86;
+  cursor: pointer;
+}
+
+.selected-row .card {
+  background-color: #53ff5e !important;
+  border: 3px solid #53ff5e !important;
+  box-shadow: 0 0 12px rgba(83, 255, 94, 0.6) !important;
+  transition: all 0.2s ease;
+}
+
+.custom-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+  font-size: 0.95rem;
+
+  /* new for truncation */
+  max-width: 200px;       /* adjust width depending on your layout */
+  white-space: nowrap;    
+  overflow: hidden;       
+  text-overflow: ellipsis;
+}
+
+/* .custom-table th,
+.custom-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+  font-size: 0.95rem;
+  white-space: nowrap;       
+  overflow: hidden;          
+  text-overflow: ellipsis;   
+} */
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .custom-table-wrapper {
+    width: 90vw; /* make wrapper full width of the viewport */
+    margin-left: -1rem;  /* counter the padding */
+    margin-right: -1rem;
+    padding: 0 1rem; /* keep inside spacing consistent */
+    overflow-x: hidden;
+  }
+
+  .custom-table thead {
+    display: none;
+  }
+
+  .custom-table,
+  .custom-table tbody,
+  .custom-table tr,
+  .custom-table td {
+    display: block;
+    width: 100%;
+  }
+
+
+  .custom-table tr {
+    margin-bottom: 1.5rem; /* More space between boxes */
+    border: 1px solid #ccc;
+    border-radius: 0.75rem; /* Slightly larger rounded corner */
+    box-shadow: 0 7px 12px rgba(0, 0, 0, 0.08); /* Deeper shadow */
+    padding: 1.25rem; /* More padding inside box */
+    background-color: #fff;
+  }
+
+  .custom-table td {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    border: none;
+    border-bottom: 1px solid #eee;
+    padding: 0.5rem 0;
+    background-color: transparent;
+    text-align: left;
+  }
+
+  .custom-table td::before {
+    content: attr(data-label) ": ";
+    font-weight: 600;
+    flex: 0 0 40%;
+    color: #000;
+  }
+
+  .custom-table td:last-child {
+    border-bottom: none;
+  }
+}
+
+/* In your CSS file or global styles */
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: none;
+  padding: 6px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  cursor: pointer;
+}
+
+.action-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05); /* subtle gray hover */
+  transform: scale(1.05); /* slight zoom effect */
+}
+
+.action-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.action-btn:disabled {
+  opacity: 0.5;       /* Makes it look faded */
+  cursor: not-allowed; /* Shows disabled cursor */
+  filter: grayscale(100%); /* Optional: makes icons grey */
+}
+
+
+.action-btn-group {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.btn-add {
+  background-color: #0ea522 !important; 
+  color: white;
+  border: none;
+}
+
+.btn-add:hover {
+  background-color: #0fba26 !important;
+}
+/* pagination */
+
+.pagination .page-link {
+  color: #00680e; /* Green text */
+  border: 1px solid #00680e;
+}
+
+.pagination .page-link:hover {
+  background-color: #00680e;
+  color: white;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #00680e !important;
+  border-color: #00680e !important;
+  color: white;
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.status-badge.issuing {
+  background-color: #e4b723;
+  color: #5a3300;
+}
+.status-badge.completed {
+  background-color: #bdfbcb;
+  color: #094917;
+}
+.status-badge.active {
+  background-color: #bdfbcb;
+  color: #094917;
+}
+.status-badge.pending {
+  background-color: #ca3900;
+  color: #f8f8f8;
+}
+.status-badge.borrowed {
+  background-color: #eeff6d;
+  color: #161604;
+}
+.status-badge.on-going {
+  background-color: #eeff6d;
+  color: #161604;
+}
+.status-badge.cancelled {
+  background-color: #f8d7da;
+  color: #6c0711;
+}
+
+
+.empty-state {
+  display: flex;
+  flex-direction: column;   /* stack gif + text vertically */
+  align-items: center;      /* center horizontally */
+  justify-content: center;  /* center vertically if parent allows */
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.empty-state img {
+  max-width: 200px;        /* shrink nicely on smaller screens */
+  width: 100%;             /* scale responsively */
+  height: auto;            /* keep aspect ratio */
+  margin-bottom: 1rem;
+}
+
+.empty-state p {
+  margin: 0.3rem 0;
+  line-height: 1.4;
+}
+
+/* table controls */
+@media (max-width: 576px) {
+  .form-control {
+    font-size: 0.9rem;
+  }
+
+  .btn {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.85rem;
+  }
+
+   .empty-state img {
+    max-width: 150px;
+  }
+  .empty-state p {
+    font-size: 0.9rem;
+  }
+}
+
+/* from Inspection Report */
+/* White arrow when marked as done */
+.done-accordion::after {
+  filter: invert(1) brightness(2); /* turns arrow white */
+}

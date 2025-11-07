@@ -1,0 +1,204 @@
+/* src/css/Sidebar.css */
+.sidebar-custom {
+  background-image: linear-gradient(
+      to bottom right,
+      rgb(0, 40, 24),
+      rgb(0, 43, 2),
+      rgb(0, 50, 2)
+    ),
+    url("/resources/imgs/kld2.png") !important;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-blend-mode: overlay;
+  color: white;
+  min-height: 100vh;
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: width 0.3s ease;
+  z-index: 1000;
+  padding: 0;
+  border-right: none;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* When open */
+.sidebar-custom.open {
+  width: 250px;
+  padding: 1rem;
+  border-right: 1px solid #dee2e6;
+}
+
+/* Desktop (≥992px) */
+/* Base sidebar */
+.sidebar-custom {
+  background-image: linear-gradient(
+      to bottom right,
+      rgb(0, 49, 29),
+      rgb(0, 63, 3),
+      rgb(0, 82, 4)
+    ),
+    url("/resources/imgs/kld2.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-blend-mode: overlay;
+  color: white;
+
+  position: fixed;     /* always fixed */
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100vh;       /* full viewport height */
+  overflow-y: auto;    /* independent scroll */
+  overflow-x: hidden;
+  transition: width 0.3s ease;
+  z-index: 1000;
+  padding: 0;
+  border-right: none;
+}
+
+/* When open */
+.sidebar-custom.open {
+  width: 250px;
+  padding: 1rem;
+  border-right: 1px solid #dee2e6;
+}
+
+/* Default: content takes full width */
+.content-wrapper {
+  transition: margin-left 0.3s ease;
+  margin-left: 0;
+}
+
+/* Desktop (≥992px) */
+@media (min-width: 992px) {
+  .sidebar-custom {
+    position: fixed;   /* stays fixed on the left */
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 0;          /* collapsed by default */
+    padding: 0;        /* no padding when closed */
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: width 0.3s ease, padding 0.3s ease;
+  }
+
+  .sidebar-custom.open {
+    width: 250px;      /* expand when open */
+    padding: 1rem;
+    border-right: 1px solid #dee2e6;
+  }
+
+  /* Only push content when admin-layout has sidebar-open */
+  .admin-layout.sidebar-open .content-wrapper {
+    margin-left: 250px; /* match sidebar width */
+  }
+}
+
+
+.sidebar-link {
+  color: white !important;
+  font-weight: normal;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.sidebar-link:hover,
+.sidebar-link:focus {
+  background: linear-gradient(to bottom right, rgba(0, 90, 52, 0.85), rgba(0, 103, 5, 0.85));
+  color: white !important;
+  font-weight: bold !important;
+  border-radius: 4px;
+}
+
+/* Hover ONLY when not active */
+.sidebar-link:not(.active-link):hover,
+.sidebar-link:not(.active-link):focus {
+  background: linear-gradient(
+    to bottom right,
+    rgba(0, 90, 52, 0.85),
+    rgba(0, 103, 5, 0.85)
+  );
+  color: white !important;
+  font-weight: bold !important;
+  border-radius: 4px;
+}
+
+/* Active state + lock it in on hover/focus */
+.sidebar-link.active-link,
+.sidebar-link.active-link:hover,
+.sidebar-link.active-link:focus {
+  background: yellow !important;       /* resets gradient too */
+  background-image: none !important;   /* extra safety */
+  color: black !important;
+  font-weight: bold !important;
+  border-radius: 4px;
+}
+
+
+.sidebar-custom {
+  scrollbar-width: none;         /* Firefox */
+  -ms-overflow-style: none;      /* Internet Explorer 10+ */
+}
+
+.sidebar-custom::-webkit-scrollbar {
+  display: none;                 /* Chrome, Safari, Opera */
+}
+
+
+.sidebar-custom::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}
+
+.sidebar-link.active-link {
+  background-color: yellow !important;
+  color: black !important;
+  font-weight: bold !important;
+  border-radius: 4px;
+}
+
+/* Bracket / tree-style lines for accordion children */
+.nav .nav-item .nav .nav-item {
+  position: relative;
+  padding-left: 1rem; /* space for the line */
+}
+
+.nav .nav-item .nav .nav-item::before {
+  content: "";
+  position: absolute;
+  left: 0.3rem;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background-color: rgba(255, 255, 255, 0.3); /* vertical line */
+}
+
+.nav .nav-item .nav .nav-item::after {
+  content: "";
+  position: absolute;
+  left: 0.3rem;
+  top: 1rem;
+  width: 0.75rem;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.3); /* horizontal line */
+}
+
+
+/* header */
+
+.navbar-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 999; /* ensure it stays on top */
+  border-bottom: 2px solid black;
+}

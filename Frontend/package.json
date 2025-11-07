@@ -1,0 +1,52 @@
+{
+  "name": "ims-react",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "proxy": "node proxy.cjs",
+    "tunnel": "cloudflared tunnel --url https://localhost:5173"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "axios": "^1.11.0",
+    "bootstrap": "^5.3.7",
+    "bootstrap-icons": "^1.13.1",
+    "chart.js": "^4.5.1",
+    "dayjs": "^1.11.18",
+    "express": "^5.1.0",
+    "framer-motion": "^12.23.9",
+    "html5-qrcode": "^2.3.8",
+    "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
+    "lucide-react": "^0.525.0",
+    "react": "^19.1.0",
+    "react-bootstrap": "^2.10.10",
+    "react-chartjs-2": "^5.3.0",
+    "react-countup": "^6.5.3",
+    "react-datepicker": "^8.8.0",
+    "react-dom": "^19.1.0",
+    "react-icons": "^5.5.0",
+    "react-router-dom": "^7.7.0",
+    "react-select": "^5.10.2",
+    "recharts": "^3.3.0",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.30.1",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.6.0",
+    "eslint": "^9.30.1",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.3.0",
+    "http-proxy": "^1.18.1",
+    "vite": "^7.0.4"
+  }
+}

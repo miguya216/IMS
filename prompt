@@ -1,0 +1,60 @@
+Create Borrowed asset listing where it shows asset from reservation_borrowing the date of return is coming.
+
+Remove Consumables by Status and create Listing for Consumables that below 10 the quantity. If there's no quantity below 10, just show the lowest. Always top 7.
+
+Nothing will change there, only this:
+
+If user select 'no' in availability
+    - make the dropdown for status into complete
+    - populate the Quantity Issued with '0' and disabled it
+    - don't let them submit it if the Borrow Remarks is blank.
+
+NOTE: it is working, i hope you dont broke it.
+
+
+After the table body, put this (signatories section)
+
+Table Row after the last asset:
+    column 1 (under inventory section, so basically all the contents in this column will compress)
+        Row 1: I HEREBY request inspection and disposition, pursuan to Section 79 of PD 1445, of the property enumerated above.
+        Row 2 Left: 
+        Request By                                                
+
+        ___________________________________________________
+        (Signature Over Printed Name of Accountable Officer)
+        ___________________________________________________
+              (Designation of Accountable Officer)
+
+        Row 2 Right: 
+        Approved by:
+        __________________________________________________
+                (Signature over Printed Name of)
+        __________________________________________________
+              (Designation Of Authorized Official)
+
+    column 2 (under Inspection & Disposal, so basically all the contents in this column will compress)
+        Row 1 Left: I CERTIFY that I have inspected each and every article enumerated in this report, and that the disposition made thereof was, in my judgement, the best for the public interest.
+        Row 1 Right: I CERTIFY that I have witnessed the disposition of the articles enumerated on this report this ____ day of _______________.
+        
+        Row 2 Left:
+        __________________________________________________
+        (Signature over Printed Name of Inspection Officer)
+        Row 2 Right:
+        __________________________________________________
+             (Signature over Printed Name of Witness)
+
+
+
+when user clicks
+
+Total asset redirect to /Super-Admin/assets if role = 1 while if role = 2  /admin/assets
+
+Total Consumables redirect to /Super-Admin/consumables if role = 1 while if role = 2  /admin/consumables
+
+Total Users redirect to /Super-Admin/users if role = 1 while if role = 2 nothing will happen.
+
+Requisition & Issue redirect to /Super-Admin/requisitionissuance if role = 1 while if role = 2  /admin/requisitionissuance
+
+Reservation & Borrowing redirect to /Super-Admin/reservationborrowing if role = 1 while if role = 2  /admin/reservationborrowing
+
+Borrowed Assets (Returning Soon) redirect to /Super-Admin/assetsborrowable if role = 1 while if role = 2  /admin/assetsborrowable

@@ -1,0 +1,84 @@
+html, body, #root, .main-bg {
+  height: 100%;
+  min-height: 100vh;
+}
+
+.navbar {
+   background: #CBD3C1;
+}
+
+.form-panel {
+  background: #f5f5f5;
+}
+
+h3 {
+  font-weight: bold;
+  color: black !important; 
+}
+
+.main-bg {
+  background: #CBD3C1;
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+/* Remove default white areas from layout wrappers */
+.content-wrapper {
+  background: transparent !important;
+}
+
+.p-4 {
+  background: transparent !important;
+}
+
+
+.btn-import {
+  background-color: white; /* Olive green */
+  color: black;
+  border: none;
+}
+
+.btn-import:hover {
+  background-color: black;
+  color: white;
+}
+
+.btn-export {
+  background-color: white; /* Dark green-gray */
+  color: black;
+  border: none;
+}
+
+.btn-export:hover {
+  background-color: black;
+  color: white;
+}
+
+
+.card-text {
+  color: white !important;
+}
+
+.loading-page {
+  font-size: large;
+  display: flex;
+  justify-content: center;  /* centers horizontally as a group */
+  align-items: center;      /* centers vertically */
+  height: 100vh;            /* full screen height */
+  gap: 10px;                /* space between text and image */
+}
+
+.loading-data {
+  display: flex;
+  justify-content: center;  /* centers horizontally as a group */
+  align-items: center;            /* full screen height */
+  gap: 10px;                /* space between text and image */
+}
+
+.loading-page p {
+  margin: 0;                /* remove default paragraph spacing */
+}
+
+.loading-data p {
+  margin: 0;                /* remove default paragraph spacing */
+}

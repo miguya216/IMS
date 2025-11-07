@@ -1,0 +1,125 @@
+/* Background for full page */
+.login-body {
+  min-height: 100vh;
+  background: #CBD3C1;
+  color: black;
+  position: relative;
+  overflow: hidden;
+  padding: 5px;
+  display: flex;              /* enable flexbox */
+  justify-content: center;    /* horizontal center */
+  align-items: center; 
+}
+.welcome-page {
+  background: #CBD3C1;
+  color: black;
+  line-height: 1.6;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  width: 50px;
+  height: auto;
+}
+
+.logo-text {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: black;
+}
+
+
+.floating-items {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* don’t block clicks */
+  z-index: 0; /* behind everything */
+}
+
+/* container floats */
+.float-item {
+  position: absolute;
+  animation: moveLeft 20s linear infinite;
+  opacity: 0.6;
+}
+
+/* images inside rotate */
+.float-item img {
+  width: 80px;
+  animation: spin 12s linear infinite;
+}
+
+/* movement */
+@keyframes moveLeft {
+  from { transform: translateX(0); }
+  to { transform: translateX(-220vw); }
+}
+
+/* rotation */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+
+/* Zigzag / scattered floating positions */
+.item1 { top: 11%;  left: 110%; animation-delay: 0s;  }
+.item2 { top: 15%; left: 118%; animation-delay: 6s;  }
+.item3 { top: 2%; left: 112%; animation-delay: 3s; }
+.item4 { top: 35%; left: 119%; animation-delay: 9s; }
+.item5 { top: 2%; left: 111%; animation-delay: 15s; }
+.item6 { top: 55%; left: 117%; animation-delay: 12s; }
+.item7 { top: 65%; left: 113%; animation-delay: 18s; }
+.item8 { top: 75%; left: 120%; animation-delay: 21s; }
+.item9 { top: 85%; left: 114%; animation-delay: 24s; }
+
+
+
+@keyframes moveLeft {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-220vw); }
+}
+
+.login-form-container {
+  width: 100%;
+  max-width: 600px;   /* controls width */
+  background: #fff;
+  padding: 5rem;      /* controls spacing inside */
+  border-radius: 1rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  position: relative;
+  z-index: 5;
+  transition: max-width 0.3s ease, padding 0.3s ease;
+}
+
+/* Smaller screens: shrink + allow scrolling */
+@media (max-width: 576px) {
+  .login-body {
+    align-items: flex-start;   /* stop vertical centering */
+    padding: 1rem;             /* breathing room */
+    overflow-y: auto;          /* allow scrolling when keyboard opens */
+  }
+
+  .login-form-container {
+    max-width: 100%;
+    padding: 1.2rem;
+    margin-top: 6rem;          /* push down slightly */
+  }
+}
+
+/* Smaller screens: shrink the box */
+@media (max-width: 576px) {
+  .login-form-container {
+    max-width: 90%;
+    padding: 1.2rem;
+  }
+}

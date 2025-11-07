@@ -1,0 +1,205 @@
+/* src/components/Modal.css */
+
+/* Modal container wrapper */
+.form-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1050;
+  overflow-y: auto;
+  padding: 2rem 1rem;
+}
+.form-modal-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100%;
+}
+
+/* Modal box */
+.form-modal-container {
+  width: 100%;
+  max-width: 800px;
+  background-color: white;
+  overflow: hidden;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+/* Header */
+.form-modal-header {
+  position: relative;
+  background: linear-gradient(to bottom right, #005a34, #006705);
+  color: white;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+
+.custom-close-btn {
+  position: absolute;
+  right: 1rem;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.custom-close-btn img {
+  width: 40px;
+  height: 40px;
+}
+
+/* Title */
+.form-modal-title {
+  margin: 0;
+  font-size: 1.25rem;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+}
+
+/* Body */
+.form-modal-body {
+  overflow-y: auto;
+  padding: 1.5rem;
+  /* background-color: white; */
+  /* background-color: yellow !important; */
+  /* background-color: #fdff71; */
+  background-color: #CBD3C1;
+  flex-grow: 1;
+}
+
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleOut {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+}
+
+.form-modal-container.animate-in {
+  animation: scaleIn 0.3s ease forwards;
+}
+
+.form-modal-container.animate-out {
+  animation: scaleOut 0.2s ease forwards;
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  color: black !important;
+  opacity: 2 !important; 
+  cursor: not-allowed !important; 
+}
+
+
+.section-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 30px 0 0px !important;
+  margin: 20px 0;
+  color: #006705; /* Bootstrap primary color */
+  font-weight: 600;
+  
+}
+
+.section-divider::before,
+.section-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 2px solid #006705;
+}
+
+.section-divider:not(:empty)::before {
+  margin-right: .75em;
+}
+.section-divider:not(:empty)::after {
+  margin-left: .75em;
+}
+
+.admin-field {
+  color: #006705 !important;
+  font-weight: 600;
+}
+
+/* Yellow Button */
+.btn-form-green {
+  background: linear-gradient(to bottom right, #005a34, #006705, #009708) !important;
+  color: white !important;
+  transition: all 0.1s ease-in-out;
+}
+
+.btn-form-green:hover {
+  background: linear-gradient(to bottom right, #009708, #006705, #005a34) !important;
+  color: white !important;
+}
+
+.btn-form-yellow {
+  background: linear-gradient(to bottom right, #ffd500, #cece00, #FFFF00) !important;
+  color: black !important;
+  transition: all 0.1s ease-in-out;
+}
+
+.btn-form-yellow:hover {
+  background: linear-gradient(to bottom right, #FFFF00, #ffea00, #ffd500) !important;
+  color: black !important;
+}
+.btn-form-red {
+  background: linear-gradient(to bottom right, #5a0000, #670000, #970000) !important;
+  color: white !important;
+  transition: all 0.1s ease-in-out;
+}
+
+.btn-form-red:hover {
+  background: linear-gradient(to bottom right, #970000, #670000, #5a0000) !important;
+  color: white !important;
+}
+
+.btn-form-blue {
+  background: linear-gradient(to bottom right, #00025a, #00026e, #000292) !important;
+  color: white !important;
+  transition: all 0.1s ease-in-out;
+}
+
+.btn-form-blue:hover {
+  background: linear-gradient(to bottom right, #000292, #00026e, #00025a) !important;
+  color: white !important;
+}
+
+.btn-form-orange {
+  background: linear-gradient(to bottom right, #af7200, #cf8600, #FFA500) !important;
+  color: white !important;
+  transition: all 0.1s ease-in-out;
+}
+
+.btn-form-orange:hover {
+  background: linear-gradient(to bottom right, #FFA500, #cf8600, #af7200) !important;
+  color: white !important;
+}

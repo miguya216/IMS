@@ -1,0 +1,46 @@
+/* Main modal container */
+.custom-confirm-modal .modal-content {
+  overflow: hidden; /* rounded corners fix */
+  border-radius: 8px;
+}
+
+/* Header: green */
+.custom-confirm-modal .modal-header {
+  background: linear-gradient(to bottom right, #005a34, #006705);
+  color: white;
+  border-bottom: none;
+}
+
+/* Title text color (optional override) */
+.custom-confirm-modal .modal-title {
+  color: white;
+}
+
+/* Body: yellow */
+.custom-confirm-modal .modal-body {
+  text-align: center;
+  /* background-color: #fdff71; */
+  background: #CBD3C1;
+  font-weight: bold;
+  color: #000;
+}
+
+/* Footer: green */
+.custom-confirm-modal .modal-footer {
+  background: linear-gradient(to bottom right, #005a34, #006705);
+  border-top: none;
+}
+
+/* Yellow button style */
+.btn-custom-yellow {
+  background-color: yellow !important;
+  color: #000 !important;
+  border: 1px solid yellow !important;
+  transition: all 0.1s ease-in-out;
+}
+
+.btn-custom-yellow:hover {
+  background-color: #e0b800 !important;
+  border-color: #e0b800 !important;
+  color: #000 !important;
+}

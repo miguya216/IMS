@@ -1,0 +1,67 @@
+.notification-dropdown {
+  animation: fadeInUp 0.2s ease;
+  background-color: #fff;
+}
+
+.notification-bell {
+  transition: all 0.2s ease;
+  border-radius: 50%;
+  padding: 6px;
+}
+
+.notification-bell.active {
+  background-color: #ffffff; /* light gray background */
+}
+
+
+.notification-item {
+  border-bottom: 1px solid #f1f1f1;
+  transition: background 0.4s ease, opacity 0.3s ease;
+  position: relative;
+}
+
+.notification-item.unread {
+  background-color: #eef5ff; /* soft blue */
+}
+
+.notification-item:hover {
+  background-color: #f9f9f9;
+}
+
+.notification-item:hover {
+  background-color: #f9f9f9;
+}
+
+.bg-soft-primary {
+  background-color: #eef5ff !important;
+}
+
+.unread-dot {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

@@ -1,0 +1,7 @@
+{
+    "require": {
+        "picqer/php-barcode-generator": "^3.2",
+        "endroid/qr-code": "^6.0",
+        "phpmailer/phpmailer": "^6.10"
+    }
+}

@@ -1,0 +1,112 @@
+/* src/css/SidebarUser.css */
+
+/* renamed from .sidebar-custom -> .user-sidebar */
+.user-sidebar {
+  background-image: linear-gradient(
+    to bottom right,
+    rgb(0, 49, 29),
+    rgb(0, 63, 3),
+    rgb(0, 82, 4)
+  );
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: white;
+  height: auto;
+  min-height: 100vh; 
+  scrollbar-width: none;         /* Firefox */
+  -ms-overflow-style: none;      /* Internet Explorer 10+ */
+}
+
+
+.user-sidebar::-webkit-scrollbar {
+  display: none;                 /* Chrome, Safari, Opera */
+}
+
+.user-sidebar::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}
+
+/* renamed from .sidebar-link -> .user-sidebar-link */
+.user-sidebar-link {
+  color: white !important;
+  font-weight: normal;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.user-sidebar-link:hover,
+.user-sidebar-link:focus {
+  background: linear-gradient(to bottom right, rgba(0, 90, 52, 0.85), rgba(0, 103, 5, 0.85));
+  color: white !important;
+  font-weight: bold !important;
+  border-radius: 4px;
+}
+
+/* Hover ONLY when not active - renamed active class to .user-sidebar-active */
+.user-sidebar-link:not(.user-sidebar-active):hover,
+.user-sidebar-link:not(.user-sidebar-active):focus {
+  background: linear-gradient(
+    to bottom right,
+    rgba(0, 90, 52, 0.85),
+    rgba(0, 103, 5, 0.85)
+  );
+  color: white !important;
+  font-weight: bold !important;
+  border-radius: 4px;
+}
+
+/* Active state + lock it in on hover/focus */
+.user-sidebar-link.user-sidebar-active,
+.user-sidebar-link.user-sidebar-active:hover,
+.user-sidebar-link.user-sidebar-active:focus {
+  background: yellow !important;       /* resets gradient too */
+  background-image: none !important;   /* extra safety */
+  color: black !important;
+  font-weight: bold !important;
+  border-radius: 4px;
+}
+
+/* Bracket / tree-style lines for accordion children
+   Scoped under .user-sidebar so other navs are unaffected */
+.user-sidebar .nav .nav-item .nav .nav-item {
+  position: relative;
+  padding-left: 1rem; /* space for the line */
+}
+
+.user-sidebar .nav .nav-item .nav .nav-item::before {
+  content: "";
+  position: absolute;
+  left: 0.3rem;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background-color: rgba(255, 255, 255, 0.3); /* vertical line */
+}
+
+.user-sidebar .nav .nav-item .nav .nav-item::after {
+  content: "";
+  position: absolute;
+  left: 0.3rem;
+  top: 1rem;
+  width: 0.75rem;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.3); /* horizontal line */
+}
+
+/* header — renamed .navbar-sticky -> .user-navbar-sticky (only change if you use it) */
+.user-navbar-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 999; 
+  font-size: 1.15rem;
+  height: 70px;
+  /* background: linear-gradient(to bottom left, #e0e0e0, #9e9e9e, #828282) !important; */
+  background: #CBD3C1; 
+  color: black;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid black;
+}
