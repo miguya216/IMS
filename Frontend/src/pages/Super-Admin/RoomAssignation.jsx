@@ -152,13 +152,18 @@ const RoomAssignation = () => {
     fetchAssetsByUser();
   }, []);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTag, assets]);
+
+
   return (
     <>
       <h3>Room Assignation</h3>
       <div className="container-fluid mt-4">
         <div className="form-panel row g-3 align-items-end rounded shadow-sm p-2">
           {/* Select Room */}
-            <div title="Select destination room for assets" className="col-md-2">
+            <div title="Select destination room for assets" className="col-auto">
               <label className="form-label fw-semibold d-none d-md-block">
                 Select Room:
               </label>
@@ -182,8 +187,20 @@ const RoomAssignation = () => {
               />
             </div>
 
+            {/* Move button */}
+            <div className="col-auto">
+              <button
+                className="btn btn-form-green"
+                onClick={handleMoveClick}
+                disabled={!selectedRoom || selectedAssets.length === 0}
+              >
+                Transmit
+              </button>
+            </div>
+
+
           {/* Search */}
-        <div className="col-md-3">
+        <div className="col-md-3 ms-auto"> 
           <label className="form-label fw-semibold d-none d-md-block">
             Search Asset:
           </label>
@@ -209,18 +226,6 @@ const RoomAssignation = () => {
           </div>
         </div>
 
-
-          {/* Move button */}
-          <div className="col-auto">
-            <button
-              className="btn btn-form-green"
-              onClick={handleMoveClick}
-              disabled={!selectedRoom || selectedAssets.length === 0}
-            >
-              Move Selected Assets
-            </button>
-          </div>
-
           {/* Scan QR button */}
           <div className="col-auto">
             <button
@@ -239,7 +244,7 @@ const RoomAssignation = () => {
       {/* Two-column asset display */}
         <div className="row mt-4">
           {/* Left: available assets */}
-          <div className="col-md-6">
+          <div className="col-md-6 border border-dark p-3">
             <h5 className="mb-3">Available Assets</h5>
             
             <div className="row mb-2 g-3 align-items-end">
@@ -320,7 +325,7 @@ const RoomAssignation = () => {
           </div>
 
           {/* Right: selected assets */}
-          <div className="col-md-6">
+          <div className="col-md-6 border border-dark p-3">
             <h5 className="mb-5">Selected Assets</h5>
             {currentSelectedAssets.length > 0 ? (
               currentSelectedAssets.map((asset) => (

@@ -314,7 +314,7 @@ const Assets = () => {
                       <td data-label="KLD Tag">{asset.kld_property_tag}</td>
                       <td data-label="Brand">{asset.brand_name}</td>
                       <td data-label="Asset Type">{asset.asset_type}</td>
-                      <td data-label="Condition">{asset.asset_condition}</td>
+                      <td className="highlight-data" data-label="Condition">{asset.asset_condition}</td>
                       {/* <td>{asset.price_amount}</td> */}
                         <td data-label="Action">
                           <div className="action-btn-group">

@@ -49,7 +49,7 @@ const ConsumableDetails = ({ consumableId }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+      <>
       <div className="row g-3">
         <div className="col-md-4">
           <label className="form-label fw-bold">KLD Property Tag</label>
@@ -60,6 +60,7 @@ const ConsumableDetails = ({ consumableId }) => {
             value={formData.kld_property_tag}
             onChange={handleChange}
             required
+            readOnly
           />
         </div>
         <div className="col-md-4">
@@ -71,6 +72,7 @@ const ConsumableDetails = ({ consumableId }) => {
             value={formData.consumable_name}
             onChange={handleChange}
             required
+            readOnly
           />
         </div>
         <div className="col-md-4">
@@ -82,6 +84,7 @@ const ConsumableDetails = ({ consumableId }) => {
             value={formData.description}
             onChange={handleChange}
             required
+            readOnly
           />
         </div>
         <div className="col-md-4">
@@ -93,6 +96,7 @@ const ConsumableDetails = ({ consumableId }) => {
             value={formData.unit_of_measure}
             onChange={handleChange}
             required
+            readOnly
           />
         </div>
         <div className="col-md-4">
@@ -104,6 +108,7 @@ const ConsumableDetails = ({ consumableId }) => {
             value={formData.total_quantity}
             onChange={handleChange}
             required
+            readOnly
           />
         </div>
         <div className="col-md-4">
@@ -115,6 +120,7 @@ const ConsumableDetails = ({ consumableId }) => {
             value={formData.price_amount}
             onChange={handleChange}
             required
+            readOnly
           />
         </div>
         <div className="col-md-4">
@@ -126,6 +132,7 @@ const ConsumableDetails = ({ consumableId }) => {
             value={formData.date_acquired}
             onChange={handleChange}
             required
+            readOnly
           />
         </div>
 
@@ -166,7 +173,7 @@ const ConsumableDetails = ({ consumableId }) => {
           Update
         </button>
       </div> */}
-    </form>
+      </>
   );
 };
 

@@ -475,7 +475,7 @@ const RequisitionIssueDetails = ({ risID, refreshTable }) => {
 
       {/* Submit Button */}
       {header.ris_status !== "cancelled" && header.ris_status !== "completed" && (
-        <div className="text-end mt-3">
+        <div className="form-modal-footer">
           <button type="submit" className="btn btn-form-green" disabled={loading}>
             {loading ? "Saving..." : "Update"}
           </button>

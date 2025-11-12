@@ -78,6 +78,18 @@
   background-color: #CBD3C1;
   flex-grow: 1;
 }
+.form-modal-footer {
+  position: sticky; /* or 'absolute' if you want it fixed to the modal bottom */
+  bottom: 0;
+  right: 0; /* ensure right edge aligns */
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem; /* optional spacing between multiple buttons */
+  padding: 0; /* remove padding so button hugs the edge */
+  z-index: 10;
+}
+
+
 
 
 @keyframes scaleIn {

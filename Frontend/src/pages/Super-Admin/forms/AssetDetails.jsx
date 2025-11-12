@@ -336,7 +336,7 @@ useEffect(() => {
         </div>
 
       {/* Buttons */}
-      <div className="d-flex justify-content-end gap-2 mt-4">
+      <div className="form-modal-footer">
         <button title='Update Asset' onClick={handleUpdate} className="btn btn-form-green">
           Update
         </button>

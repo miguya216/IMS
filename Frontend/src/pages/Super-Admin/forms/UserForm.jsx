@@ -159,7 +159,7 @@ const {
         )}
       </div>
 
-      <div className="d-flex justify-content-end gap-2 mt-4">
+      <div className="form-modal-footer">
         <button type="submit" className="btn btn-form-green">Save</button>
       </div>
         <Popups

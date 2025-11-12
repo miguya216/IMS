@@ -191,7 +191,7 @@ const Users = () => {
                     <td data-label="KLD ID">{user.kld_id}</td>
                     <td data-label="Name">{user.full_name}</td>
                     <td data-label="Unit">{user.unit}</td>
-                    <td data-label="Role">{user.role}</td>
+                    <td className="highlight-data" data-label="Role">{user.role}</td>
 
                     <td data-label="EAF">
                       <div className="action-btn-group">

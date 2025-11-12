@@ -117,9 +117,22 @@ export const useUserFormHandler = ({ onClose, setShowLoading, setShowResponse, s
       } else {
         console.error("Insert failed:", result.message);
         setResponseTitle("❌ Failed");
-        setResponseMessage("Failed to insert user.");
+        
+        // If backend provides a detailed SQL error, show it
+        if (result.message && result.message.includes("SQLSTATE")) {
+          // Simplify the SQL error message for display
+          const readableError = result.message.includes("Duplicate entry")
+            ? "Duplicate entry detected: that KLD ID or email already exists."
+            : result.message;
+            
+          setResponseMessage(readableError);
+        } else {
+          setResponseMessage(result.message || "Failed to insert user.");
+        }
+        
         setShowResponse(true);
       }
+
     } catch (error) {
       console.error("Submission error:", error);
       setResponseTitle("❌ Failed");

@@ -332,7 +332,7 @@ const Assets = () => {
                       <td data-label="KLD Tag">{asset.kld_property_tag}</td>
                       <td data-label="Brand">{asset.brand_name}</td>
                       <td data-label="Asset Type">{asset.asset_type}</td>
-                      <td data-label="Asset Condition">{asset.asset_condition}</td>
+                      <td className="highlight-data" data-label="Asset Condition">{asset.asset_condition}</td>
                       <td data-label="Status">
                         <span className={`status-badge ${asset.asset_status}`}>
                         {asset.asset_status.charAt(0).toUpperCase() + asset.asset_status.slice(1)}

@@ -212,7 +212,7 @@ const ReservationBorrowingForm = ({ onClose, refreshTable }) => {
 return (
     <>
       <form onSubmit={handleSubmit}>
-        <div className="row g-2">
+        <div className="row g-2 mb-3">
           {/* 🗓 Date & Time of Use */}
           <div className="col-md-6">
             <label className="form-label fw-bold">Date of Use</label>
@@ -366,7 +366,7 @@ return (
         </div>
 
         {/* Footer */}
-        <div className="d-flex justify-content-between gap-2 mt-4">
+        <div className="form-modal-footer gap-3">
           <span className="form-label">
             {items.filter((i) => i.description).length} items added
           </span>

@@ -281,8 +281,8 @@ return (
       {/* Controls */}
       <h3>Inventory and Inspection Report</h3>
       <div className="form-panel container-fluid p-3 rounded shadow-sm">
-        <div className="row g-3 align-items-end">
-          <div title="Pick an employee from the list" className="col-md-3">
+        <div className="row g-2 align-items-end">
+          <div title="Pick an employee from the list" className="col-auto">
             <label className="form-label fw-semibold d-none d-md-block">Select Employee:</label>
             <Select
               options={users.map((u) => ({
@@ -304,12 +304,12 @@ return (
             />
           </div>
 
-          <div className="col-md-2">
+          <div className="col-auto">
             <label className="form-label d-none d-md-block">Unit</label>
-            <input type="text" className="form-control" value={userUnit} readOnly style={{ height: "36px" }} />
+            <input type="text" className="form-control" value={userUnit} disabled style={{ height: "36px" }} />
           </div>
 
-          <div title="Choose the room assigned of employee's asset" className="col-md-2">
+          <div title="Choose the room assigned of employee's asset" className="col-auto">
             <label className="form-label fw-semibold d-none d-md-block">Select Room Assigned:</label>
             <Select
               options={rooms.map((r) => ({
@@ -332,8 +332,20 @@ return (
             />
           </div>
 
+          <div className="col-auto">
+           <button
+              title="Preview the PDF"
+              className="btn btn-form-green"
+              onClick={handlePDFPreview}
+              disabled={!selectedUser || !selectedRoom}
+            >
+              Transmit
+            </button>
+
+          </div>
+
           {/* Search Bar */}
-          <div className="col-md-2">
+          <div className="col d-flex justify-content-end align-items-center gap-2">
             <div className="position-relative">
               <input
                 title="Search by Property Tag, Type, or Brand..."
@@ -369,17 +381,6 @@ return (
             </button>
           </div>
 
-          <div className="col-auto">
-           <button
-              title="Preview the PDF"
-              className="btn btn-form-green"
-              onClick={handlePDFPreview}
-              disabled={!selectedUser || !selectedRoom}
-            >
-              Commit
-            </button>
-
-          </div>
         </div>
       </div>
 
@@ -409,7 +410,7 @@ return (
                   aria-expanded="false"
                   aria-controls={`collapse-${idx}`}
                   style={{
-                    background: asset.markedDone ? "#006705" : "white",
+                    background: asset.markedDone ? "#006705" : "#f5f5f5",
                     color: asset.markedDone ? "#fff" : "inherit",
                   }}
                 >
@@ -424,8 +425,7 @@ return (
                 data-bs-parent="#assetsAccordion"
               >
                 <div
-                  className="accordion-body"
-                  style={{ backgroundColor: "#fdff71" }}
+                  className="accordion-body border border-dark p-3"
                 >
                   {/* --- Inventory Section --- */}
                   <h6 className="fw-bold mb-3">Inventory</h6>
@@ -433,27 +433,27 @@ return (
                   <div className="row g-2 align-items-end mb-3">
                     <div className="col-md-2">
                       <label className="form-label fw-semibold">Date Acquired</label>
-                      <input type="text" className="form-control" value={asset.date_acquired} readOnly />
+                      <input type="text" className="form-control" value={asset.date_acquired} disabled />
                     </div>
                     <div className="col-md-3">
                       <label className="form-label fw-semibold">Description</label>
-                      <input type="text" className="form-control" value={`${asset.asset_type} / ${asset.brand_name}`} readOnly />
+                      <input type="text" className="form-control" value={`${asset.asset_type} / ${asset.brand_name}`} disabled />
                     </div>
                     <div className="col-md-2">
                       <label className="form-label fw-semibold">Property No.</label>
-                      <input type="text" className="form-control" value={asset.kld_property_tag} readOnly />
+                      <input type="text" className="form-control" value={asset.kld_property_tag} disabled />
                     </div>
                     <div className="col-md-1">
                       <label className="form-label fw-semibold">Quantity</label>
-                      <input type="number" className="form-control" value={asset.quantity} onChange={(e) => handleChange(idx, "quantity", e.target.value)} readOnly/>
+                      <input type="number" className="form-control" value={asset.quantity} onChange={(e) => handleChange(idx, "quantity", e.target.value)} disabled/>
                     </div>
                     <div className="col-md-2">
                       <label className="form-label fw-semibold">Unit Cost</label>
-                      <input type="number" className="form-control" value={asset.unitCostInput} readOnly />
+                      <input type="number" className="form-control" value={asset.unitCostInput} disabled />
                     </div>
                     <div className="col-md-2">
                       <label className="form-label fw-semibold">Total Cost</label>
-                      <input type="number" className="form-control" value={asset.totalCostInput} readOnly />
+                      <input type="number" className="form-control" value={asset.totalCostInput} disabled />
                     </div>
 
                     <div className="col-md-2">
@@ -470,7 +470,7 @@ return (
                         type="number"
                         className="form-control"
                         value={asset.carryingAmount}
-                        readOnly
+                        disabled
                       />
                     </div>
                     <div className="col-md-2">
@@ -490,7 +490,7 @@ return (
                     </div>
                   </div>
 
-                  <hr />
+                  <hr className="thick-hr" />
 
                   {/* --- Inspection and Disposal Section --- */}
               <h6 className="fw-bold mb-3">Inspection and Disposal</h6>

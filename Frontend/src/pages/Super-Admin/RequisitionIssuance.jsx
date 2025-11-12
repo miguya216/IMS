@@ -161,7 +161,7 @@ const RequisitionIssuance = () => {
                 <th>Employee name</th>
                 <th>RIS Type</th>
                 <th>RIS Status</th>
-                <th>Action</th>
+                <th>Details</th>
               </tr>
             </thead>
             <tbody>
@@ -187,13 +187,13 @@ const RequisitionIssuance = () => {
                     <td data-label="RIS number">{ris.ris_number}</td>
                     <td data-label="Office / Unit">{ris.office_unit}</td>
                     <td data-label="Employee name">{ris.employee_name}</td>
-                    <td data-label="RIS Type">{ris.ris_type}</td>
+                    <td className="highlight-data" data-label="RIS Type">{ris.ris_type}</td>
                     <td data-label="RIS Status">
                       <span className={`status-badge ${ris.ris_status}`}>
                         {ris.ris_status.charAt(0).toUpperCase() + ris.ris_status.slice(1)}
                       </span>
                     </td>
-                    <td data-label="Action">
+                    <td data-label="Details">
                       <div className="action-btn-group">
                         <button
                           title="More"

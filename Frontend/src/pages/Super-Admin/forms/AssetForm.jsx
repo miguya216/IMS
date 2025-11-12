@@ -244,7 +244,7 @@ const AssetForm = ({ fetchAssets }) => {
   return (
     <>
       <form onSubmit={handleSubmit}>
-        <div className="row g-3">
+        <div className="row g-3 mb-3">
 
           <div className="col-md-4">
             <label className="form-label fw-bold">Property Tag</label>
@@ -337,7 +337,7 @@ const AssetForm = ({ fetchAssets }) => {
         </div>
         </div>
 
-        <div className="d-flex justify-content-end gap-2 mt-4">
+        <div className="form-modal-footer">
           <button title="Save Asset" type="submit" className="btn btn-form-green">Save</button>
         </div>
       </form>

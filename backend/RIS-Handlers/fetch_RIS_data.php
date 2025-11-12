@@ -21,8 +21,16 @@ try {
         JOIN unit u ON usr.unit_ID = u.unit_ID
         JOIN ris_tag_type rt ON r.ris_tag_ID = rt.ris_tag_ID
         WHERE r.ris_status != 'inactive'
-        ORDER by created_at DESC
-    ");
+        ORDER BY 
+            CASE 
+                WHEN r.ris_status = 'pending' THEN 1
+                WHEN r.ris_status = 'issuing' THEN 2
+                WHEN r.ris_status = 'cancelled' THEN 3
+                WHEN r.ris_status = 'completed' THEN 4
+                ELSE 5
+            END,
+            r.created_at DESC;
+        ");
     $stmt->execute();
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

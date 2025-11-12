@@ -105,7 +105,7 @@ const RequisitionIssueDetails = ({ risID, refreshTable }) => {
   return (
     <div>
       <form>
-        <div className="row g-3">
+        <div className="row g-3 mb-3">
           {/* Header Info */}
           <div className="col-md-4">
             <label className="form-label fw-bold">RIS No.</label>
@@ -226,7 +226,7 @@ const RequisitionIssueDetails = ({ risID, refreshTable }) => {
 
         {/* Cancel Button */}
         {header.ris_status === "pending" && (
-          <div className="text-end mt-3">
+          <div className="form-modal-footer">
             <button
               type="button"
               className="btn btn-form-red"

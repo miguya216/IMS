@@ -167,7 +167,7 @@ const ReservationBorrowing = () => {
               <th>Date & Time of Use</th>
               <th>Date & Time of Return</th>
               <th>Status</th>
-              <th>Action</th>
+              <th>Details</th>
             </tr>
           </thead>
           <tbody>
@@ -204,7 +204,7 @@ const ReservationBorrowing = () => {
                         item.brs_status.slice(1)}
                     </span>
                   </td>
-                  <td data-label="Action">
+                  <td data-label="Details">
                     <div className="action-btn-group">
                       <button
                         title="More"

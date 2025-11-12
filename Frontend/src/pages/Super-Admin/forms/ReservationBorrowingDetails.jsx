@@ -564,7 +564,7 @@ const validateAssets = () => {
           )}
        
 
-        <div className="text-end mt-3">
+        <div className="form-modal-footer">
           {reservation.brs_status !== "cancelled" &&
             originalAssets.some(
               (a) =>

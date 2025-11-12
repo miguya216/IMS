@@ -20,7 +20,16 @@ try {
             rb.brs_status
         FROM reservation_borrowing rb
         INNER JOIN user u ON rb.user_ID = u.user_ID
-        ORDER BY rb.created_at DESC
+        ORDER BY
+            CASE
+                WHEN rb.brs_status = 'pending' THEN 1
+                WHEN rb.brs_status = 'issuing' THEN 2
+                WHEN rb.brs_status = 'on-going' THEN 3
+                WHEN rb.brs_status = 'cancelled' THEN 4
+                WHEN rb.brs_status = 'completed' THEN 5
+                ELSE 6
+            END,
+        rb.created_at DESC
     ");
     
     $stmt->execute();

@@ -126,7 +126,7 @@ const TransferAccountability = () => {
 
   // -------------- END SELECTION LOGIC ----------------
 
-  // Commit → Preview
+  // Transmit → Preview
   const handleTransfer = async () => {
   if (selectedFromUser === selectedToUser) {
     setResponseTitle("⚠️ Invalid Input");
@@ -277,14 +277,18 @@ const TransferAccountability = () => {
     }
   };
 
-  // Render
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, assets]);
+
   return (
     <>
       <h3>Property Transfer</h3>
       <div className="form-panel container-fluid p-3 rounded shadow-sm">
         <div className="row g-3 align-items-end">
           {/* From User */}
-          <div title="Select a user to view their items for transfer" className="col-md-2" >
+          <div title="Select a user to view their items for transfer" className="col-auto" >
             <label htmlFor="fromUser" className="form-label fw-semibold d-none d-md-block">
               Select From Accountable:
             </label>
@@ -299,7 +303,7 @@ const TransferAccountability = () => {
           </div>
 
           {/* To User */}
-          <div title="Select the user to assign responsibility for this asset" className="col-md-2">
+          <div title="Select the user to assign responsibility for this asset" className="col-auto">
             <label htmlFor="toUser" className="form-label fw-semibold d-none d-md-block">
               Select To Accountable:
             </label>
@@ -314,7 +318,7 @@ const TransferAccountability = () => {
           </div>
 
           {/* Transfer Type */}
-          <div title="Specify the transfer type" className="col-md-2">
+          <div title="Specify the transfer type" className="col-auto">
             <label htmlFor="transferType" className="form-label fw-semibold d-none d-md-block">
               Select Transfer Type:
             </label>
@@ -327,8 +331,16 @@ const TransferAccountability = () => {
               isClearable
             />
           </div>
+          
+          <div className="col-auto">
+            <button title="Preview the PDF" onClick={handleTransfer} className="btn btn-form-green"
+              disabled={!selectedFromUser || !selectedToUser || !selectedTransferType || selectedAssets.length === 0}
+            >
+              Transmit
+            </button>
+          </div>
 
-          <div className="col-md-2">
+          <div className="col d-flex justify-content-end align-items-center gap-2">
             <div className="position-relative">
               <input
                 title="Search by description name or tag"
@@ -357,35 +369,12 @@ const TransferAccountability = () => {
               Scan QR
             </button>
           </div>
-
-          <div className="col-auto">
-            <button title="Preview the PDF" onClick={handleTransfer} className="btn btn-form-green"
-              disabled={!selectedFromUser || !selectedToUser || !selectedTransferType || selectedAssets.length === 0}
-            >
-              Commit
-            </button>
-          </div>
-
-          <QRScannerModal isOpen={showQRScanner} onClose={() => setShowQRScanner(false)} onScanSuccess={handleQRSuccess} onScanError={(err) => console.error("QR Error:", err)} />
-
-          {/* PDF Preview Modal */}
-          <Modalbigger isOpen={showPdfPreview} onClose={() => setShowPdfPreview(false)} title="PDF Preview" footer={<button className="btn btn-form-green" onClick={handleConfirmDownloadClick}>Confirm Transaction</button>}>
-            <div style={{ height: "80vh" }}>
-              {pdfPreviewUrl && <iframe src={pdfPreviewUrl} title="PDF Preview" width="100%" height="100%" style={{ border: "none" }} />}
-            </div>
-          </Modalbigger>
-
-          <Modalbigger isOpen={showAssetPdfPreview} onClose={() => setShowAssetPdfPreview(false)} title="Asset PDF Preview" footer={<button className="btn btn-form-green" onClick={() => { const link = document.createElement("a"); link.href = pdfPreviewUrl; link.download = selectedPDFName; link.click(); }}>Download PDF</button>}>
-            <div style={{ height: "80vh" }}>
-              {pdfPreviewUrl && <iframe src={pdfPreviewUrl} title="Asset PDF Preview" width="100%" height="100%" style={{ border: "none" }} />}
-            </div>
-          </Modalbigger>
         </div>
       </div>
 
       <div className="row mt-4">
         {/* Left: Available Assets */}
-        <div className="col-md-6">
+        <div className="col-md-6 border border-dark p-3">
           <h5 className="mb-3">Available Assets</h5>
 
           {/* Global Select All (filtered) */}
@@ -467,7 +456,7 @@ const TransferAccountability = () => {
         </div>
 
         {/* Right: Selected Assets */}
-        <div className="col-md-6">
+        <div className="col-md-6 border border-dark p-3">
           <h5 className="mb-5">Selected Assets</h5>
 
           {currentSelectedAssets.length > 0 ? (
@@ -525,6 +514,21 @@ const TransferAccountability = () => {
           {selectedTotalPages > 1 && <Pagination currentPage={selectedCurrentPage} totalPages={selectedTotalPages} onPageChange={(page) => setSelectedCurrentPage(page)} />}
         </div>
       </div>
+
+      <QRScannerModal isOpen={showQRScanner} onClose={() => setShowQRScanner(false)} onScanSuccess={handleQRSuccess} onScanError={(err) => console.error("QR Error:", err)} />
+
+      {/* PDF Preview Modal */}
+      <Modalbigger isOpen={showPdfPreview} onClose={() => setShowPdfPreview(false)} title="PDF Preview" footer={<button className="btn btn-form-green" onClick={handleConfirmDownloadClick}>Confirm Transaction</button>}>
+        <div style={{ height: "80vh" }}>
+          {pdfPreviewUrl && <iframe src={pdfPreviewUrl} title="PDF Preview" width="100%" height="100%" style={{ border: "none" }} />}
+        </div>
+      </Modalbigger>
+
+      <Modalbigger isOpen={showAssetPdfPreview} onClose={() => setShowAssetPdfPreview(false)} title="Asset PDF Preview" footer={<button className="btn btn-form-green" onClick={() => { const link = document.createElement("a"); link.href = pdfPreviewUrl; link.download = selectedPDFName; link.click(); }}>Download PDF</button>}>
+        <div style={{ height: "80vh" }}>
+          {pdfPreviewUrl && <iframe src={pdfPreviewUrl} title="Asset PDF Preview" width="100%" height="100%" style={{ border: "none" }} />}
+        </div>
+      </Modalbigger>
 
       <Popups
         showConfirmYesNo={showConfirmYesNo}

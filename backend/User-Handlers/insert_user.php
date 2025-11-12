@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $account_ID = isset($_SESSION['user']['user_ID']) ? intval($_SESSION['user']['user_ID']) : null;
 
     $response = $user->insertNewUser(
-        $account_ID,                       // who performed the action
+        $account_ID,                       
         $data['role'] ?? '',
         $data['kld_email'] ?? '',
         $data['password'] ?? '',
@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data['first_name'] ?? '',
         $data['middle_name'] ?? '',
         $data['last_name'] ?? '',
-        $data['new_unit'] ?: $data['unit'] // Use new unit name if provided
+        $data['new_unit'] ?: $data['unit'] 
     );
 
     echo json_encode([

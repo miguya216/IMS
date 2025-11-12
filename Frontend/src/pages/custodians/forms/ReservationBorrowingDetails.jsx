@@ -288,7 +288,7 @@ const ReservationBorrowingDetails = ({ brsID, refreshTable, onClose }) => {
             <p>No assets found for this reservation.</p>
           )}
 
-        <div className="text-end mt-3">
+        <div className="form-modal-footer">
           {reservation.brs_status === "pending" && (
             <button
               type="button"
