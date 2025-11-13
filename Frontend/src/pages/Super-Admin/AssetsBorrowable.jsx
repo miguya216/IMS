@@ -153,6 +153,7 @@ const Assets = () => {
   };
 
   const handlePDFPreview = async (assetID) => {
+    setShowLoading(true);
   try {
     if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl);
 
@@ -163,9 +164,13 @@ const Assets = () => {
       setShowPdfPreview(true);
     } else {
       console.error("Failed to generate Asset PDF");
+      setShowLoading(false);
     }
   } catch (err) {
     console.error("PDF preview error:", err);
+    setShowLoading(false);
+  } finally { 
+    setShowLoading(false);
   }
 };
 
@@ -462,9 +467,8 @@ const Assets = () => {
               onCloseResponse={() => setShowResponse(false)}
 
               showLoading={showLoading}
-              loadingText="Generating PDF, please wait..."
+              loadingText="Generating Property Card PDF, please wait..."
             />
-
       </div>
   );
 };

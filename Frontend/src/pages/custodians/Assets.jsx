@@ -4,10 +4,12 @@ import React, { useState, useEffect, useRef} from "react";
 import TableControls from "../../components/TableControls";
 import Pagination from "../../components/Pagination";
 import Modal from '/src/components/Modal.jsx'
+import Modalbigger from "/src/components/Modal-bigger.jsx";
 import Popups from "/src/components/Popups.jsx";
 import AssetForm from '/src/pages/Super-admin/forms/AssetForm.jsx'
 import AssetDetails from '/src/pages/custodians/forms/AssetDetails.jsx';
 import AssetImport from "/src/pages/Super-admin/forms/functions/AssetImportCsv";
+import { generateAssetPDF } from "/src/pages/Super-admin/forms/functions/GenerateAssetPDF.jsx";
 import { useWebSocketContext } from "/src/layouts/context/WebSocketProvider";
 
 const Assets = () => {
@@ -21,12 +23,14 @@ const Assets = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedAssetID, setSelectedAssetID] = useState(null);
-  const [showConfirmYesNo, setShowConfirmYesNo] = useState(false);
-  const [assetToDelete, setAssetToDelete] = useState(null);
-  const [showResponse, setShowResponse] = useState(false);
-  const [responseMessage, setResponseMessage] = useState("");
   const assetImportRef = useRef();
   const [selectedRow, setSelectedRow] = useState(null);
+  const [showPdfPreview, setShowPdfPreview] = useState(false);
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState(null);
+  const [selectedPDFName, setSelectedPDFName] = useState("");
+  const [showLoading, setShowLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState("");
+
 
   const handleImport = () => {
     assetImportRef.current?.importCsv();
@@ -73,40 +77,35 @@ const Assets = () => {
     }
   }, [lastMessage]);
 
-  const handleDeleteClick = (assetID) => {
-    setAssetToDelete(assetID);
-    setShowConfirmYesNo(true);
-  };
-
-  const confirmDelete = () => {
-  setShowConfirmYesNo(false);
-
-  fetch(`/api/Assets-Handlers/delete_asset.php?id=${assetToDelete}`, {
-    method: "DELETE",
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      setResponseMessage(data.message || "Asset deleted successfully.");
-      setShowResponse(true);
-      fetchAssets(); // Reload data from server
-    })
-    .catch((err) => {
-      console.error("Delete failed:", err);
-      setResponseMessage("Failed to delete asset.");
-      setShowResponse(true);
-    });
-};
-
-
-  const cancelDelete = () => {
-    setAssetToDelete(null);
-    setShowConfirmYesNo(false);
-  };
-  
   const handleExport = () => {
     window.open("/api/Assets-Handlers/export_assets.php", "_blank");
   };
 
+  
+  const handlePDFPreview = async (assetID) => {
+    setLoadingText("Generating Property Card PDF, please wait...");
+    setShowLoading(true);
+  
+    try {
+      if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl);
+  
+      const result = await generateAssetPDF(assetID);
+      if (result) {
+        setPdfPreviewUrl(result.url);
+        setSelectedPDFName(result.filename);
+        setShowPdfPreview(true);
+      } else {
+        console.error("Failed to generate Asset PDF");
+        setShowLoading(false);
+      }
+    } catch (err) {
+      console.error("PDF preview error:", err);
+      setShowLoading(false);
+    } finally {
+      setShowLoading(false);
+    }
+  };
+  
 
   // Register global function to reload from anywhere
   useEffect(() => {
@@ -209,16 +208,17 @@ const Assets = () => {
                             className="action-icon"
                           />
                         </button>
-                        {/* <button
-                          className="action-btn"
-                          onClick={() => handleDeleteClick(asset.asset_ID)}
-                        >
-                          <img
-                            src="/resources/imgs/delete.png"
-                            alt="Delete"
-                            className="action-icon"
-                          />
-                        </button> */}
+                        <button
+                            title="Property Card"
+                            className="action-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handlePDFPreview(asset.asset_ID);
+                              setSelectedRow(asset.asset_ID);
+                            }}
+                          >
+                            <img src="/resources/imgs/pdf-icon.png" alt="PDF" className="action-icon" />
+                        </button>
                       </div>
                     </td>
 
@@ -252,18 +252,40 @@ const Assets = () => {
               />
             </Modal>
 
-            <Popups
-              showConfirmYesNo={showConfirmYesNo}
-              confirmYesNoTitle="Delete Asset"
-              confirmYesNoBody="Are you sure you want to archive this asset?"
-              confirmYesLabel="Yes, Delete"
-              confirmNoLabel="Cancel"
-              onConfirmYes={confirmDelete}
-              onConfirmNo={cancelDelete}
+            <Modalbigger
+              isOpen={showPdfPreview}
+              onClose={() => setShowPdfPreview(false)}
+              title="Asset Details PDF Preview"
+              footer={
+                <button
+                  className="btn btn-form-green"
+                  onClick={() => {
+                    const link = document.createElement("a");
+                    link.href = pdfPreviewUrl;
+                    link.download = selectedPDFName;
+                    link.click();
+                  }}
+                >
+                  Download PDF
+                </button>
+              }
+            >
+              <div style={{ height: "80vh" }}>
+                {pdfPreviewUrl && (
+                  <iframe
+                    src={pdfPreviewUrl}
+                    title="Asset Details PDF Preview"
+                    width="100%"
+                    height="100%"
+                    style={{ border: "none" }}
+                  />
+                )}
+              </div>
+            </Modalbigger>
 
-              showResponse={showResponse}
-              responseMessage={responseMessage}
-              onCloseResponse={() => setShowResponse(false)}
+            <Popups
+              showLoading={showLoading}
+              loadingText={loadingText || "Generating PDF, please wait..."}
             />
 
       </div>

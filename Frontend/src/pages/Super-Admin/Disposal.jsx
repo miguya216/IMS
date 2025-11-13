@@ -4,12 +4,14 @@ import Modal from "/src/components/Modal";
 import Modalbigger from "/src/components/Modal-bigger";
 import DisposalForm from "/src/pages/Super-admin/forms/DisposalForm";
 import { generateDisposalPDF } from "/src/pages/Super-admin/forms/functions/GenerateDisposalPDF.jsx";
-import Pagination from "/src/components/Pagination"; //  import pagination
+import Pagination from "/src/components/Pagination";
+import Popups from "/src/components/Popups";
 
 const Disposal = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [disposals, setDisposals] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showLoading, setShowLoading] = useState(false);
 
   // search state
   const [searchQuery, setSearchQuery] = useState("");
@@ -47,10 +49,12 @@ const Disposal = () => {
 
   // PDF preview logic
   const handlePDFPreview = async (disposalID) => {
+    setShowLoading(true);
+
     try {
       if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl);
 
-      const result = await generateDisposalPDF(disposalID); // returns { url, filename }
+      const result = await generateDisposalPDF(disposalID); 
       if (result) {
         setPdfPreviewUrl(result.url);
         setSelectedPDFName(result.filename);
@@ -60,6 +64,10 @@ const Disposal = () => {
       }
     } catch (err) {
       console.error("PDF preview error:", err);
+      setShowLoading(false);
+    }
+    finally{
+      setShowLoading(false);
     }
   };
 
@@ -207,6 +215,11 @@ const Disposal = () => {
           )}
         </div>
       </Modalbigger>
+
+      <Popups
+        showLoading={showLoading}
+        loadingText="Generating Disposal Form PDF..."
+      />
     </>
   );
 };

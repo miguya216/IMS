@@ -8,6 +8,7 @@ import ReservationBorrowingDetails from "/src/pages/custodians/forms/Reservation
 import { generateBRSPDF } from "/src/pages/Super-Admin/forms/functions/GenerateBRSPDF";
 import { useWebSocketContext } from "/src/layouts/context/WebSocketProvider";
 import Pagination from "/src/components/Pagination";
+import Popups from "/src/components/Popups";
 
 const ReservationBorrowing = () => {
   const location = useLocation();
@@ -19,6 +20,7 @@ const ReservationBorrowing = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [brsList, setBrsList] = useState([]); 
   const [loading, setLoading] = useState(false);
+  const [showLoading, setShowLoading] = useState(false);
   const [isDetailModal, setDetailModal] = useState(false);
   const [selectedBrsId, setSelectBrsId] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null);
@@ -93,6 +95,7 @@ const ReservationBorrowing = () => {
 
    // Handle PDF preview (same logic as RIS)
   const handlePDFPreview = async (brsId) => {
+    setShowLoading(true);
     try {
       if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl); // clear previous blob
       const result = await generateBRSPDF(brsId);
@@ -102,9 +105,13 @@ const ReservationBorrowing = () => {
         setShowPdfPreview(true);
       } else {
         console.error("Failed to generate BRS PDF");
+        setShowLoading(false);
       }
     } catch (err) {
       console.error("PDF preview error:", err);
+      setShowLoading(false);
+    } finally {
+      setShowLoading(false);
     }
   };
 
@@ -125,6 +132,18 @@ const ReservationBorrowing = () => {
   const indexOfFirst = indexOfLast - itemsPerPage;
   const currentItems = filteredBrsList.slice(indexOfFirst, indexOfLast);
   const totalPages = Math.ceil(filteredBrsList.length / itemsPerPage);
+
+  // helper function
+  const toStandardTime = (time) => {
+    if (!time) return "";
+    const [hourStr, minuteStr] = time.split(":");
+    let hour = parseInt(hourStr);
+    const minute = parseInt(minuteStr);
+    const ampm = hour >= 12 ? "PM" : "AM";
+    hour = hour % 12 || 12; // convert "0" or "12" to "12"
+    return `${hour}:${minute.toString().padStart(2, "0")} ${ampm}`;
+  };
+
 
   return (
     <>
@@ -171,10 +190,10 @@ const ReservationBorrowing = () => {
                   <td data-label="BRS no">{item.brs_no}</td>
                   <td data-label="Date Requested">{item.date_requested}</td>
                   <td data-label="Date & Time of use">
-                    {item.date_of_use} {item.time_of_use}
+                    {item.date_of_use} {toStandardTime(item.time_of_use)}
                   </td>
                   <td data-label="Date & Time of return">
-                    {item.date_of_return} {item.time_of_return}
+                    {item.date_of_return} {toStandardTime(item.time_of_return)}
                   </td>
                   <td data-label="Status">
                     <span className={`status-badge ${item.brs_status}`}>
@@ -290,6 +309,11 @@ const ReservationBorrowing = () => {
           )}
         </div>
       </Modalbigger>
+
+      <Popups 
+        showLoading={showLoading}
+        loadingText="Generating BRS form PDF, please wait..."
+      />
     </>
   );
 };

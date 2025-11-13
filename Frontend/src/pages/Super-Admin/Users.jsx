@@ -26,6 +26,8 @@ const Users = () => {
   const [showPdfPreview, setShowPdfPreview] = useState(false);
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState(null);
   const [selectedPDFName, setSelectedPDFName] = useState("");
+  const [showLoading, setShowLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState("");
   const [selectedRow, setSelectedRow] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 7;
@@ -122,6 +124,13 @@ const Users = () => {
   // 🔹 Unified PDF Preview Handler
   const handlePDFPreview = async (type, user_ID) => {
     try {
+      // Set dynamic loading text
+      if (type === "EAF") setLoadingText("Generating EAF PDF, please wait...");
+      if (type === "PAR") setLoadingText("Generating PAR PDF, please wait...");
+      if (type === "ICS") setLoadingText("Generating ICS PDF, please wait...");
+
+      setShowLoading(true);
+      
       if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl);
 
       let result = null;
@@ -135,9 +144,13 @@ const Users = () => {
         setShowPdfPreview(true);
       } else {
         console.error(`Failed to generate ${type} PDF`);
+        setShowLoading(false);
       }
     } catch (err) {
       console.error("PDF preview error:", err);
+      setShowLoading(false);
+    } finally {
+      setShowLoading(false);
     }
   };
 
@@ -251,7 +264,7 @@ const Users = () => {
                       </div>
                     </td>
 
-                    <td data-label="">
+                    <td data-label="Action">
                       <div className="action-btn-group">
                         <button
                           title="More"
@@ -357,6 +370,9 @@ const Users = () => {
         responseTitle={responseTitle}
         responseMessage={responseMessage}
         onCloseResponse={() => setShowResponse(false)}
+
+        showLoading={showLoading}
+        loadingText={loadingText}
       />
     </div>
   );

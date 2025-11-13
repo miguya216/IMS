@@ -3,6 +3,7 @@ import TableControls from "/src/components/TableControls";
 import Modal from "/src/components/Modal";
 import Modalbigger from "/src/components/Modal-bigger";
 import Pagination from "/src/components/Pagination"; 
+import Popups from "/src/components/Popups"; 
 import RequisitionIssuanceForm from "/src/pages/custodians/forms/RequisitionIssueForm.jsx";
 import RequisitionIssueDetails from "/src/pages/Super-admin/forms/RequisitionIssueDetails.jsx";
 import { generateRISPDF } from "/src/pages/Super-admin/forms/functions/GenerateRISPDF.jsx";
@@ -22,6 +23,7 @@ const RequisitionIssuance = () => {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [risList, setRisList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showLoading, setShowLoading] = useState(false);
   const [selectedRIS, setSelectedRIS] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null); // for active row
 
@@ -124,6 +126,8 @@ const RequisitionIssuance = () => {
   const totalPages = Math.ceil(filteredRisList.length / itemsPerPage);
 
   const handlePDFPreview = async (risID) => {
+    setShowLoading(true);
+
     try {
       if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl);
 
@@ -137,6 +141,10 @@ const RequisitionIssuance = () => {
       }
     } catch (err) {
       console.error("PDF preview error:", err);
+      setShowLoading(false);
+    }
+    finally{
+      setShowLoading(false);
     }
   };
 
@@ -300,7 +308,11 @@ const RequisitionIssuance = () => {
           )}
         </div>
       </Modalbigger>
-
+      
+      <Popups 
+        showLoading={showLoading}
+        loadingText="Generating RIS form PDF..."
+      />
     </>
   );
 };

@@ -8,6 +8,7 @@ import RequisitionIssuanceForm from "/src/pages/custodians/forms/RequisitionIssu
 import RequisitionIssueDetails from "/src/pages/custodians/forms/RequisitionIssueDetails.jsx";
 import { generateRISPDF } from "/src/pages/Super-admin/forms/functions/GenerateRISPDF.jsx";
 import { useWebSocketContext } from "/src/layouts/context/WebSocketProvider";
+import Popups from "/src/components/Popups";
 
 const RequisitionIssuance = () => {
   const location = useLocation();
@@ -20,6 +21,7 @@ const RequisitionIssuance = () => {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [risList, setRisList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showLoading, setShowLoading] = useState(false);
   const [selectedRIS, setSelectedRIS] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null);
 
@@ -100,6 +102,7 @@ const RequisitionIssuance = () => {
   const totalPages = Math.ceil(filteredRisList.length / itemsPerPage);
 
   const handlePDFPreview = async (risID) => {
+    setShowLoading(true);
     try {
       if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl);
 
@@ -110,9 +113,13 @@ const RequisitionIssuance = () => {
         setShowPdfPreview(true);
       } else {
         console.error("Failed to generate PDF");
+        setShowLoading(false);
       }
     } catch (err) {
       console.error("PDF preview error:", err);
+      setShowLoading(false);
+    } finally {
+      setShowLoading(false);
     }
   };
 
@@ -249,6 +256,19 @@ const RequisitionIssuance = () => {
         isOpen={showPdfPreview}
         onClose={() => setShowPdfPreview(false)}
         title="RIS PDF Preview"
+        footer={
+           <button
+                className="btn btn-form-green"
+                onClick={() => {
+                  const link = document.createElement("a");
+                  link.href = pdfPreviewUrl;
+                  link.download = selectedPDFName; // use dynamic filename
+                  link.click();
+                }}
+              >
+                Download PDF
+              </button>
+        }
       >
         <div style={{ height: "80vh" }}>
           {pdfPreviewUrl && (
@@ -260,22 +280,13 @@ const RequisitionIssuance = () => {
               style={{ border: "none" }}
             />
           )}
-          {/* Download button overlay */}
-          <div className="d-flex justify-content-end gap-2 mt-3">
-              <button
-                className="btn btn-form-green"
-                onClick={() => {
-                  const link = document.createElement("a");
-                  link.href = pdfPreviewUrl;
-                  link.download = selectedPDFName; // use dynamic filename
-                  link.click();
-                }}
-              >
-                Download PDF
-              </button>
-          </div>  
         </div>
       </Modalbigger>
+
+      <Popups 
+        showLoading={showLoading}
+        loadingText="Generating RIS form PDF, please wait..."
+      />
     </>
   );
 };

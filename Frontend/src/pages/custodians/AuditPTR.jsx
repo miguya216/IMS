@@ -4,9 +4,11 @@ import Modalbigger from "/src/components/Modal-bigger";
 import { AuditPTRPDF } from "/src/pages/Super-admin/forms/functions/AuditPTRPDF.jsx";
 import Pagination from "/src/components/Pagination"; // import your pagination
 import { useLocation } from "react-router-dom";
+import Popups from "/src/components/Popups";
 
 const AuditPTR = () => {
   const [role, setRole] = useState(null);
+  const [showLoading, setShowLoading] = useState(false);
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -84,6 +86,7 @@ const AuditPTR = () => {
 
   // PDF preview
   const handlePDFPreview = async (ptr_ID) => {
+    setShowLoading(true);
     try {
       if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl);
 
@@ -94,9 +97,13 @@ const AuditPTR = () => {
         setShowPdfPreview(true);
       } else {
         console.error("Failed to generate PTR PDF");
+        setShowLoading(false);
       }
     } catch (err) {
       console.error("PDF preview error:", err);
+      setShowLoading(false);
+    } finally {
+      setShowLoading(false);
     }
   };
 
@@ -240,6 +247,11 @@ const AuditPTR = () => {
           )}
         </div>
       </Modalbigger>
+
+      <Popups 
+        showLoading={showLoading}
+        loadingText="Generating Property Transfer Report PDF, please wait..."
+      />
     </>
   );
 };

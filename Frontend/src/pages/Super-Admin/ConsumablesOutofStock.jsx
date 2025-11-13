@@ -317,7 +317,7 @@ const ConsumablesOutofStock = () => {
         onCloseResponse={() => setShowResponse(false)}
 
         showLoading={showLoading}
-        loadingText="Generating PDF, please wait..."
+        loadingText="Generating Stock Card PDF, please wait..."
       />
     </div>
   );

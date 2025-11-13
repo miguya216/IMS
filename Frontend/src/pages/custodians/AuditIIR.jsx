@@ -3,10 +3,12 @@ import TableControls from "/src/components/TableControls";
 import Modalbigger from "/src/components/Modal-bigger";
 import Pagination from "/src/components/Pagination";
 import { AuditIIRPDF } from "/src/pages/Super-admin/forms/functions/AuditIIRPDF.jsx"; // you'll make this similar to AuditPTRPDF
+import Popups from "/src/components/Popups";
 
 const AuditIIR = () => {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showLoading, setShowLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRow, setSelectedRow] = useState(null); 
   
@@ -39,6 +41,7 @@ const AuditIIR = () => {
 
   // PDF preview
   const handlePDFPreview = async (iir_id) => {
+    setShowLoading(true);
     try {
       if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl);
 
@@ -49,9 +52,13 @@ const AuditIIR = () => {
         setShowPdfPreview(true);
       } else {
         console.error("Failed to generate IIR PDF");
+        setShowLoading(false);
       }
     } catch (err) {
       console.error("PDF preview error:", err);
+      setShowLoading(false);
+    } finally {
+      setShowLoading(false);
     }
   };
 
@@ -195,6 +202,11 @@ const AuditIIR = () => {
           )}
         </div>
       </Modalbigger>
+
+      <Popups 
+        showLoading={showLoading}
+        loadingText="Generating Inventory Inspection Report PDF, please wait..."
+      />
     </>
   );
 };

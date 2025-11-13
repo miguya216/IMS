@@ -24,6 +24,7 @@ const ConsumableArchive = () => {
   const [responseTitle, setResponseTitle] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedRow, setSelectedRow] = useState(null);
+  const [showLoading, setShowLoading] = useState(false);
 
   // pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -103,15 +104,25 @@ const ConsumableArchive = () => {
     setDetailModalOpen(true);
   };
 
+  //  Single item PDF Preview
   const handlePDFPreview = async (id) => {
-    if (pdfUrl) URL.revokeObjectURL(pdfUrl);
-    const result = await generateConsumablePDF(id);
-    if (result) {
-      setPdfUrl(result.url);
-      setPdfFilename(result.filename);
-      setPdfModalOpen(true);
-    } else {
-      console.error("Failed to generate consumable PDF");
+    try {
+      setShowLoading(true);
+
+      if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+
+      const result = await generateConsumablePDF(id);
+      if (result) {
+        setPdfUrl(result.url);
+        setPdfFilename(result.filename);
+        setPdfModalOpen(true);
+      } else {
+        console.error("Failed to generate consumable PDF");
+      }
+    } catch (err) {
+      console.error("PDF preview error:", err);
+    } finally {
+      setShowLoading(false);
     }
   };
 
@@ -310,6 +321,9 @@ const ConsumableArchive = () => {
         responseTitle={responseTitle}
         responseMessage={responseMessage}
         onCloseResponse={() => setShowResponse(false)}
+
+        showLoading={showLoading}
+        loadingText="Generating Stock Card PDF, please wait..."
       />
     </div>
   );

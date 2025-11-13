@@ -33,6 +33,7 @@ const Assets = () => {
   const [multiSelectMode, setMultiSelectMode] = useState(false);
   const [selectedAssets, setSelectedAssets] = useState([]);
   const [showLoading, setShowLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState("");
   const [selectedRow, setSelectedRow] = useState(null);
 
   const handleImport = () => {
@@ -90,7 +91,6 @@ const Assets = () => {
       });
     }
   };
-
 
   //  Exit multi-select mode
   const exitMultiSelect = () => {
@@ -164,6 +164,7 @@ const Assets = () => {
     
   const handleExport = async () => {
     try {
+      setLoadingText("Generating Asset Sticker PDF, please wait...");
       setShowLoading(true); // Show loading popup
 
       if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl);
@@ -184,7 +185,10 @@ const Assets = () => {
   };
 
 
-  const handlePDFPreview = async (assetID) => {
+const handlePDFPreview = async (assetID) => {
+  setLoadingText("Generating Property Card PDF, please wait...");
+  setShowLoading(true);
+
   try {
     if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl);
 
@@ -195,12 +199,15 @@ const Assets = () => {
       setShowPdfPreview(true);
     } else {
       console.error("Failed to generate Asset PDF");
+      setShowLoading(false);
     }
   } catch (err) {
     console.error("PDF preview error:", err);
+    setShowLoading(false);
+  } finally {
+    setShowLoading(false);
   }
 };
-
 
   // Register global function to reload from anywhere
   useEffect(() => {
@@ -333,8 +340,6 @@ const Assets = () => {
                 </button>
               </div>
             </div>
-
-
 
             <table className="custom-table">
               <thead>
@@ -499,7 +504,7 @@ const Assets = () => {
               onCloseResponse={() => setShowResponse(false)}
 
               showLoading={showLoading}
-              loadingText="Generating PDF, please wait..."
+              loadingText={loadingText || "Generating PDF, please wait..."}
             />
 
       </div>

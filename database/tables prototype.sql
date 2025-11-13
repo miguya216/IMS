@@ -1,5 +1,3 @@
--- IMS table August 14.
-
 -- Create database
 -- status (active, inactive) for soft deletion
 
@@ -265,7 +263,7 @@ CREATE TABLE ris_consumables (
 CREATE TABLE reservation_borrowing (
     brs_ID INT AUTO_INCREMENT PRIMARY KEY,
     brs_no VARCHAR (50) UNIQUE NOT NULL,
-    user_ID INT NOT NULL, -- who made the form
+    user_ID INT NOT NULL, 
     date_of_use DATE NOT NULL,
     time_of_use TIME NOT NULL,
     date_of_return DATE NOT NULL,

@@ -30,6 +30,7 @@ const Consumables = () => {
 
   const [loading, setLoading] = useState(true);
   const [showLoading, setShowLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState("");
 
   const [selectedRow, setSelectedRow] = useState(null);
 
@@ -113,6 +114,7 @@ const Consumables = () => {
   //  Show details PDF (like Assets)
   const handleExport = async () => {
     try {
+      setLoadingText("Generating Consumable Stickers PDF, please wait...");
       setShowLoading(true);
 
       if (pdfUrl) URL.revokeObjectURL(pdfUrl);
@@ -139,6 +141,7 @@ const Consumables = () => {
   //  Single item PDF Preview
   const handlePDFPreview = async (id) => {
     try {
+      setLoadingText("Generating Stock Card PDF, please wait...");
       setShowLoading(true);
 
       if (pdfUrl) URL.revokeObjectURL(pdfUrl);
@@ -353,7 +356,7 @@ const Consumables = () => {
         onCloseResponse={() => setShowResponse(false)}
 
         showLoading={showLoading}
-        loadingText="Generating PDF, please wait..."
+        loadingText={loadingText}
       />
     </div>
   );

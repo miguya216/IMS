@@ -2,11 +2,13 @@ import { useEffect, useState, useMemo } from "react";
 import TableControls from "/src/components/TableControls";
 import Pagination from "/src/components/Pagination"; // import pagination
 import Modalbigger from "/src/components/Modal-bigger"; // modal for preview
-import { AuditRoomAssignationPDF } from "/src/pages/Super-admin/forms/functions/AuditRoomAssignationPDF.jsx"; // ✅ pdf generator
+import { AuditRoomAssignationPDF } from "/src/pages/Super-admin/forms/functions/AuditRoomAssignationPDF.jsx";
+import Popups from "/src/components/Popups";
 
 const AuditRoomAssignation = () => {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showLoading, setShowLoading] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
 
   // search state
@@ -43,6 +45,7 @@ const AuditRoomAssignation = () => {
 
   // PDF preview
   const handlePDFPreview = async (room_assignation_ID) => {
+    setShowLoading(true);
     try {
       if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl);
 
@@ -53,9 +56,13 @@ const AuditRoomAssignation = () => {
         setShowPdfPreview(true);
       } else {
         console.error("Failed to generate Room Assignation PDF");
+        setShowLoading(false);
       }
     } catch (err) {
       console.error("PDF preview error:", err);
+      setShowLoading(false);
+    } finally {
+      setShowLoading(false);
     }
   };
 
@@ -127,16 +134,16 @@ const AuditRoomAssignation = () => {
               paginatedRecords.map((row) => (
                 <tr key={row.room_assignation_ID}
                  className={selectedRow === row.room_assignation_ID ? "selected-row" : ""}>
-                  <td>{row.room_assignation_no}</td>
-                  <td>{row.from_room || "Not Assigned Yet"}</td>
-                  <td>{row.to_room}</td>
-                  <td>{row.moved_by}</td>
-                  <td>
+                  <td data-label="Room Assigna. No.">{row.room_assignation_no}</td>
+                  <td data-label="From Room">{row.from_room || "Not Assigned Yet"}</td>
+                  <td data-label="To Room">{row.to_room}</td>
+                  <td data-label="Moved By">{row.moved_by}</td>
+                  <td data-label="Moved At">
                     {row.moved_at
                       ? new Date(row.moved_at).toLocaleDateString()
                       : ""}
                   </td>
-                  <td>
+                  <td data-label="PDF">
                     <div className="action-btn-group">
                       <button
                         title="View Room Assignation Record"
@@ -207,6 +214,11 @@ const AuditRoomAssignation = () => {
           )}
         </div>
       </Modalbigger>
+
+      <Popups 
+        showLoading={showLoading}
+        loadingText="Generating Room Assignation Report PDF, please wait..."
+      />
     </>
   );
 };
