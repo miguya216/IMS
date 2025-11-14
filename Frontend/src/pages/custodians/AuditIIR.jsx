@@ -25,7 +25,7 @@ const AuditIIR = () => {
   const fetchIIR = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/Inventory-Inspection-Hanlders/fetch_iir.php");
+      const res = await fetch("/api/Inventory-Inspection-Hanlders/fetch_custodian_iir.php");
       const data = await res.json();
       setRecords(data);
     } catch (err) {

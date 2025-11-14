@@ -33,7 +33,7 @@ const AuditPTR = () => {
   const fetchPTR = async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/Transfer-Form/fetch_pt_records.php");
+      const response = await fetch("/api/Transfer-Form/fetch_custodian_pt_records.php");
       const data = await response.json();
 
       if (data.success) {

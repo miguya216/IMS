@@ -14,6 +14,7 @@ try {
     $sql = "
         SELECT 
             a.asset_ID,
+            CONCAT(user.f_name, ' ', COALESCE(user.m_name, ''), ' ', user.l_name) AS accounted,
             a.kld_property_tag,
             a.property_tag,
             b.brand_name,
@@ -21,6 +22,8 @@ try {
             a.price_amount,
             ac.condition_name
         FROM asset a
+        LEFT JOIN user
+            ON a.responsible_user_ID = user.user_ID
         LEFT JOIN brand b 
             ON a.brand_ID = b.brand_ID
         LEFT JOIN asset_type at 
@@ -39,6 +42,7 @@ try {
     while ($row = $stmt->fetch()) {
         $assets[] = [
             "asset_ID"        => (int)$row["asset_ID"],
+            "accounted"       => $row["accounted"],
             "property_tag"    => $row["property_tag"],
             "kld_property_tag"=> $row["kld_property_tag"],
             "brand_name"      => $row["brand_name"],

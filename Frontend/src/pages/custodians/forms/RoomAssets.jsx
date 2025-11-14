@@ -10,7 +10,7 @@ const RoomAsset = ({ roomId }) => {
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; // adjust as needed
+  const itemsPerPage = 7; // adjust as needed
 
   useEffect(() => {
     if (!roomId) return; 
@@ -35,6 +35,7 @@ const RoomAsset = ({ roomId }) => {
   const filteredAssets = assets.filter((asset) => {
     const query = searchQuery.toLowerCase();
     return (
+      asset.accounted?.toLowerCase().includes(query) ||
       asset.kld_property_tag?.toLowerCase().includes(query) ||
       asset.brand_name?.toLowerCase().includes(query) ||
       asset.asset_type?.toLowerCase().includes(query) ||
@@ -66,6 +67,7 @@ const RoomAsset = ({ roomId }) => {
           <thead>
             <tr>
               <th>#</th>
+              <th>Accounted</th>
               <th>KLD-Property Tag</th>
               <th>Brand</th>
               <th>Asset Type</th>
@@ -84,6 +86,7 @@ const RoomAsset = ({ roomId }) => {
               currentAssets.map((asset, index) => (
                 <tr key={asset.asset_ID}>
                   <td data-label="#">{startIndex + index + 1}</td>
+                  <td data-label="Accounted">{asset.accounted}</td>
                   <td data-label="KLD-Property Tag">{asset.kld_property_tag}</td>
                   <td data-label="Brand">{asset.brand_name}</td>
                   <td data-label="Asset Type">{asset.asset_type}</td>

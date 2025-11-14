@@ -37,7 +37,7 @@
 
   /* new for truncation */
   width: auto;
-  max-width: 300px;       /* adjust width depending on your layout */
+  max-width: 270px;       /* adjust width depending on your layout */
   white-space: nowrap;    
   overflow: hidden;       
   text-overflow: ellipsis;

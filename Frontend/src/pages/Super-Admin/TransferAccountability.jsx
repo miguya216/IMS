@@ -14,7 +14,7 @@ const TransferAccountability = () => {
   const [selectedFromUser, setSelectedFromUser] = useState("");
   const [selectedToUser, setSelectedToUser] = useState("");
   const [assets, setAssets] = useState([]);
-  const [selectedAssets, setSelectedAssets] = useState([]); // stores asset_ID numbers (or strings depending on backend)
+  const [selectedAssets, setSelectedAssets] = useState([]); 
   const [currentPage, setCurrentPage] = useState(1);
   const [transferTypes, setTransferTypes] = useState([]);
   const [selectedTransferType, setSelectedTransferType] = useState("");
@@ -25,6 +25,7 @@ const TransferAccountability = () => {
   const [responseTitle, setResponseTitle] = useState("");
   const [responseMessage, setResponseMessage] = useState("");
   const [selectedPDFName, setSelectedPDFName] = useState("");
+  const [showLoading, setShowLoading] = useState(false);
 
   // pagination for selected assets
   const [selectedCurrentPage, setSelectedCurrentPage] = useState(1);
@@ -261,6 +262,7 @@ const TransferAccountability = () => {
   };
 
   const handlePDFPreview = async (assetID) => {
+    setShowLoading(true);
     try {
       if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl);
 
@@ -271,9 +273,13 @@ const TransferAccountability = () => {
         setShowAssetPdfPreview(true);
       } else {
         console.error("Failed to generate Asset PDF");
+        setShowLoading(false);
       }
     } catch (err) {
       console.error("PDF preview error:", err);
+      setShowLoading(false);
+    } finally {
+      setShowLoading(false);
     }
   };
 
@@ -414,22 +420,32 @@ const TransferAccountability = () => {
                 </div>
 
                 <div className="row">
-                  <div className="col-6 small text-muted">Date Acquired</div>
+                  <div className="col-6 small">Date Acquired</div>
                   <div className="col-6 fw-semibold">{asset.date_acquired}</div>
 
-                  <div className="col-6 small text-muted">KLD Tag</div>
+                  <hr className="my-2"/>
+
+                  <div className="col-6 small">KLD Tag</div>
                   <div className="col-6 fw-semibold">{asset.kld_property_tag}</div>
 
-                  <div className="col-6 small text-muted">Transfer Type</div>
+                  <hr className="my-2"/>
+
+                  <div className="col-6 small">Transfer Type</div>
                   <div className="col-6 fw-semibold">{asset.transfer_type_name}</div>
 
-                  <div className="col-6 small text-muted">Condition</div>
+                  <hr className="my-2"/>
+
+                  <div className="col-6 small">Condition</div>
                   <div className="col-6 fw-semibold">{asset.condition_name}</div>
 
-                  <div className="col-6 small text-muted">Description</div>
+                  <hr className="my-2"/>
+
+                  <div className="col-6 small">Description</div>
                   <div className="col-6 fw-semibold">{asset.description}</div>
 
-                  <div className="col-6 small text-muted">
+                  <hr className="my-2"/>
+
+                  <div className="col-6 small">
                     Property Card
                   </div>
                   <div className="col-6">
@@ -473,22 +489,32 @@ const TransferAccountability = () => {
                 </div>
 
                 <div className="row">
-                  <div className="col-6 small text-muted">Date Acquired</div>
+                  <div className="col-6 small">Date Acquired</div>
                   <div className="col-6 fw-semibold">{asset.date_acquired}</div>
 
-                  <div className="col-6 small text-muted">KLD Tag</div>
+                  <hr className="my-2"/>
+
+                  <div className="col-6 small">KLD Tag</div>
                   <div className="col-6 fw-semibold">{asset.kld_property_tag}</div>
 
-                  <div className="col-6 small text-muted">Transfer Type</div>
+                  <hr className="my-2"/>
+
+                  <div className="col-6 small">Transfer Type</div>
                   <div className="col-6 fw-semibold">{asset.transfer_type_name}</div>
 
-                  <div className="col-6 small text-muted">Condition</div>
+                  <hr className="my-2"/>
+
+                  <div className="col-6 small">Condition</div>
                   <div className="col-6 fw-semibold">{asset.condition_name}</div>
 
-                  <div className="col-6 small text-muted">Description</div>
+                  <hr className="my-2"/>
+
+                  <div className="col-6 small">Description</div>
                   <div className="col-6 fw-semibold">{asset.description}</div>
 
-                  <div className="col-6 small text-muted">
+                  <hr className="my-2"/>
+
+                  <div className="col-6 small">
                     Property Card
                   </div>
                   <div className="col-6">
@@ -539,11 +565,13 @@ const TransferAccountability = () => {
         onConfirmYes={handleConfirmDownloadYes}
         onConfirmNo={handleConfirmDownloadNo}
         showConfirmDone={false}
-        showLoading={false}
         showResponse={showResponse}
         responseTitle={responseTitle}
         responseMessage={responseMessage}
         onCloseResponse={() => setShowResponse(false)}
+
+        showLoading={showLoading}
+        loadingText="Generating Property Card PDF, please wait..."
       />
     </>
   );

@@ -26,7 +26,7 @@ const AuditRoomAssignation = () => {
   const fetchRoomAssignations = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/Room-Handlers/fetch_room_assignation.php");
+      const res = await fetch("/api/Room-Handlers/fetch_custodian_room_assignation.php");
       const data = await res.json();
 
       if (data.success) {

@@ -296,17 +296,25 @@ const RoomAssignation = () => {
                   </div>
 
                   <div className="row">
-                    <div className="col-6 small text-muted">KLD-Property Tag</div>
+                    <div className="col-6 small">KLD-Property Tag</div>
                     <div className="col-6 fw-semibold">{asset.kld_property_tag}</div>
 
-                    <div className="col-6 small text-muted">Room</div>
+                    <hr className="my-2"/>
+
+                    <div className="col-6 small">Room</div>
                     <div className="col-6 fw-semibold">{asset.room}</div>
 
-                    <div className="col-6 small text-muted">Brand</div>
+                    <hr className="my-2"/>
+
+                    <div className="col-6 small">Brand</div>
                     <div className="col-6 fw-semibold">{asset.brand}</div>
 
-                    <div className="col-6 small text-muted">Asset Type</div>
+                    <hr className="my-2"/>
+
+                    <div className="col-6 small">Asset Type</div>
                     <div className="col-6 fw-semibold">{asset.asset_type}</div>
+
+                    <hr className="my-2"/>
                   </div>
                 </div>
               ))
@@ -345,17 +353,25 @@ const RoomAssignation = () => {
                     </div>
 
                     <div className="row">
-                      <div className="col-6 small text-muted">KLD-Property Tag</div>
+                      <div className="col-6 small">KLD-Property Tag</div>
                       <div className="col-6 fw-semibold">{asset.kld_property_tag}</div>
 
-                      <div className="col-6 small text-muted">Room</div>
+                      <hr className="my-2"/>
+
+                      <div className="col-6 small">Room</div>
                       <div className="col-6 fw-semibold">{asset.room}</div>
 
-                      <div className="col-6 small text-muted">Brand</div>
+                      <hr className="my-2"/>
+
+                      <div className="col-6 small">Brand</div>
                       <div className="col-6 fw-semibold">{asset.brand}</div>
 
-                      <div className="col-6 small text-muted">Asset Type</div>
+                      <hr className="my-2"/>
+
+                      <div className="col-6 small">Asset Type</div>
                       <div className="col-6 fw-semibold">{asset.asset_type}</div>
+
+                      <hr className="my-2"/>
                     </div>
                   </div>
                 ))
