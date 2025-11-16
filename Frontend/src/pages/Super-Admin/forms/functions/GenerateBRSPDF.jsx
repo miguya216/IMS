@@ -61,10 +61,22 @@ export const generateBRSPDF = async (brsID) => {
 
     // Background layer (z-index 0)
     const drawBackground = () => {
-      if (headerFooterImg) {
-        doc.addImage(headerFooterImg, "PNG", 0, 0, pageWidth, pageHeight);
-      }
+      if (!headerFooterImg) return;
+      // draw image now on current page (this will be underneath any later drawings)
+      doc.addImage(headerFooterImg, "PNG", 0, 0, pageWidth, pageHeight);
     };
+
+     // --- OVERRIDE addPage so every time a new page is created we draw the bg first ---
+    const originalAddPage = doc.addPage.bind(doc);
+    doc.addPage = (...args) => {
+      originalAddPage(...args);
+      // draw background immediately on the newly created page
+      drawBackground();
+      return doc;
+    };
+
+    // Draw background on FIRST PAGE before anything else
+    drawBackground();
 
     // --- Table and content ---
     const checkBoxImg = new Image();
@@ -73,6 +85,7 @@ export const generateBRSPDF = async (brsID) => {
 
     autoTable(doc, {
       startY: 97, // pushed down for header
+      margin: { top: 48, bottom: 20},
       head: [
         [
           { content: "Asset for Reservation / Borrowing", colSpan: 3, styles: { halign: "center", valign: "middle" } },
@@ -101,6 +114,7 @@ export const generateBRSPDF = async (brsID) => {
         item.return_asset_remarks || "",
       ]),
       styles: {
+        fillColor: false,
         font: "helvetica",
         fontSize: 9,
         textColor: [0, 0, 0],
@@ -110,18 +124,13 @@ export const generateBRSPDF = async (brsID) => {
         valign: "middle",
       },
       headStyles: {
-        fillColor: [255, 255, 255],
+        fillColor: false,
         textColor: [0, 0, 0],
         fontStyle: "bold",
         lineColor: [0, 0, 0],
         lineWidth: 0.5,
       },
       theme: "grid",
-
-      // Background first
-      willDrawPage: () => {
-        drawBackground();
-      },
 
       // Foreground text
       didDrawPage: (dataArg) => {
@@ -178,7 +187,7 @@ export const generateBRSPDF = async (brsID) => {
     });
 
     // --- Signature Table ---
-    const nextY = doc.lastAutoTable.finalY + 2;
+    const nextY = doc.lastAutoTable.finalY + 3;
     const signHead = [
       [
         { content: "", styles: { halign: "center" } },
@@ -199,10 +208,12 @@ export const generateBRSPDF = async (brsID) => {
 
     autoTable(doc, {
       startY: nextY,
+      margin: { top: 48, bottom: 20},
       head: signHead,
       body: signBody,
       theme: "grid",
       styles: {
+        fillColor: false,
         font: "helvetica",
         fontSize: 9,
         textColor: [0, 0, 0],
@@ -212,7 +223,7 @@ export const generateBRSPDF = async (brsID) => {
         valign: "middle",
       },
       headStyles: {
-        fillColor: [255, 255, 255],
+        fillColor: false,
         textColor: [0, 0, 0],
         fontStyle: "bold",
       },

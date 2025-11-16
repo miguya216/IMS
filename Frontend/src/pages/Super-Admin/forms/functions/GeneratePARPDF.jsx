@@ -48,11 +48,13 @@ export async function generatePARPDF(user_ID) {
     ]);
 
     autoTable(doc, {
-      startY: 80, // move down to leave space for title/header
+      startY: 80, 
+      margin: { top: 48, bottom: 20},
       head: [["Description", "KLD Property Tag", "Date Transferred", "Amount"]],
       body: tableBody,
       theme: "grid",
       styles: { 
+        fillColor: false,
         fontSize: 8,
         cellPadding: 3,
         textColor: [0,0,0],
@@ -61,7 +63,7 @@ export async function generatePARPDF(user_ID) {
       },
       headStyles: { 
         fontStyle: "bold",
-        fillColor: [255,255,255],
+        fillColor: false,
         textColor: [0,0,0],
         lineColor: [0,0,0],
         lineWidth: 0.3,
@@ -112,7 +114,8 @@ export async function generatePARPDF(user_ID) {
           doc.setFont("helvetica", "normal");
           doc.text(`${assets.length}`, 41, yPos);
         }
-      }
+      },
+      rowPageBreak: 'avoid',
     });
 
     // Export

@@ -44,10 +44,22 @@ export const generateRISPDF = async (risID) => {
 
     // Function to draw background
     const drawBackground = () => {
-      if (headerFooterImg) {
-        doc.addImage(headerFooterImg, "PNG", 0, 0, pageWidth, pageHeight);
-      }
+      if (!headerFooterImg) return;
+      // draw image now on current page (this will be underneath any later drawings)
+      doc.addImage(headerFooterImg, "PNG", 0, 0, pageWidth, pageHeight);
     };
+
+    // --- OVERRIDE addPage so every time a new page is created we draw the bg first ---
+    const originalAddPage = doc.addPage.bind(doc);
+    doc.addPage = (...args) => {
+      originalAddPage(...args);
+      // draw background immediately on the newly created page
+      drawBackground();
+      return doc;
+    };
+
+    // Draw background on FIRST PAGE before anything else
+    drawBackground();
 
     // Main table data
     const allRows = [
@@ -80,10 +92,12 @@ export const generateRISPDF = async (risID) => {
 
     autoTable(doc, {
       startY: 78, // shift content down to clear header area
+      margin: { top: 48, bottom: 20},
       head: tableHead,
       body: allRows,
       theme: "grid",
       styles: {
+        fillColor: false,
         halign: "center",
         font: "helvetica",
         fontSize: 9,
@@ -102,12 +116,7 @@ export const generateRISPDF = async (risID) => {
         5: { cellWidth: 40 },
       },
 
-      // 🪄 Background (z-index 0)
-      willDrawPage: () => {
-        drawBackground();
-      },
-
-      // 🪄 Foreground text (z-index 1)
+      // Foreground text (z-index 1)
       didDrawPage: (dataArg) => {
         if (dataArg.pageNumber === 1) {
           let y = 48; // start lower than before
@@ -145,10 +154,12 @@ export const generateRISPDF = async (risID) => {
           }
         }
       },
+
+      rowPageBreak: 'avoid',
     });
 
     // --- Signature Table ---
-    const nextY = doc.lastAutoTable.finalY + 1;
+    const nextY = doc.lastAutoTable.finalY + 3;
     const signHead = [
       [
         { content: "", styles: { halign: "center" } },
@@ -170,6 +181,7 @@ export const generateRISPDF = async (risID) => {
 
     autoTable(doc, {
       startY: nextY,
+      margin: { top: 48, bottom: 20},
       head: signHead,
       body: signBody,
       styles: {
@@ -177,18 +189,22 @@ export const generateRISPDF = async (risID) => {
         fontSize: 9,
         textColor: [0, 0, 0],
         lineColor: [0, 0, 0],
+        fillColor: false,
         lineWidth: 0.5,
         halign: "center",
         valign: "middle"
       },
       headStyles: {
-        fillColor: [255, 255, 255],
+        fillColor: false,
         textColor: [0, 0, 0],
         fontStyle: "bold",
         lineColor: [0, 0, 0],
         lineWidth: 0.5,
       },
+
+
       theme: "grid",
+      rowPageBreak: 'avoid',
     });
 
     // Output as Blob

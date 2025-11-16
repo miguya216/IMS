@@ -49,10 +49,12 @@ export const generateTransferPDFPreview = async (
     // Apply background + content layering
     autoTable(doc, {
       startY: 70,
+      margin: { top: 48, bottom: 20 },
       head: [["Date Acquired", "Property No.", "Description", "Transfer Type", "Condition"]],
       body: tableData,
       theme: "grid",
       styles: {
+        fillColor: false,
         fontSize: 9,
         cellPadding: 3,
         lineWidth: 0.4,
@@ -62,7 +64,7 @@ export const generateTransferPDFPreview = async (
         valign: "middle"
       },
       headStyles: {
-        fillColor: [255, 255, 255],
+        fillColor: false,
         textColor: [0, 0, 0],
         fontStyle: "bold",
         lineWidth: 0.5,
@@ -78,46 +80,50 @@ export const generateTransferPDFPreview = async (
 
       // Draw text afterward
       didDrawPage: (dataArg) => {
-        const topOffset = 45; // push content down from top header image
-        let yPos = topOffset;
+        const pageNumber = doc.internal.getCurrentPageInfo().pageNumber;
+        if (pageNumber === 1) {
+          const topOffset = 45;
+          let yPos = topOffset;
 
-        // Title
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(16);
-        doc.text("PROPERTY TRANSFER REPORT", pageWidth / 2, yPos, { align: "center" });
-
-        yPos += 10;
-        const leftX = 14;
-        const rightX = 120;
-        const ptrvalueGap = 18;
-        const valueGap = 35;
-
-        doc.setFontSize(12).setTextColor(0, 0, 0);
-
-        // Left column
-        doc.setFont("helvetica", "bold");
-        doc.text("From Accountable:", leftX, yPos);
-        doc.setFont("helvetica", "normal");
-        doc.text(fromUser || "-", leftX + 39, yPos);
-
-        if (ptrNo) {
+          // Title
           doc.setFont("helvetica", "bold");
-          doc.text("PTR No:", rightX, yPos);
+          doc.setFontSize(16);
+          doc.text("PROPERTY TRANSFER REPORT", pageWidth / 2, yPos, { align: "center" });
+
+          yPos += 10;
+          const leftX = 14;
+          const rightX = 120;
+          const ptrvalueGap = 18;
+          const valueGap = 35;
+
+          doc.setFontSize(12).setTextColor(0, 0, 0);
+
+          // Left column
+          doc.setFont("helvetica", "bold");
+          doc.text("From Accountable:", leftX, yPos);
           doc.setFont("helvetica", "normal");
-          doc.text(ptrNo, rightX + ptrvalueGap, yPos);
+          doc.text(fromUser || "-", leftX + 39, yPos);
+
+          if (ptrNo) {
+            doc.setFont("helvetica", "bold");
+            doc.text("PTR No:", rightX, yPos);
+            doc.setFont("helvetica", "normal");
+            doc.text(ptrNo, rightX + ptrvalueGap, yPos);
+          }
+
+          yPos += 8;
+          doc.setFont("helvetica", "bold");
+          doc.text("To Accountable:", leftX, yPos);
+          doc.setFont("helvetica", "normal");
+          doc.text(toUser || "-", leftX + 34, yPos);
+
+          doc.setFont("helvetica", "bold");
+          doc.text("Date Transferred:", rightX, yPos);
+          doc.setFont("helvetica", "normal");
+          doc.text(new Date().toLocaleDateString(), rightX + valueGap, yPos);
         }
-
-        yPos += 8;
-        doc.setFont("helvetica", "bold");
-        doc.text("To Accountable:", leftX, yPos);
-        doc.setFont("helvetica", "normal");
-        doc.text(toUser || "-", leftX + 34, yPos);
-
-        doc.setFont("helvetica", "bold");
-        doc.text("Date Transferred:", rightX, yPos);
-        doc.setFont("helvetica", "normal");
-        doc.text(new Date().toLocaleDateString(), rightX + valueGap, yPos);
       },
+      rowPageBreak: 'avoid',
     });
 
     // Output PDF blob

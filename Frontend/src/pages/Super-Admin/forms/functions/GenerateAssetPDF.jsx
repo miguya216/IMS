@@ -49,13 +49,14 @@ export const generateAssetPDF = async (assetID) => {
 
     autoTable(doc, {
       startY: 80,
+      margin: { top: 48, bottom: 20 },
       head: [tableColumn],
       body: tableRows,
       theme: "grid",
       headStyles: { fillColor: false, textColor: 0 },
       bodyStyles: { textColor: 0 },
       margin: { left: 10, right: 10 },
-      styles: { halign: "center", valign: "middle", fontSize: 10, lineWidth: 0.5, lineColor: [0, 0, 0] },
+      styles: { fillColor: false, halign: "center", valign: "middle", fontSize: 10, lineWidth: 0.5, lineColor: [0, 0, 0] },
 
       // Draw image BEFORE content (background)
       willDrawPage: () => {
@@ -110,6 +111,7 @@ export const generateAssetPDF = async (assetID) => {
           );
         }
       },
+      rowPageBreak: 'avoid',
 
     });
 

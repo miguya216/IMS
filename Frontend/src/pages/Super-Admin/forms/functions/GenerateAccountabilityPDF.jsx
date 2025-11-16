@@ -53,7 +53,8 @@ export const generateAccountabilityPDF = async (user_ID) => {
     ]);
 
     autoTable(doc, {
-      startY: topOffset + 35, // table starts below header info
+      startY: topOffset + 35, 
+      margin: { top: 48, bottom: 20},
       head: [[
         "Date",
         "Item",
@@ -65,6 +66,7 @@ export const generateAccountabilityPDF = async (user_ID) => {
       ]],
       body: tableBody,
       styles: { 
+        fillColor: false,
         fontSize: 8,
         cellPadding: 3,
         textColor: [0,0,0],
@@ -74,7 +76,7 @@ export const generateAccountabilityPDF = async (user_ID) => {
       },
       headStyles: { 
         fontStyle: "bold",
-        fillColor: [255,255,255],
+        fillColor: false,
         textColor: [0,0,0],
         lineColor: [0,0,0],
         lineWidth: 0.3,
@@ -108,31 +110,31 @@ export const generateAccountabilityPDF = async (user_ID) => {
           doc.setFontSize(12);
           doc.text("ACCOUNTABILITY FORM", pageWidth / 2, yPos, { align: "center" });
 
-          doc.setFontSize(10);
           yPos += 10;
 
           doc.setFont("helvetica", "bold");
           doc.text(`Name:`, 14, yPos);
-          doc.text(`Department:`, 150, yPos);
+          doc.text(`Department:`, 145, yPos);
           doc.setFont("helvetica", "normal");
-          doc.text(`${header.full_name}`, 35, yPos);
+          doc.text(`${header.full_name}`, 28, yPos);
           doc.text(`${header.department}`, 171, yPos);
 
           yPos += 8;
           doc.setFont("helvetica", "bold");
           doc.text(`Position:`, 14, yPos);
-          doc.text(`Control No:`, 150, yPos);
+          doc.text(`Control No:`, 145, yPos);
           doc.setFont("helvetica", "normal");
-          doc.text(`${header.position}`, 35, yPos);
-          doc.text(`${header.control_no}`, 171, yPos);
+          doc.text(`${header.position}`, 33, yPos);
+          doc.text(`${header.control_no}`, 169, yPos);
 
           yPos += 8;
           doc.setFont("helvetica", "bold");
           doc.text(`Total Assets:`, 14, yPos);
           doc.setFont("helvetica", "normal");
-          doc.text(`${assets.length}`, 38, yPos);
+          doc.text(`${assets.length}`, 42, yPos);
         }
-      }
+      },
+      rowPageBreak: 'avoid',
     });
 
     // Add declaration below table
@@ -141,12 +143,12 @@ export const generateAccountabilityPDF = async (user_ID) => {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     const declaration = `Item/s above is/are accepted by me with the distinct understanding of the following:
-1. This is a property of Kolehiyo ng Lungsod ng Dasmariñas.
-2. This is to be used only by assigned staff/individual as required in the performance duties.
-3. This is to be returned to the company upon demand or in the event of resignation or termination.
-4. I shall be accountable for any loss or damage of this items/s.
-5. I shall be audited anytime by the Cost Controller / Property Custodian.
-6. This is a shared unit and I have to report any damage immediately, otherwise I will held liable.`;
+      1. This is a property of Kolehiyo ng Lungsod ng Dasmariñas.
+      2. This is to be used only by assigned staff/individual as required in the performance duties.
+      3. This is to be returned to the company upon demand or in the event of resignation or termination.
+      4. I shall be accountable for any loss or damage of this items/s.
+      5. I shall be audited anytime by the Cost Controller / Property Custodian.
+      6. This is a shared unit and I have to report any damage immediately, otherwise I will held liable.`;
 
     const wrappedDeclaration = doc.splitTextToSize(declaration, 180);
     doc.text(wrappedDeclaration, 14, finalY);

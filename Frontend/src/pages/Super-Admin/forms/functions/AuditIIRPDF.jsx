@@ -103,6 +103,7 @@ export const AuditIIRPDF = async (iir_id) => {
         head,
         body,
         styles: {
+          fillColor: false,
           fontSize: 8,
           cellPadding: 2,
           lineWidth: 0.5,
@@ -112,12 +113,12 @@ export const AuditIIRPDF = async (iir_id) => {
         },
         theme: "grid",
         headStyles: {
-          fillColor: [255, 255, 255],
+          fillColor: false,
           textColor: 0,
           lineWidth: 0.5,
           lineColor: [0, 0, 0],
         },
-        margin: { top: 90, left: 30, right: 15, bottom: 20 },
+        margin: { bottom: 15 },
         tableWidth: "auto",
         columnStyles: {
           0: { cellWidth: 60 },
@@ -136,17 +137,26 @@ export const AuditIIRPDF = async (iir_id) => {
           13: { cellWidth: 45 },
           14: { cellWidth: 45 },
         },
+        rowPageBreak: 'avoid',
       });
 
-         // ===== Signatory Section =====
-      const finalY = doc.lastAutoTable.finalY || 120;
+       // ===== Signatory Section =====
+      let finalY = doc.lastAutoTable.finalY || 120;
+      const signatoryHeight = 180;
+      const pageHeight = doc.internal.pageSize.getHeight();
+
+      // Check if the signatory section fits on the current page
+      if (finalY + signatoryHeight > pageHeight - 15) {
+        doc.addPage(); // Add a new page if not enough space
+        finalY = 30;   // Start from top margin
+      }
+
       const tableX = 30;
       const totalWidth = doc.internal.pageSize.getWidth() - 62; // left + right margins
       const leftWidth = totalWidth * (10 / 15);
       const rightWidth = totalWidth * (5 / 15);
-      const signatoryHeight = 180;
 
-      // Border boxes
+      // Draw the boxes
       doc.setLineWidth(0.5);
       doc.rect(tableX, finalY, leftWidth, signatoryHeight);
       doc.rect(tableX + leftWidth, finalY, rightWidth, signatoryHeight);

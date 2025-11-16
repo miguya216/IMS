@@ -41,19 +41,28 @@ export const generateDisposalPDF = async (disposalID) => {
       headerFooterImg = await getBase64FromUrl(`/${headerFooterPath}`);
     }
 
-    // 🪄 Draw background image behind content
+     // Function to draw background
     const drawBackground = () => {
-      if (headerFooterImg) {
-        doc.addImage(headerFooterImg, "PNG", 0, 0, pageWidth, pageHeight);
-      }
+      if (!headerFooterImg) return;
+      // draw image now on current page (this will be underneath any later drawings)
+      doc.addImage(headerFooterImg, "PNG", 0, 0, pageWidth, pageHeight);
     };
+
+    // --- OVERRIDE addPage so every time a new page is created we draw the bg first ---
+    const originalAddPage = doc.addPage.bind(doc);
+    doc.addPage = (...args) => {
+      originalAddPage(...args);
+      // draw background immediately on the newly created page
+      drawBackground();
+      return doc;
+    };
+
+    // Draw background on FIRST PAGE before anything else
+    drawBackground();
 
     // Start drawing PDF layout
     autoTable(doc, {
-      startY: 0, // dummy to access didDrawPage even without table
-      willDrawPage: () => {
-        drawBackground(); // background behind everything
-      },
+      startY: 0, 
       didDrawPage: () => {
         // Bring content down to avoid overlap with header image
         let y = 50;
@@ -138,7 +147,7 @@ export const generateDisposalPDF = async (disposalID) => {
               {
                 content: "Disposal Items",
                 colSpan: 5,
-                styles: { halign: "center", fontStyle: "bold" },
+                styles: { fillColor: false, halign: "center", fontStyle: "bold" },
               },
             ],
             ["Qty", "KLD Property Tag", "Property Tag", "Asset Type", "Brand"],
@@ -146,8 +155,9 @@ export const generateDisposalPDF = async (disposalID) => {
 
           autoTable(doc, {
             head: tableHead,
+            margin: { top: 48, bottom: 20},
             body: items.map((item) => [
-              "",
+              item.qty || 1,
               item.kld_property_tag || "",
               item.property_tag || "",
               item.asset_type || "",
@@ -155,6 +165,7 @@ export const generateDisposalPDF = async (disposalID) => {
             ]),
             startY: y,
             styles: {
+              fillColor: false,
               halign: "center",
               valign: "middle",
               font: "helvetica",
@@ -178,23 +189,44 @@ export const generateDisposalPDF = async (disposalID) => {
               3: { cellWidth: 45 },
               4: { cellWidth: 40 },
             },
+
+            rowPageBreak: 'avoid',
           });
 
           y = doc.lastAutoTable.finalY + 10;
         }
 
         // ===== Certification Text =====
+        const certText =
+          'The signatures below ascertain that the condition of the above listed items are in "unserviceable" condition and authorize their disposal. ' +
+          'Also, the signatures below certify that the equipment listed is free from any and all radioactive or hazardous materials.';
+
+        // PDF page size and margins
+        const pageBottomMargin = 20; // same as table bottom margin
+        const pageTopMargin = 48; // same as table top margin
+
+        // Set font and size for measurements
         doc.setFont("helvetica", "bold");
         doc.setFontSize(9.5);
-        doc.text(
-          'The signatures below ascertain that the condition of the above listed items are in "unserviceable" condition and authorize their disposal. ' +
-            "Also, the signatures below certify that the equipment listed is free from any and all radioactive or hazardous materials.",
-          14,
-          y,
-          { maxWidth: 180 }
-        );
 
-        y += 15;
+        // Measure height of certification text
+        const certHeight = doc.getTextDimensions(certText, { maxWidth: 180 }).h;
+
+        // Estimate height of signature block
+        const signatureBlockHeight = 15 + 8 + 8 + 15 + 8 + 8; // all lines + spacing
+
+        // Total height needed for this section
+        const totalHeightNeeded = certHeight + signatureBlockHeight;
+
+        // Check if it fits on current page
+        if (y + totalHeightNeeded > pageHeight - pageBottomMargin) {
+          doc.addPage();
+          y = pageTopMargin; // start below header
+        }
+
+        // Draw certification text
+        doc.text(certText, 14, y, { maxWidth: 180 });
+        y += certHeight + 5;
 
         // ===== Signature Lines =====
         doc.text("Signature of Dept. Inventory Coordinator: ____________________", 14, y);

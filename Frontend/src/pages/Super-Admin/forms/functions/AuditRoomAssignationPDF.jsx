@@ -53,10 +53,12 @@ export const AuditRoomAssignationPDF = async (room_assignation_ID) => {
 
     autoTable(doc, {
       head: [["Price Amount", "KLD-Property Tag", "Description", "Condition"]],
+      margin: { top: 48, bottom: 20},
       body: tableData,
       startY: 82, // bring down table below header
       styles: {
-        fontSize: 8,
+        fillColor: false,
+        fontSize: 10,
         cellPadding: 3,
         lineWidth: 0.5,
         lineColor: [0, 0, 0],
@@ -65,7 +67,7 @@ export const AuditRoomAssignationPDF = async (room_assignation_ID) => {
         textColor: [0, 0, 0],
       },
       headStyles: {
-        fillColor: [255, 255, 255],
+        fillColor: false,
         textColor: [0, 0, 0],
         fontStyle: "bold",
         lineWidth: 0.5,
@@ -96,25 +98,25 @@ export const AuditRoomAssignationPDF = async (room_assignation_ID) => {
           doc.setFont("helvetica", "bold");
           doc.text("From Room:", leftX, yPos);
           doc.setFont("helvetica", "normal");
-          doc.text(header.from_room || "Not Assigned Yet", leftX + doc.getTextWidth("From Room:") + 2, yPos);
+          doc.text(header.from_room || "Not Assigned Yet", leftX + doc.getTextWidth("From Room:") + 3, yPos);
 
           doc.setFont("helvetica", "bold");
-          doc.text("Assignation No.:", rightX, yPos);
+          doc.text("Assignation No:", rightX, yPos);
           doc.setFont("helvetica", "normal");
-          doc.text(header.room_assignation_no?.toString() || "", rightX + doc.getTextWidth("Assignation No.:") + 2, yPos);
+          doc.text(header.room_assignation_no?.toString() || "", rightX + doc.getTextWidth("Assignation No.:") + 4, yPos);
 
           yPos += 8;
           doc.setFont("helvetica", "bold");
           doc.text("To Room:", leftX, yPos);
           doc.setFont("helvetica", "normal");
-          doc.text(header.to_room || "", leftX + doc.getTextWidth("To Room:") + 2, yPos);
+          doc.text(header.to_room || "", leftX + doc.getTextWidth("To Room:") + 3, yPos);
 
           doc.setFont("helvetica", "bold");
           doc.text("Date Moved:", rightX, yPos);
           doc.setFont("helvetica", "normal");
           doc.text(
             header.moved_at ? new Date(header.moved_at).toLocaleDateString() : new Date().toLocaleDateString(),
-            rightX + doc.getTextWidth("Date Moved:") + 2,
+            rightX + doc.getTextWidth("Date Moved:") + 3,
             yPos
           );
 
@@ -122,9 +124,10 @@ export const AuditRoomAssignationPDF = async (room_assignation_ID) => {
           doc.setFont("helvetica", "bold");
           doc.text("Moved By:", leftX, yPos);
           doc.setFont("helvetica", "normal");
-          doc.text(header.moved_by || "", leftX + doc.getTextWidth("Moved By:") + 2, yPos);
+          doc.text(header.moved_by || "", leftX + doc.getTextWidth("Moved By:") + 3, yPos);
         }
       },
+      rowPageBreak: 'avoid',
     });
 
     const pdfBlob = doc.output("blob");

@@ -57,10 +57,12 @@ export const AuditPTRPDF = async (ptr_ID) => {
     ]);
 
     autoTable(doc, {
-      startY: 70, // shifted down a bit to make space for header
+      startY: 70, 
+      margin: { top: 48, bottom: 20 },
       head: [["Date Acquired", "Property No.", "Description", "Transfer Type", "Condition"]],
       body: tableData,
       styles: {
+        fillColor: false,
         fontSize: 9,
         cellPadding: 3,
         lineWidth: 0.5,
@@ -70,7 +72,7 @@ export const AuditPTRPDF = async (ptr_ID) => {
         textColor: [0, 0, 0],
       },
       headStyles: {
-        fillColor: [255, 255, 255],
+        fillColor: false,
         textColor: [0, 0, 0],
         fontStyle: "bold",
         lineWidth: 0.5,
@@ -131,6 +133,7 @@ export const AuditPTRPDF = async (ptr_ID) => {
             );
         }
       },
+      rowPageBreak: 'avoid',
     });
 
     // ===== Output =====

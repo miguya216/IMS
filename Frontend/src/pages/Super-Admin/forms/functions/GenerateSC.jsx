@@ -42,7 +42,8 @@ export const generateConsumablePDF = async (consumableID) => {
     const rec = records[0];
 
     autoTable(doc, {
-      startY: 75, // table starts below header info
+      startY: 75, 
+      margin: { top: 48, bottom: 20},
       head: [["Date", "Ref ID", "Qty In", "Qty Out", "Officer", "Balance", "Remarks"]],
       body: records.map((r) => [
         r.record_date,
@@ -57,7 +58,7 @@ export const generateConsumablePDF = async (consumableID) => {
       headStyles: { fillColor: false, textColor: 0 },
       bodyStyles: { textColor: 0 },
       margin: { left: 10, right: 10 },
-      styles: { halign: "center", valign: "middle", fontSize: 10, lineWidth: 0.5, lineColor: [0, 0, 0] },
+      styles: { fillColor: false, halign: "center", valign: "middle", fontSize: 10, lineWidth: 0.5, lineColor: [0, 0, 0] },
 
       // Draw background before content
       willDrawPage: () => {
@@ -95,6 +96,7 @@ export const generateConsumablePDF = async (consumableID) => {
           doc.text(`${rec.description || "-"}`, 37, yPos);
         }
       },
+      rowPageBreak: 'avoid',
     });
 
     // Export PDF
