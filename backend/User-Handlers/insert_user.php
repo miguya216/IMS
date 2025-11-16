@@ -1,16 +1,12 @@
 <?php
 session_start();
 require_once __DIR__ . '/../conn.php';
-require_once __DIR__ . '/../../vendor/autoload.php';
-
-use Endroid\QrCode\QrCode;
-use Endroid\QrCode\Writer\PngWriter;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode(file_get_contents("php://input"), true);
     $user = new User();
 
-    // ✅ Get the account_ID from session
+    // Get the account_ID from session
     $account_ID = isset($_SESSION['user']['user_ID']) ? intval($_SESSION['user']['user_ID']) : null;
 
     $response = $user->insertNewUser(
@@ -117,25 +113,10 @@ class User {
         if (!empty($kld_email) && !empty($password) && !empty($role_id)) {
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
             $stmt = $this->pdo->prepare("
-                INSERT INTO account (user_ID, kld_ID, password_hash, role_ID, qr_ID) 
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO account (user_ID, kld_ID, password_hash, role_ID) 
+                VALUES (?, ?, ?, ?)
             ");
-            $stmt->execute([$userId, $kld_id, $hashedPassword, $role_id, NULL]);
-
-            // Generate QR code
-            $qr = new QrCode($kld_id);
-            $writer = new PngWriter();
-            $qrFilename = uniqid("qr_account_") . ".png";
-            $qrPath = "qrcodes/$qrFilename";
-            file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/IMS-REACT/frontend/public/" . $qrPath, $writer->write($qr)->getString());
-
-            // Save qr_code
-            $stmt = $this->pdo->prepare("INSERT INTO qr_code (qr_image_path) VALUES (?)");
-            $stmt->execute([$qrPath]);
-            $new_qr_id = $this->pdo->lastInsertId();
-
-            $stmt = $this->pdo->prepare("UPDATE account SET qr_ID = ? WHERE user_ID = ?");
-            $stmt->execute([$new_qr_id, $userId]);
+            $stmt->execute([$userId, $kld_id, $hashedPassword, $role_id]);
         }
 
         // === Insert Activity Log ===

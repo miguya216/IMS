@@ -1,3 +1,5 @@
+-- IMS table August 14.
+
 -- Create database
 -- status (active, inactive) for soft deletion
 
@@ -179,13 +181,11 @@ CREATE TABLE account (
     kld_ID VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     role_ID INT,
-    qr_ID INT NULL,
     remember_token VARCHAR(255),
     token_expiry DATETIME,
     FOREIGN KEY (user_ID) REFERENCES user(user_ID),
     FOREIGN KEY (role_ID) REFERENCES role(role_ID),
-    FOREIGN KEY (kld_ID) REFERENCES kld(kld_ID),
-    FOREIGN KEY (qr_ID) REFERENCES qr_code(qr_ID)
+    FOREIGN KEY (kld_ID) REFERENCES kld(kld_ID)
 );
 
 CREATE TABLE forgot_pass_token (

@@ -6,10 +6,11 @@
 CREATE DATABASE IF NOT EXISTS IMS;
 USE IMS;
 
--- email sender
+-- settings
 CREATE TABLE settings_preferences (
     setting_pref_ID TINYINT PRIMARY KEY,
-    email_sender VARCHAR(255)
+    email_sender VARCHAR(255) NOT NULL,
+    header_footer_img_path VARCHAR(255) NULL
 );
 
 -- Sign up verification
@@ -26,6 +27,14 @@ CREATE TABLE asset_type (
     asset_type VARCHAR(100) NOT NULL UNIQUE,
     asset_type_status ENUM('active', 'inactive') DEFAULT 'active'
 );
+
+-- Asset Classification Table
+CREATE TABLE asset_classification (
+    asset_classification_ID INT AUTO_INCREMENT PRIMARY KEY,
+    asset_classification VARCHAR (100) NOT NULL UNIQUE,
+    asset_classification_status ENUM('active', 'inactive') DEFAULT 'active'
+);
+
 
 -- Brand table
 CREATE TABLE brand (
@@ -47,6 +56,7 @@ CREATE TABLE transfer_type (
     transfer_type_name VARCHAR(100) NOT NULL UNIQUE,
     transfer_type_status ENUM('active', 'inactive') DEFAULT 'active'
 );
+
 
 -- Barcode table
 CREATE TABLE barcode (
@@ -121,6 +131,7 @@ CREATE TABLE asset (
     asset_ID INT AUTO_INCREMENT PRIMARY KEY,
     brand_ID INT,
     asset_type_ID INT,
+    asset_classification_ID INT,
     a_source_ID INT,
     transfer_type_ID INT NULL,
     kld_property_tag VARCHAR(100) UNIQUE NOT NULL,
@@ -137,6 +148,7 @@ CREATE TABLE asset (
     asset_status ENUM('active', 'inactive', 'pending', 'borrowed') DEFAULT 'active',
     FOREIGN KEY (brand_ID) REFERENCES brand(brand_ID),
     FOREIGN KEY (asset_type_ID) REFERENCES asset_type(asset_type_ID),
+    FOREIGN KEY (asset_classification_ID) REFERENCES asset_classification (asset_classification_ID),
     FOREIGN KEY (a_source_ID) REFERENCES acquisition_source (a_source_ID),
     FOREIGN KEY (transfer_type_ID) REFERENCES transfer_type (transfer_type_ID),
     FOREIGN KEY (responsible_user_ID) REFERENCES user(user_ID),
@@ -253,7 +265,7 @@ CREATE TABLE ris_consumables (
 CREATE TABLE reservation_borrowing (
     brs_ID INT AUTO_INCREMENT PRIMARY KEY,
     brs_no VARCHAR (50) UNIQUE NOT NULL,
-    user_ID INT NOT NULL, -- who made the form
+    user_ID INT NOT NULL, 
     date_of_use DATE NOT NULL,
     time_of_use TIME NOT NULL,
     date_of_return DATE NOT NULL,
@@ -339,13 +351,15 @@ CREATE TABLE property_card_record (
     record_ID INT AUTO_INCREMENT PRIMARY KEY,
     property_card_ID INT NOT NULL,
     record_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    reference_type ENUM('IIR','RIS','BRS','PTR','CSV') NOT NULL,
+    reference_type ENUM('IIR','RIS','BRS','PTR','CSV','RA') NOT NULL,
     reference_ID VARCHAR(50) NOT NULL,
     officer_user_ID INT NULL,
+    room_ID INT NULL,
     price_amount DECIMAL(12,2) NOT NULL,
     remarks VARCHAR(255) NULL,
     FOREIGN KEY (property_card_ID) REFERENCES property_card(property_card_ID),
-    FOREIGN KEY (officer_user_ID) REFERENCES user(user_ID)
+    FOREIGN KEY (officer_user_ID) REFERENCES user(user_ID),
+    FOREIGN KEY (room_ID) REFERENCES room (room_ID)
 );
 
 CREATE TABLE stock_card (

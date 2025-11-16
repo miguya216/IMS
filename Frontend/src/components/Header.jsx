@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { FaBars, FaBell } from "react-icons/fa";
-import Modal from "/src/components/Modal.jsx";
 import { useWebSocketContext } from "/src/layouts/context/WebSocketProvider";
 import "/src/css/Notification.css";
 import dayjs from "dayjs";
@@ -11,27 +10,14 @@ import { useNavigate } from "react-router-dom";
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
 
-const Header = ({ toggleSidebar, showQr = true }) => {
+const Header = ({ toggleSidebar = true }) => {
   const notifRef = useRef(null);
   const { lastMessage } = useWebSocketContext();
-  const [qrModalOpen, setQrModalOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
-  const [qrPath, setQrPath] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [userRole, setUserRole] = useState(null);
   const navigate = useNavigate();
-
-  // === QR FETCH ===
-  useEffect(() => {
-    if (qrModalOpen) {
-      fetch("/api/get_user_qr.php")
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.qrPath) setQrPath(data.qrPath);
-        });
-    }
-  }, [qrModalOpen]);
 
   // === FETCH NOTIFICATIONS ===
   const fetchNotifications = () => {
@@ -273,25 +259,6 @@ const Header = ({ toggleSidebar, showQr = true }) => {
           )}
         </div>
       </nav>
-
-      {/* QR Modal */}
-      <Modal
-        isOpen={qrModalOpen}
-        onClose={() => setQrModalOpen(false)}
-        title="My QR Code"
-      >
-        <div className="text-center p-3">
-          {qrPath ? (
-            <img
-              src={`/${qrPath}`}
-              alt="Account QR"
-              style={{ width: 200, height: 200 }}
-            />
-          ) : (
-            <p>Loading QR code...</p>
-          )}
-        </div>
-      </Modal>
     </>
   );
 };

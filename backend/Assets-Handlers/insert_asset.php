@@ -254,7 +254,7 @@ class Asset {
                 $writer = new PngWriter();
                 $qrFilename = uniqid("qr_room_") . ".png";
                 $qrPath = "qrcodes/$qrFilename";
-                file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/IMS-REACT/frontend/public/" . $qrPath, $writer->write($qr)->getString());
+                file_put_contents(BASE_STORAGE_PATH . $qrPath, $writer->write($qr)->getString());
 
                 // Update the qr_code table with correct image path
                 $stmt = $this->pdo->prepare("UPDATE qr_code SET qr_image_path = ? WHERE qr_ID = ?");
