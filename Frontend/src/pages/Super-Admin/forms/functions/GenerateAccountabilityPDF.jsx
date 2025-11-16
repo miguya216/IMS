@@ -38,7 +38,26 @@ export const generateAccountabilityPDF = async (user_ID) => {
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
 
-    // 🪄 Shift all content down by this offset to clear header/footer
+    // Function to draw background
+    const drawBackground = () => {
+      if (!headerFooterImg) return;
+      // draw image now on current page (this will be underneath any later drawings)
+      doc.addImage(headerFooterImg, "PNG", 0, 0, pageWidth, pageHeight);
+    };
+
+    // --- OVERRIDE addPage so every time a new page is created we draw the bg first ---
+    const originalAddPage = doc.addPage.bind(doc);
+    doc.addPage = (...args) => {
+      originalAddPage(...args);
+      // draw background immediately on the newly created page
+      drawBackground();
+      return doc;
+    };
+
+    // Draw background on FIRST PAGE before anything else
+    drawBackground();
+
+    // Shift all content down by this offset to clear header/footer
     const topOffset = 50;
 
     // Table data
@@ -142,6 +161,7 @@ export const generateAccountabilityPDF = async (user_ID) => {
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
+
     const declaration = `Item/s above is/are accepted by me with the distinct understanding of the following:
       1. This is a property of Kolehiyo ng Lungsod ng Dasmariñas.
       2. This is to be used only by assigned staff/individual as required in the performance duties.
@@ -151,10 +171,27 @@ export const generateAccountabilityPDF = async (user_ID) => {
       6. This is a shared unit and I have to report any damage immediately, otherwise I will held liable.`;
 
     const wrappedDeclaration = doc.splitTextToSize(declaration, 180);
+
+    // Estimate height of declaration
+    const lineHeight = doc.getLineHeight() / doc.internal.scaleFactor; // in units
+    const declarationHeight = wrappedDeclaration.length * lineHeight;
+
+    // Estimate height of signature block
+    const signatureHeight = 30 + 10 + 5; // spacing + lines + labels
+
+    const totalHeightNeeded = declarationHeight + signatureHeight;
+
+    // If not enough space, add new page
+    if (finalY + totalHeightNeeded > doc.internal.pageSize.getHeight() - 20) { // bottom margin
+      doc.addPage();
+      finalY = 50; // topOffset to clear header
+    }
+
+    // Draw declaration
     doc.text(wrappedDeclaration, 14, finalY);
 
     // Signatures
-    finalY += 30;
+    finalY += declarationHeight + 10;
     doc.setFont("helvetica", "normal");
     doc.text("Accepted by:", 20, finalY);
     doc.text("Issued by:", 100, finalY);
@@ -170,6 +207,7 @@ export const generateAccountabilityPDF = async (user_ID) => {
     doc.text("Signature over printed name/date", 20, finalY);
     doc.text("Cost Control", 100, finalY);
     doc.text("Comptroller", 160, finalY);
+
 
     // Export PDF
     const pdfBlob = doc.output("blob");

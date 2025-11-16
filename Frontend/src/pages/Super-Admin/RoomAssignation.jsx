@@ -241,107 +241,134 @@ const RoomAssignation = () => {
         </div>
       </div>
 
-      {/* Two-column asset display */}
-        <div className="row mt-4">
-          {/* Left: available assets */}
-          <div className="col-md-6 border border-dark p-3">
+      <div className="row mt-4 g-4" style={{ height: '80vh', minHeight: '20vh' }}>
+        {/* Left: available assets */}
+        <div className="col-md-6">
+          <div className="p-3 rounded-4 shadow-sm bg-subtle border border-dark d-flex flex-column h-100">
             <h5 className="mb-3">Available Assets</h5>
-            
+
+            {/* Select All Checkbox */}
             <div className="row mb-2 g-3 align-items-end">
-              {/* Select All Checkbox */}
-                <div className="col-md-3">
-                  <div className="form-check">
-                    <input
-                      title="Select All displayed asset"
-                      type="checkbox"
-                      className="form-check-input"
-                      id="selectAllCheckbox"
-                      checked={
-                        filteredAssets.length > 0 &&
-                        selectedAssets.length === filteredAssets.length
+              <div className="col-md-3">
+                <div className="form-check">
+                  <input
+                    title="Select All displayed asset"
+                    type="checkbox"
+                    className="form-check-input"
+                    id="selectAllCheckbox"
+                    checked={
+                      filteredAssets.length > 0 &&
+                      selectedAssets.length === filteredAssets.length
+                    }
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedAssets(filteredAssets.map((a) => a.asset_ID));
+                      } else {
+                        setSelectedAssets([]);
                       }
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedAssets(filteredAssets.map((a) => a.asset_ID));
-                        } else {
-                          setSelectedAssets([]);
-                        }
-                      }}
-                    />
-                    <label className="form-check-label" htmlFor="selectAllCheckbox">
-                      Select All
-                    </label>
-                  </div>
+                    }}
+                  />
+                  <label className="form-check-label" htmlFor="selectAllCheckbox">
+                    Select All
+                  </label>
                 </div>
+              </div>
             </div>
-            
-            {currentAssets.length > 0 ? (
-              currentAssets.map((asset) => (
-                <div
-                  key={asset.asset_ID}
-                  className={`p-3 mb-3 rounded shadow-sm border ${
-                    selectedAssets.includes(asset.asset_ID) ? "bg-success-subtle" : "bg-white"
-                  }`}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => toggleSelect(asset.asset_ID)}
-                >
-                  <div className="d-flex justify-content-between align-items-center mb-2">
-                    <input
-                      type="checkbox"
-                      checked={selectedAssets.includes(asset.asset_ID)}
-                      onChange={() => toggleSelect(asset.asset_ID)}
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                    <span className="fw-semibold text-secondary">Select Asset</span>
-                  </div>
 
-                  <div className="row">
-                    <div className="col-6 small">KLD-Property Tag</div>
-                    <div className="col-6 fw-semibold">{asset.kld_property_tag}</div>
-
-                    <hr className="my-2"/>
-
-                    <div className="col-6 small">Room</div>
-                    <div className="col-6 fw-semibold">{asset.room}</div>
-
-                    <hr className="my-2"/>
-
-                    <div className="col-6 small">Brand</div>
-                    <div className="col-6 fw-semibold">{asset.brand}</div>
-
-                    <hr className="my-2"/>
-
-                    <div className="col-6 small">Asset Type</div>
-                    <div className="col-6 fw-semibold">{asset.asset_type}</div>
-
-                    <hr className="my-2"/>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="text-center text-muted">No assets found</div>
-            )}
-
-            {/* Pagination for available assets */}
-            {totalPages > 1 && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={(page) => setCurrentPage(page)}
-              />
-            )}
-          </div>
-
-          {/* Right: selected assets */}
-          <div className="col-md-6 border border-dark p-3">
-            <h5 className="mb-5">Selected Assets</h5>
-            {currentSelectedAssets.length > 0 ? (
-              currentSelectedAssets.map((asset) => (
+            {/* Scrollable Asset List */}
+            <div className="overflow-auto" style={{ maxHeight: '65vh', minHeight: '20vh' }}>
+              {currentAssets.length > 0 ? (
+                currentAssets.map((asset) => (
                   <div
                     key={asset.asset_ID}
-                    className="p-3 mb-3 rounded shadow-sm border bg-success-subtle"
-                    style={{ cursor: "pointer" }}
-                  onClick={() => toggleSelect(asset.asset_ID)}
+                    className={`p-3 mb-3 rounded-3 shadow-sm border ${
+                      selectedAssets.includes(asset.asset_ID)
+                        ? "bg-success-subtle"
+                        : "bg-white"
+                    }`}
+                    style={{
+                      cursor: "pointer",
+                      transition: "transform 0.2s, box-shadow 0.2s",
+                    }}
+                    onClick={() => toggleSelect(asset.asset_ID)}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.transform = "translateY(-3px)")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.transform = "translateY(0)")
+                    }
+                  >
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                      <input
+                        type="checkbox"
+                        checked={selectedAssets.includes(asset.asset_ID)}
+                        onChange={() => toggleSelect(asset.asset_ID)}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                      <span className="fw-semibold text-secondary">Select Asset</span>
+                    </div>
+
+                    <div className="row">
+                      <div className="col-6 small">KLD-Property Tag</div>
+                      <div className="col-6 fw-semibold">{asset.kld_property_tag}</div>
+
+                      <hr className="my-2" />
+
+                      <div className="col-6 small">Room</div>
+                      <div className="col-6 fw-semibold">{asset.room}</div>
+
+                      <hr className="my-2" />
+
+                      <div className="col-6 small">Brand</div>
+                      <div className="col-6 fw-semibold">{asset.brand}</div>
+
+                      <hr className="my-2" />
+
+                      <div className="col-6 small">Asset Type</div>
+                      <div className="col-6 fw-semibold">{asset.asset_type}</div>
+
+                      <hr className="my-2" />
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center text-muted">No assets found</div>
+              )}
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={(page) => setCurrentPage(page)}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Right: selected assets */}
+        <div className="col-md-6">
+          <div className="p-3 rounded-4 shadow-sm bg-subtle border border-dark d-flex flex-column h-100">
+            <h5 className="mb-3">Selected Assets</h5>
+
+            <div className="overflow-auto" style={{ maxHeight: '65vh' }}>
+              {currentSelectedAssets.length > 0 ? (
+                currentSelectedAssets.map((asset) => (
+                  <div
+                    key={asset.asset_ID}
+                    className="p-3 mb-3 rounded-3 shadow-sm border bg-success-subtle"
+                    style={{
+                      cursor: "pointer",
+                      transition: "transform 0.2s, box-shadow 0.2s",
+                    }}
+                    onClick={() => toggleSelect(asset.asset_ID)}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.transform = "translateY(-3px)")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.transform = "translateY(0)")
+                    }
                   >
                     <div className="d-flex justify-content-between align-items-center mb-2">
                       <input
@@ -356,38 +383,41 @@ const RoomAssignation = () => {
                       <div className="col-6 small">KLD-Property Tag</div>
                       <div className="col-6 fw-semibold">{asset.kld_property_tag}</div>
 
-                      <hr className="my-2"/>
+                      <hr className="my-2" />
 
                       <div className="col-6 small">Room</div>
                       <div className="col-6 fw-semibold">{asset.room}</div>
 
-                      <hr className="my-2"/>
+                      <hr className="my-2" />
 
                       <div className="col-6 small">Brand</div>
                       <div className="col-6 fw-semibold">{asset.brand}</div>
 
-                      <hr className="my-2"/>
+                      <hr className="my-2" />
 
                       <div className="col-6 small">Asset Type</div>
                       <div className="col-6 fw-semibold">{asset.asset_type}</div>
 
-                      <hr className="my-2"/>
+                      <hr className="my-2" />
                     </div>
                   </div>
                 ))
-            ) : (
-              <div className="text-center text-muted">No selected assets</div>
-            )}
-            {/* Pagination for selected assets */}
-        {selectedTotalPages > 1 && (
-          <Pagination
-            currentPage={selectedCurrentPage}
-            totalPages={selectedTotalPages}
-            onPageChange={(page) => setSelectedCurrentPage(page)}
-          />
-        )}
+              ) : (
+                <div className="text-center text-muted">No selected assets</div>
+              )}
+
+              {/* Pagination */}
+              {selectedTotalPages > 1 && (
+                <Pagination
+                  currentPage={selectedCurrentPage}
+                  totalPages={selectedTotalPages}
+                  onPageChange={(page) => setSelectedCurrentPage(page)}
+                />
+              )}
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
 
       
       {/* Scanner Modal */}

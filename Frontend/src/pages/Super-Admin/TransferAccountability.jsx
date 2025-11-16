@@ -378,169 +378,184 @@ const TransferAccountability = () => {
         </div>
       </div>
 
-      <div className="row mt-4">
+      <div className="row mt-4 g-4">
         {/* Left: Available Assets */}
-        <div className="col-md-6 border border-dark p-3">
-          <h5 className="mb-3">Available Assets</h5>
+        <div className="col-md-6">
+          <div className="p-3 rounded-4 shadow-sm bg-subtle border border-dark">
+            <h5 className="mb-4">Available Assets</h5>
 
-          {/* Global Select All (filtered) */}
-          <div className="row mb-2 g-3 align-items-end">
-            <div className="col-md-3">
-              <div className="form-check">
-                <input
-                  title="Select all filtered assets"
-                  type="checkbox"
-                  className="form-check-input"
-                  id="selectAllFiltered"
-                  checked={filteredAssets.length > 0 && filteredAssets.every((a) => selectedAssets.includes(a.asset_ID))}
-                  onChange={toggleSelectAllFiltered}
-                />
-                <label className="form-check-label" htmlFor="selectAllFiltered">Select All</label>
+            {/* Global Select All */}
+            <div className="row mb-3 g-3 align-items-end">
+              <div className="col-md-3">
+                <div className="form-check">
+                  <input
+                    title="Select all filtered assets"
+                    type="checkbox"
+                    className="form-check-input"
+                    id="selectAllFiltered"
+                    checked={filteredAssets.length > 0 && filteredAssets.every((a) => selectedAssets.includes(a.asset_ID))}
+                    onChange={toggleSelectAllFiltered}
+                  />
+                  <label className="form-check-label" htmlFor="selectAllFiltered">Select All</label>
+                </div>
               </div>
             </div>
+
+            <div className="overflow-auto" style={{ maxHeight: '65vh', minHeight: '20vh' }}>
+              {paginatedAssets.length > 0 ? (
+              paginatedAssets.map((asset) => (
+                <div
+                  key={asset.asset_ID}
+                  className={`p-3 mb-3 rounded-3 shadow-sm border ${selectedAssets.includes(asset.asset_ID) ? "bg-success-subtle" : "bg-white"}`}
+                  style={{ 
+                    cursor: "pointer", 
+                    transition: "transform 0.2s, box-shadow 0.2s" 
+                  }}
+                  onClick={() => toggleSelect(asset.asset_ID)}
+                  onMouseEnter={e => e.currentTarget.style.transform = "translateY(-5px)"}
+                  onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
+                  title="Select Asset"
+                >
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <input
+                      type="checkbox"
+                      checked={selectedAssets.includes(asset.asset_ID)}
+                      onChange={(e) => { e.stopPropagation(); toggleSelect(asset.asset_ID); }}
+                    />
+                    <span className="fw-semibold text-secondary">Select Asset</span>
+                  </div>
+
+                  <div className="row">
+                    <div className="col-6 small">Date Acquired</div>
+                    <div className="col-6 fw-semibold">{asset.date_acquired}</div>
+
+                    <hr className="my-2"/>
+
+                    <div className="col-6 small">KLD Tag</div>
+                    <div className="col-6 fw-semibold">{asset.kld_property_tag}</div>
+
+                    <hr className="my-2"/>
+
+                    <div className="col-6 small">Transfer Type</div>
+                    <div className="col-6 fw-semibold">{asset.transfer_type_name}</div>
+
+                    <hr className="my-2"/>
+
+                    <div className="col-6 small">Condition</div>
+                    <div className="col-6 fw-semibold">{asset.condition_name}</div>
+
+                    <hr className="my-2"/>
+
+                    <div className="col-6 small">Description</div>
+                    <div className="col-6 fw-semibold">{asset.description}</div>
+
+                    <hr className="my-2"/>
+
+                    <div className="col-6 small">Property Card</div>
+                    <div className="col-6">
+                      <button 
+                        className="btn btn-form-blue btn-sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePDFPreview(asset.asset_ID);
+                        }}
+                        title="Check Asset's Property Card"
+                      >
+                        Check Property Card
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center text-muted">No assets found</div>
+            )}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={(page) => setCurrentPage(page)} />}
           </div>
-
-
-          {paginatedAssets.length > 0 ? (
-            paginatedAssets.map((asset) => (
-              <div
-                key={asset.asset_ID}
-                className={`p-3 mb-3 rounded shadow-sm border ${selectedAssets.includes(asset.asset_ID) ? "bg-success-subtle" : "bg-white"}`}
-                style={{ cursor: "pointer" }}
-                onClick={() => toggleSelect(asset.asset_ID)}
-                title="Select Asset"
-              >
-                <div className="d-flex justify-content-between align-items-center mb-2">
-                  <input
-                    type="checkbox"
-                    checked={selectedAssets.includes(asset.asset_ID)}
-                    onChange={(e) => { e.stopPropagation(); toggleSelect(asset.asset_ID); }}
-                  />
-                  <span className="fw-semibold text-secondary">Select Asset</span>
-                </div>
-
-                <div className="row">
-                  <div className="col-6 small">Date Acquired</div>
-                  <div className="col-6 fw-semibold">{asset.date_acquired}</div>
-
-                  <hr className="my-2"/>
-
-                  <div className="col-6 small">KLD Tag</div>
-                  <div className="col-6 fw-semibold">{asset.kld_property_tag}</div>
-
-                  <hr className="my-2"/>
-
-                  <div className="col-6 small">Transfer Type</div>
-                  <div className="col-6 fw-semibold">{asset.transfer_type_name}</div>
-
-                  <hr className="my-2"/>
-
-                  <div className="col-6 small">Condition</div>
-                  <div className="col-6 fw-semibold">{asset.condition_name}</div>
-
-                  <hr className="my-2"/>
-
-                  <div className="col-6 small">Description</div>
-                  <div className="col-6 fw-semibold">{asset.description}</div>
-
-                  <hr className="my-2"/>
-
-                  <div className="col-6 small">
-                    Property Card
-                  </div>
-                  <div className="col-6">
-                    <button 
-                      className="btn btn-form-blue"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handlePDFPreview(asset.asset_ID);
-                      }}
-                      title="Check Asset's Property Card"
-                    >
-                      Check Property Card
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="text-center text-muted">No assets found</div>
-          )}
-
-          {/* Pagination */}
-          {totalPages > 1 && <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={(page) => setCurrentPage(page)} />}
         </div>
 
         {/* Right: Selected Assets */}
-        <div className="col-md-6 border border-dark p-3">
-          <h5 className="mb-5">Selected Assets</h5>
+        <div className="col-md-6">
+          <div className="p-3 rounded-4 shadow-sm border border-dark">
+            <h5 className="mb-4">Selected Assets</h5>
 
-          {currentSelectedAssets.length > 0 ? (
-            currentSelectedAssets.map((asset) => (
-              <div key={asset.asset_ID}
-              className="p-3 mb-3 rounded shadow-sm border bg-success-subtle"
-              style={{ cursor: "pointer" }}
-              onClick={() => toggleSelect(asset.asset_ID)}
-              title="diselect Asset"
-              >
-                <div className="d-flex justify-content-between align-items-center mb-2">
-                  <input type="checkbox" checked={true} onChange={() => toggleSelect(asset.asset_ID)} />
-                  <span className="fw-semibold text-secondary">Unselect Asset</span>
-                </div>
+            <div className="overflow-auto" style={{ maxHeight: '70vh', minHeight: '25vh' }}>
+              {currentSelectedAssets.length > 0 ? (
+                currentSelectedAssets.map((asset) => (
+                  <div
+                    key={asset.asset_ID}
+                    className="p-3 mb-3 rounded-3 shadow-sm border bg-success-subtle"
+                    style={{ 
+                      cursor: "pointer", 
+                      transition: "transform 0.2s, box-shadow 0.2s" 
+                    }}
+                    onClick={() => toggleSelect(asset.asset_ID)}
+                    onMouseEnter={e => e.currentTarget.style.transform = "translateY(-5px)"}
+                    onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
+                    title="Deselect Asset"
+                  >
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                      <input type="checkbox" checked={true} onChange={() => toggleSelect(asset.asset_ID)} />
+                      <span className="fw-semibold text-secondary">Unselect Asset</span>
+                    </div>
 
-                <div className="row">
-                  <div className="col-6 small">Date Acquired</div>
-                  <div className="col-6 fw-semibold">{asset.date_acquired}</div>
+                    <div className="row">
+                      <div className="col-6 small">Date Acquired</div>
+                      <div className="col-6 fw-semibold">{asset.date_acquired}</div>
 
-                  <hr className="my-2"/>
+                      <hr className="my-2"/>
 
-                  <div className="col-6 small">KLD Tag</div>
-                  <div className="col-6 fw-semibold">{asset.kld_property_tag}</div>
+                      <div className="col-6 small">KLD Tag</div>
+                      <div className="col-6 fw-semibold">{asset.kld_property_tag}</div>
 
-                  <hr className="my-2"/>
+                      <hr className="my-2"/>
 
-                  <div className="col-6 small">Transfer Type</div>
-                  <div className="col-6 fw-semibold">{asset.transfer_type_name}</div>
+                      <div className="col-6 small">Transfer Type</div>
+                      <div className="col-6 fw-semibold">{asset.transfer_type_name}</div>
 
-                  <hr className="my-2"/>
+                      <hr className="my-2"/>
 
-                  <div className="col-6 small">Condition</div>
-                  <div className="col-6 fw-semibold">{asset.condition_name}</div>
+                      <div className="col-6 small">Condition</div>
+                      <div className="col-6 fw-semibold">{asset.condition_name}</div>
 
-                  <hr className="my-2"/>
+                      <hr className="my-2"/>
 
-                  <div className="col-6 small">Description</div>
-                  <div className="col-6 fw-semibold">{asset.description}</div>
+                      <div className="col-6 small">Description</div>
+                      <div className="col-6 fw-semibold">{asset.description}</div>
 
-                  <hr className="my-2"/>
+                      <hr className="my-2"/>
 
-                  <div className="col-6 small">
-                    Property Card
+                      <div className="col-6 small">Property Card</div>
+                      <div className="col-6">
+                        <button 
+                          className="btn btn-form-blue btn-sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handlePDFPreview(asset.asset_ID);
+                          }}
+                          title="Check Asset's Property Card"
+                        >
+                          Check Property Card
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  <div className="col-6">
-                    <button 
-                      className="btn btn-form-blue"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handlePDFPreview(asset.asset_ID);
-                      }}
-                      title="Check Asset's Property Card"
-                    >
-                      Check Property Card
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="text-center text-muted">No selected assets</div>
-          )}
+                ))
+              ) : (
+                <div className="text-center text-muted">No selected assets</div>
+              )}
+            </div>
 
-          {/* Pagination for selected assets */}
-          {selectedTotalPages > 1 && <Pagination currentPage={selectedCurrentPage} totalPages={selectedTotalPages} onPageChange={(page) => setSelectedCurrentPage(page)} />}
+            {/* Pagination for selected assets */}
+            {selectedTotalPages > 1 && <Pagination currentPage={selectedCurrentPage} totalPages={selectedTotalPages} onPageChange={(page) => setSelectedCurrentPage(page)} />}
+          </div>
         </div>
       </div>
 
+      
       <QRScannerModal isOpen={showQRScanner} onClose={() => setShowQRScanner(false)} onScanSuccess={handleQRSuccess} onScanError={(err) => console.error("QR Error:", err)} />
 
       {/* PDF Preview Modal */}
