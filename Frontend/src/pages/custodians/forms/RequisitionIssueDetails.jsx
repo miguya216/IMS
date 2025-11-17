@@ -166,7 +166,7 @@ const RequisitionIssueDetails = ({ risID, refreshTable }) => {
                 </div>
                 <div className="col-md-4">
                   <label className="form-label fw-bold">Quantity (Issuance)</label>
-                  <input type="number" className="form-control" value={item.quantity_issuance || ""} readOnly />
+                  <input type="number" className="form-control" value={item.quantity_issuance ?? ""} readOnly />
                 </div>
                 <div className="col-md-4">
                   <label className="form-label fw-bold">Remarks</label>

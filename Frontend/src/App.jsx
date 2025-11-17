@@ -8,6 +8,7 @@ import AdminLayout from "/src/layouts/AdminLayout";
 import CustodianLayout from "/src/layouts/CustodianLayout";
 import WelcomePage from "/src/pages/Welcome";
 import ForgotPassword from "/src/pages/ForgotPassword";
+import Legal from "/src/pages/legal";
 import RecoverAccount from "/src/pages/RecoverAccount";
 
 
@@ -19,6 +20,7 @@ function App() {
         <Route path="/welcome" element={<WelcomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgotpassword" element={<ForgotPassword />} />
+        <Route path="/legal" element={<Legal />} />
         <Route path="/recoveraccount/:token" element={<RecoverAccount />} />
         {/* <Route path="/assethunt" element={<AssetHunt />} /> */}
         <Route path="/Super-Admin/*" element={<SuperAdminLayout />} />

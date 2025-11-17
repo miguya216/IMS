@@ -27,7 +27,16 @@ try {
             time_of_return
         FROM reservation_borrowing
         WHERE user_ID = :user_ID
-        ORDER BY created_at DESC
+        ORDER BY
+            CASE
+                WHEN brs_status = 'pending' THEN 1
+                WHEN brs_status = 'issuing' THEN 2
+                WHEN brs_status = 'on-going' THEN 3
+                WHEN brs_status = 'cancelled' THEN 4
+                WHEN brs_status = 'completed' THEN 5
+                ELSE 6
+            END,
+        created_at DESC
     ");
     $stmt->execute([':user_ID' => $user_ID]);
     $reservations = $stmt->fetchAll();

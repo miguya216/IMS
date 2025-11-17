@@ -1,0 +1,119 @@
+/* ----------- GENERAL PAGE LAYOUT ----------- */
+.legal-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  background: #ffffff;
+  color: #222;
+  line-height: 1.7;
+  font-family: "Inter", Arial, sans-serif;
+}
+
+/* Centralized main content wrapper */
+.legal-content-container {
+  height: 90vh; 
+  max-width: 900px;
+  margin: 20px auto 30px; 
+  padding: 40px;
+  background: #ffffffd8; 
+  backdrop-filter: blur(4px);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  z-index: 10;
+  position: relative !important;
+  overflow-y: auto;     
+  overflow-x: hidden;
+  backdrop-filter: blur(4px);
+}
+
+
+/* ----------- TITLE ----------- */
+.legal-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #004d2d;
+  text-align: center;
+}
+
+/* ----------- SECTION HEADERS ----------- */
+.legal-section-title {
+  font-size: 1.35rem;
+  margin-top: 40px;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: #005a34;
+  border-left: 5px solid #009f60;
+  padding-left: 10px;
+}
+
+/* ----------- PARAGRAPHS ----------- */
+.legal-text {
+  margin-bottom: 16px;
+  font-size: 1rem;
+  color: #333;
+}
+
+/* ----------- LISTS ----------- */
+.legal-list {
+  padding-left: 20px;
+  margin-bottom: 16px;
+}
+
+.legal-list li {
+  margin-bottom: 6px;
+}
+
+/* ----------- LINKS ----------- */
+.legal-link {
+  color: #008f52;
+  text-decoration: underline;
+}
+
+.legal-link:hover {
+  color: #005a34;
+}
+
+/* ----------- CARD BOXES (OPTIONAL) ----------- */
+.legal-box {
+  background: #f8faf9;
+  border-left: 4px solid #009f60;
+  padding: 15px 20px;
+  border-radius: 6px;
+  margin: 20px 0;
+}
+
+.back-btn {
+  position: sticky;
+  bottom: 20px;
+  float: right; /* helps sticky right alignment inside scroll div */
+
+  padding: 8px 16px;
+  font-size: 0.95rem;
+
+  background: linear-gradient(to bottom right, #005a34, #006705, #009708);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+
+  cursor: pointer;
+  z-index: 50;
+  transition: background 0.2s;
+  margin-left: auto; 
+}
+
+
+.back-btn:hover {
+  background: linear-gradient(to bottom right, #009708, #006705, #005a34) !important;
+}
+
+
+/* ----------- RESPONSIVE ----------- */
+@media (max-width: 600px) {
+  .legal-title {
+    font-size: 1.7rem;
+  }
+  .legal-section-title {
+    font-size: 1.2rem;
+  }
+}

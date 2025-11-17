@@ -401,7 +401,7 @@ const TransferAccountability = () => {
               </div>
             </div>
 
-            <div className="overflow-auto" style={{ maxHeight: '65vh', minHeight: '20vh' }}>
+            <div className="overflow-auto" style={{ maxHeight: '65vh', minHeight: '40vh' }}>
               {paginatedAssets.length > 0 ? (
               paginatedAssets.map((asset) => (
                 <div
@@ -482,7 +482,7 @@ const TransferAccountability = () => {
           <div className="p-3 rounded-4 shadow-sm border border-dark">
             <h5 className="mb-4">Selected Assets</h5>
 
-            <div className="overflow-auto" style={{ maxHeight: '70vh', minHeight: '25vh' }}>
+            <div className="overflow-auto" style={{ maxHeight: '70vh', minHeight: '45vh' }}>
               {currentSelectedAssets.length > 0 ? (
                 currentSelectedAssets.map((asset) => (
                   <div

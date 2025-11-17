@@ -13,11 +13,13 @@ if (isset($_SESSION['user']) && isset($_SESSION['user']['user_ID'])) {
                 k.kld_email AS email,
                 a.role_ID AS role,
                 r.role_name,
-                u.unit_ID
+                u.unit_ID,
+                un.unit_name
             FROM user u
             LEFT JOIN account a ON u.user_ID = a.user_ID
             LEFT JOIN role r ON a.role_ID = r.role_ID
             LEFT JOIN kld k ON u.kld_ID = k.kld_ID
+            LEFT JOIN unit un ON u.unit_ID = un.unit_ID
             WHERE u.user_ID = ?
             LIMIT 1
         ");
@@ -33,7 +35,8 @@ if (isset($_SESSION['user']) && isset($_SESSION['user']['user_ID'])) {
                     'email' => $user['email'],
                     'role' => (int)$user['role'],
                     'role_name' => $user['role_name'],
-                    'unit_ID' => (int)$user['unit_ID']
+                    'unit_ID' => (int)$user['unit_ID'],
+                    'unit_name' => $user['unit_name']
                 ]
             ]);
         } else {

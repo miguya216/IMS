@@ -188,7 +188,7 @@ const ReservationBorrowing = () => {
                   className={selectedRow === item.brs_ID ? "selected-row" : ""}
                 >
                   <td data-label="BRS no">{item.brs_no}</td>
-                  <td data-label="Date Requested">{item.date_requested}</td>
+                  <td data-label="Date Requested">{item.date_requested?.split(" ")[0]}</td>
                   <td data-label="Date & Time of use">
                     {item.date_of_use} {toStandardTime(item.time_of_use)}
                   </td>

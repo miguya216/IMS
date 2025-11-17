@@ -32,7 +32,9 @@ const RoomAssignation = () => {
     (asset) =>
       asset.kld_property_tag?.toLowerCase().includes(searchTag.toLowerCase()) ||
       asset.brand?.toLowerCase().includes(searchTag.toLowerCase()) ||
-      asset.asset_type?.toLowerCase().includes(searchTag.toLowerCase())
+      asset.asset_type?.toLowerCase().includes(searchTag.toLowerCase()) ||
+      asset.responsible_person?.toLowerCase().includes(searchTag.toLowerCase()) ||
+      asset.room?.toLowerCase().includes(searchTag.toLowerCase())
   );
 
   // Apply pagination
@@ -314,6 +316,11 @@ const RoomAssignation = () => {
 
                       <hr className="my-2" />
 
+                      <div className="col-6 small">Accounted to</div>
+                      <div className="col-6 fw-semibold">{asset.responsible_person}</div>
+
+                      <hr className="my-2" />
+
                       <div className="col-6 small">Room</div>
                       <div className="col-6 fw-semibold">{asset.room}</div>
 
@@ -382,6 +389,11 @@ const RoomAssignation = () => {
                     <div className="row">
                       <div className="col-6 small">KLD-Property Tag</div>
                       <div className="col-6 fw-semibold">{asset.kld_property_tag}</div>
+
+                      <hr className="my-2" />
+
+                      <div className="col-6 small">Accounted to</div>
+                      <div className="col-6 fw-semibold">{asset.responsible_person}</div>
 
                       <hr className="my-2" />
 

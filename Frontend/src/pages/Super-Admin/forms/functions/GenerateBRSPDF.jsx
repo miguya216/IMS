@@ -79,9 +79,10 @@ export const generateBRSPDF = async (brsID) => {
     drawBackground();
 
     // --- Table and content ---
-    const checkBoxImg = new Image();
-    checkBoxImg.src = "/resources/imgs/check-box.png";
-    await new Promise((resolve) => (checkBoxImg.onload = resolve));
+    // const checkBoxImg = new Image();
+    // checkBoxImg.src = "/resources/imgs/check-box.png";
+    // await new Promise((resolve) => (checkBoxImg.onload = resolve));
+    const checkBoxImg = await getBase64FromUrl("/resources/imgs/check-box.png");
 
     autoTable(doc, {
       startY: 97, // pushed down for header

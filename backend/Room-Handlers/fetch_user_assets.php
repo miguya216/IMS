@@ -7,8 +7,6 @@ if (!isset($_SESSION['user']['user_ID'])) {
     exit;
 }
 
-$user_ID = $_SESSION['user']['user_ID'];
-
 $sql = "
     SELECT 
         a.asset_ID,
@@ -17,7 +15,9 @@ $sql = "
         b.brand_name AS brand,
         at.asset_type AS asset_type,
         a.price_amount AS price_amount,
-        ac.condition_name AS asset_condition
+        ac.condition_name AS asset_condition,
+        CONCAT(u.f_name, ' ', u.l_name) AS responsible_person,
+        u.user_ID AS responsible_user_ID
     FROM asset a
     LEFT JOIN room r 
         ON a.room_ID = r.room_ID
@@ -27,12 +27,13 @@ $sql = "
         ON a.asset_type_ID = at.asset_type_ID
     LEFT JOIN asset_condition ac 
         ON a.asset_condition_ID = ac.asset_condition_ID
+    LEFT JOIN user u
+        ON a.responsible_user_ID = u.user_ID
     WHERE a.asset_status = 'active'
-      AND a.responsible_user_ID = :user_ID
 ";
 
 $stmt = $pdo->prepare($sql);
-$stmt->execute(['user_ID' => $user_ID]);
+$stmt->execute();
 $assets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 header('Content-Type: application/json');

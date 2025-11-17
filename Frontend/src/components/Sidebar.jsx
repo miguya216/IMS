@@ -80,9 +80,10 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
     >
       {user && (
         <>
-          <div className="mb-4 text-white">
+          <div className="mb-4 text-white row g-1">
             <h5 className="mb-0">{user.name}</h5>
             <small className="text-light">{user.email}</small>
+            <small className="text-light">Institue/Unit: {user.unit_name || ""}</small>
           </div>
           <hr className="border-light" />
 

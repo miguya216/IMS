@@ -210,6 +210,26 @@ return (
           Forgot Password
         </a>
       </div>
+
+      {/* AGREEMENT TEXT - FOOTER STYLE */}
+      <p
+        className="text-center mt-2"
+        style={{
+          fontSize: "0.9rem",
+          color: "#555",
+        }}
+      >
+        <p
+          className="text-center mt-2"
+          style={{ fontSize: "0.9rem", color: "#555" }}
+        >
+          By logging in, you agree to our{" "}
+          <a href="/legal" style={{ color: "#005a34", fontWeight: 600 }}>
+            Terms of Use & Privacy Policy
+          </a>.
+        </p>
+      </p>
+
     </div>
       <Popups
         showConfirmDone={showConfirmDone}

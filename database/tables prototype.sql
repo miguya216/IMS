@@ -195,6 +195,8 @@ CREATE TABLE forgot_pass_token (
     token_expiry DATE NOT NULL,
     is_used BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (kld_email) REFERENCES kld(kld_email)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );
 
 -- Notification
