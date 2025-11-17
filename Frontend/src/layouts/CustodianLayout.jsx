@@ -16,6 +16,7 @@ import AssetHunt from "/src/pages/Super-Admin/AssetHunt.jsx";
 import AuditPTR from "/src/pages/custodians/AuditPTR";
 import AuditIIR from "/src/pages/custodians/AuditIIR";
 import AuditRoomAssignation from "/src/pages/custodians/AuditRoomAssignation";
+import InstitutesConsumables from "/src/pages/custodians/InstitutesConsumables";
 
 function CustodianLayout() {
   const [loading, setLoading] = useState(true);
@@ -91,6 +92,7 @@ function CustodianLayout() {
             <Route path="auditptr" element={<AuditPTR />} />
             <Route path="auditiir" element={<AuditIIR />} />
             <Route path="auditroomassignation" element={<AuditRoomAssignation />} />
+            <Route path="institutesconsumables" element={<InstitutesConsumables />} />
             <Route path="custodiansettings" element={<CustodianSettings />} />
           </Routes>
         </div>

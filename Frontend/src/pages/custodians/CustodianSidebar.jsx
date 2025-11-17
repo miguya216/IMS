@@ -212,6 +212,17 @@ const CustodianSidebar = ({ closeSidebar, openAccordion, setOpenAccordion, isDes
                       Room Assignation Records
                     </NavLink>
                   </li>
+                  <li className="nav-item">
+                    <NavLink
+                      to="/custodians/institutesconsumables"
+                      onClick={handleNavClick}
+                      className={({ isActive }) =>
+                        `nav-link sidebar-link ${isActive ? "active-link" : ""}`
+                      }
+                    >
+                      Consumables Tracking
+                    </NavLink>
+                  </li>
                 </ul>
               )}
             </li>
