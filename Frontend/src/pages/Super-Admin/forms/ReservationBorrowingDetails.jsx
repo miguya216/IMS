@@ -501,7 +501,7 @@ const validateAssets = () => {
                         (originalStatus === "pending" && asset.is_available !== "no")
                       }
                       onChange={(e) =>
-                        handleAssetChange(index, "borrow_asset_remarks", e.target.value)
+                        handleAssetChange(index, "borrow_asset_remarks", e.target.value.trimStart())
                       }
                     />
                 </div>
@@ -552,7 +552,7 @@ const validateAssets = () => {
                       (!asset.return_asset_remarks && !asset.enableReturnRemarks)
                     }
                     onChange={(e) =>
-                      handleAssetChange(index, "return_asset_remarks", e.target.value)
+                      handleAssetChange(index, "return_asset_remarks", e.target.value.trimStart())
                     }
                   />
                 </div>

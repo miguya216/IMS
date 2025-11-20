@@ -68,7 +68,7 @@ export const generateRISPDF = async (risID) => {
         item.UOM || "",
         item.asset_description || "",
         item.quantity_requisition,
-        item.quantity_issuance || 0,
+        item.quantity_issuance ?? "",
         item.ris_remarks || "",
       ]),
       ...consumables.map((c) => [

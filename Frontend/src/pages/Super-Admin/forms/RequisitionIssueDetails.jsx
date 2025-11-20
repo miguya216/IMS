@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Popups from "/src/components/Popups.jsx";
 import { useWebSocketContext } from "/src/layouts/context/WebSocketProvider";
 
-const RequisitionIssueDetails = ({ risID, refreshTable }) => {
+const RequisitionIssueDetails = ({ risID, refreshTable, closeModal }) => {
   const { send: sendWS, isConnected: wsConnected } = useWebSocketContext();
   const { lastMessage, isConnected } = useWebSocketContext();
     
@@ -98,6 +98,29 @@ const RequisitionIssueDetails = ({ risID, refreshTable }) => {
     }
   };
 
+  const isInvalidPair = (qty, remarks) => {
+    const normalizedQty =
+      qty === "" || qty === null || qty === undefined || String(qty).trim() === ""
+        ? ""
+        : qty;
+
+    const normalizedRemarks =
+      !remarks || remarks.trim() === ""
+        ? ""
+        : remarks.trim();
+
+    const hasQty = normalizedQty !== "";
+    const hasRemarks = normalizedRemarks !== "";
+
+    // VALID cases:
+    // - both empty
+    // - both filled
+    if ((hasQty && hasRemarks) || (!hasQty && !hasRemarks)) {
+      return false; // valid
+    }
+
+    return true; // invalid
+  };
 
   // Actual request (runs only if user confirms)
   const submitUpdate = async () => {
@@ -138,6 +161,11 @@ const RequisitionIssueDetails = ({ risID, refreshTable }) => {
           console.warn("WS notify failed", e);
         }
         refreshTable();
+
+        setTimeout(() => {
+          closeModal();
+        }, 1500);
+
       }
     } catch (err) {
       console.error("Update error:", err);
@@ -155,16 +183,8 @@ const RequisitionIssueDetails = ({ risID, refreshTable }) => {
 
     // Collect all invalid entries (from both items & consumables)
     const invalidItems = [
-      ...items.filter(
-        (i) =>
-          (i.quantity_issuance !== "" && i.quantity_issuance !== null && i.quantity_issuance !== undefined && (!i.ris_remarks || i.ris_remarks.trim() === "")) ||
-          ((i.quantity_issuance === "" || i.quantity_issuance === null || i.quantity_issuance === undefined) && i.ris_remarks && i.ris_remarks.trim() !== "")
-      ),
-      ...consumables.filter(
-        (c) =>
-          (c.quantity_issuance !== "" && c.quantity_issuance !== null && c.quantity_issuance !== undefined && (!c.ris_remarks || c.ris_remarks.trim() === "")) ||
-          ((c.quantity_issuance === "" || c.quantity_issuance === null || c.quantity_issuance === undefined) && c.ris_remarks && c.ris_remarks.trim() !== "")
-      ),
+      ...items.filter(i => isInvalidPair(i.quantity_issuance, i.ris_remarks)),
+      ...consumables.filter(c => isInvalidPair(c.quantity_issuance, c.ris_remarks)),
     ];
 
     if (invalidItems.length > 0) {
@@ -352,7 +372,7 @@ const RequisitionIssueDetails = ({ risID, refreshTable }) => {
                     value={item.ris_remarks || ""}
                     onChange={(e) => {
                       const newItems = [...items];
-                      newItems[index].ris_remarks = e.target.value;
+                      newItems[index].ris_remarks = e.target.value.trimStart();
                       setItems(newItems);
                     }}
                      disabled={
@@ -450,7 +470,7 @@ const RequisitionIssueDetails = ({ risID, refreshTable }) => {
                     value={c.ris_remarks || ""}
                     onChange={(e) => {
                       const newConsumables = [...consumables];
-                      newConsumables[index].ris_remarks = e.target.value;
+                      newConsumables[index].ris_remarks = e.target.value.trimStart();
                       setConsumables(newConsumables);
                     }}
                     disabled={

@@ -274,7 +274,10 @@ const RequisitionIssuance = () => {
         onClose={() => setIsDetailsModalOpen(false)}
         title="Requisition and Issuance Details"
       >
-        <RequisitionIssueDetails risID={selectedRIS} refreshTable={fetchRIS} />
+        <RequisitionIssueDetails 
+          risID={selectedRIS} refreshTable={fetchRIS} 
+          closeModal={() => setIsDetailsModalOpen(false)} 
+        />
       </Modal>
 
       {/* PDF Preview Modal */}
