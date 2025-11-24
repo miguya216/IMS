@@ -6,6 +6,7 @@ import ConnectionNotifier from "/src/components/ConnectionNotifier";
 
 import Dashboard from "/src/pages/custodians/Dashboard";
 import Assets from "/src/pages/custodians/Assets";
+import AssetsArchive from '/src/pages/custodians/AssetsArchive';
 import RoomList from "/src/pages/custodians/RoomList";
 import RequisitionIssuance from "/src/pages/custodians/RequisitionIssuance";
 import ReservationBorrowing from "/src/pages/custodians/ReservationBorrowing";
@@ -85,6 +86,7 @@ function CustodianLayout() {
           <Routes>
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="assets" element={<Assets />} />
+            <Route path="assetsarchive" element={<AssetsArchive />} />
             <Route path="assethunt" element={<AssetHunt />} />
             <Route path="roomlist" element={<RoomList />} />
             <Route path="requisitionissuance" element={<RequisitionIssuance />} />

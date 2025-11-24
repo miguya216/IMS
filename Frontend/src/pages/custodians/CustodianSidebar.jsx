@@ -56,6 +56,17 @@ const CustodianSidebar = ({ closeSidebar, openAccordion, setOpenAccordion, isDes
                 Assigned Assets
               </NavLink>
             </li>
+            <li className="nav-item">
+              <NavLink
+                to="/custodians/assetsarchive"
+                onClick={handleNavClick}
+                className={({ isActive }) =>
+                  `nav-link sidebar-link ${isActive ? "active-link" : ""}`
+                }
+              >
+                Archive Assets
+              </NavLink>
+            </li>
             {/* <li className="nav-item">
               <NavLink
                 to="/custodians/assethunt"
@@ -65,17 +76,6 @@ const CustodianSidebar = ({ closeSidebar, openAccordion, setOpenAccordion, isDes
                 }
               >
                 Asset Hunt
-              </NavLink>
-            </li> */}
-            {/* <li className="nav-item">
-              <NavLink
-                to="/custodians/assetsarchive"
-                onClick={handleNavClick}
-                className={({ isActive }) =>
-                  `nav-link sidebar-link ${isActive ? "active-link" : ""}`
-                }
-              >
-                Archive Assets
               </NavLink>
             </li> */}
           </ul>

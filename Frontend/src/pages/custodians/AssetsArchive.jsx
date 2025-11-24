@@ -4,11 +4,18 @@ import React, { useState, useEffect, useRef} from "react";
 import TableControls from "../../components/TableControls";
 import Pagination from "../../components/Pagination";
 import Modal from '/src/components/Modal.jsx'
+import Modalbigger from "/src/components/Modal-bigger.jsx";
 import Popups from "/src/components/Popups.jsx";
+import AssetForm from '/src/pages/Super-admin/forms/AssetForm.jsx'
 import AssetDetails from '/src/pages/custodians/forms/AssetDetails.jsx';
-
+import AssetImport from "/src/pages/Super-admin/forms/functions/AssetImportCsv";
+import { generateAssetPDF } from "/src/pages/Super-admin/forms/functions/GenerateAssetPDF.jsx";
+import { useWebSocketContext } from "/src/layouts/context/WebSocketProvider";
 
 const Assets = () => {
+  const { lastMessage, isConnected } = useWebSocketContext();
+
+  const [formResetSignal, setFormResetSignal] = useState(0);
   const [assets, setAssets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filteredAssets, setFilteredAssets] = useState([]);
@@ -16,11 +23,26 @@ const Assets = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedAssetID, setSelectedAssetID] = useState(null);
-  const [showConfirmYesNo, setShowConfirmYesNo] = useState(false);
-  const [assetToDelete, setAssetToDelete] = useState(null);
-  const [showResponse, setShowResponse] = useState(false);
-  const [responseMessage, setResponseMessage] = useState("");
+  const assetImportRef = useRef();
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [showPdfPreview, setShowPdfPreview] = useState(false);
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState(null);
+  const [selectedPDFName, setSelectedPDFName] = useState("");
+  const [showLoading, setShowLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState("");
+
+
+  const handleImport = () => {
+    assetImportRef.current?.importCsv();
+  };
+
   const itemsPerPage = 7;
+  const [showModal, setShowModal] = useState(false);
+
+  const handleAddAsset = () => {
+    setFormResetSignal(Date.now());
+    setShowModal(true);
+  };
 
   const fetchAssets = () => {
     fetch("/api/fetch_data.php?action=custodianassetsarchive")
@@ -36,37 +58,54 @@ const Assets = () => {
   };
 
   const handleMoreClick = (assetID) => {
-  setSelectedAssetID(assetID);
-  setShowDetailModal(true);
-};
-
-  const handleDeleteClick = (assetID) => {
-    setAssetToDelete(assetID);
-    setShowConfirmYesNo(true);
+    setSelectedAssetID(assetID);
+    setShowDetailModal(true);
   };
 
-  const confirmDelete = () => {
-    setShowConfirmYesNo(false);
-
-    fetch(`/api/Assets-Handlers/restore_asset.php?id=${assetToDelete}`, {
-      method: "DELETE",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setResponseMessage(data.message || "Asset restored successfully.");
-        setShowResponse(true);
+  // websocket
+  useEffect(() => {
+    if (!lastMessage) return;
+    // If the incoming message is a JSON object indicating refresh, call fetchRIS
+    try {
+      const msg = typeof lastMessage === "string" ? JSON.parse(lastMessage) : lastMessage;
+      if (msg && msg.type === "refreshAsset") {
+        // either optimistically insert msg.ris data, or just refetch
         fetchAssets();
-      })
-      .catch(() => {
-        setResponseMessage("Failed to Restore Asset.");
-        setShowResponse(true);
-      });
+      }
+    } catch (e) {
+      // ignore non-json messages
+    }
+  }, [lastMessage]);
+
+  const handleExport = () => {
+    window.open("/api/Assets-Handlers/export_assets.php", "_blank");
   };
 
-  const cancelDelete = () => {
-    setAssetToDelete(null);
-    setShowConfirmYesNo(false);
+  
+  const handlePDFPreview = async (assetID) => {
+    setLoadingText("Generating Property Card PDF, please wait...");
+    setShowLoading(true);
+  
+    try {
+      if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl);
+  
+      const result = await generateAssetPDF(assetID);
+      if (result) {
+        setPdfPreviewUrl(result.url);
+        setSelectedPDFName(result.filename);
+        setShowPdfPreview(true);
+      } else {
+        console.error("Failed to generate Asset PDF");
+        setShowLoading(false);
+      }
+    } catch (err) {
+      console.error("PDF preview error:", err);
+      setShowLoading(false);
+    } finally {
+      setShowLoading(false);
+    }
   };
+  
 
   // Register global function to reload from anywhere
   useEffect(() => {
@@ -101,13 +140,19 @@ const Assets = () => {
   return (
     <div className="container-fluid">
       <TableControls
-        title="Archive Assets"
+        title="Assets"
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
+        onAdd={handleAddAsset}
         onFilter={() => console.log("Filter clicked")}
+        onExport={handleExport}
+        showImportButton={true}
+        onImport={handleImport}
         searchPlaceholder="Search assets..."
+        searchInputTitle="Search by asset name or tag"
       />
-       {loading ? (
+      <AssetImport ref={assetImportRef} onImportSuccess={fetchAssets} />
+        {loading ? (
           <>
             <div className="loading-data">
                 <p>loading</p>
@@ -119,7 +164,7 @@ const Assets = () => {
             </div>
           </>
         ) : currentItems.length === 0 ? (
-          <p className="text-center text-muted">No matching users found.</p>
+          <p className="text-center text-muted">No matching assets found.</p>
         ) : (
           <>
           <div className="custom-table-wrapper">
@@ -137,18 +182,25 @@ const Assets = () => {
               </thead>
               <tbody>
                 {currentItems.map((asset) => (
-                  <tr key={asset.asset_ID}>
+                  <tr 
+                    key={asset.asset_ID}
+                    className={selectedRow === asset.asset_ID ? "selected-row" : ""}
+                  >
                     <td data-label="Accounted">{asset.responsible}</td>
                     <td data-label="KLD Property Tag">{asset.kld_property_tag}</td>
                     <td data-label="Property Tag">{asset.property_tag}</td>
                     <td data-label="Brand">{asset.brand_name}</td>
                     <td data-label="Asset Type">{asset.asset_type}</td>
-                    <td data-label="Condition">{asset.asset_condition}</td>
+                    <td className="highlight-data" data-label="Condition">{asset.asset_condition}</td>
                     <td data-label="Details">
                       <div className="action-btn-group">
                         <button
+                          title="More"
                           className="action-btn"
-                          onClick={() => handleMoreClick(asset.asset_ID)}
+                          onClick={() => {
+                            handleMoreClick(asset.asset_ID);
+                            setSelectedRow(asset.asset_ID);
+                          }}
                         >
                           <img
                             src="/resources/imgs/detail.png"
@@ -156,16 +208,17 @@ const Assets = () => {
                             className="action-icon"
                           />
                         </button>
-                        {/* <button
-                          className="action-btn"
-                          onClick={() => handleDeleteClick(asset.asset_ID)}
-                        >
-                          <img
-                            src="/resources/imgs/restore.png"
-                            alt="Delete"
-                            className="action-icon"
-                          />
-                        </button> */}
+                        <button
+                            title="Property Card"
+                            className="action-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handlePDFPreview(asset.asset_ID);
+                              setSelectedRow(asset.asset_ID);
+                            }}
+                          >
+                            <img src="/resources/imgs/pdf-icon.png" alt="PDF" className="action-icon" />
+                        </button>
                       </div>
                     </td>
 
@@ -181,27 +234,58 @@ const Assets = () => {
               onPageChange={setCurrentPage}
             />
           </>
-          )}
+        )}
+            <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Add Asset">
+              {showModal && (
+                <AssetForm
+                  key={formResetSignal} // This forces re-mount
+                  onClose={() => setShowModal(false)}
+                  fetchAssets={fetchAssets}
+                />
+              )}
+            </Modal>
             <Modal isOpen={showDetailModal} onClose={() => setShowDetailModal(false)}title="Asset Details">
               <AssetDetails 
                 assetID={selectedAssetID} 
                 onClose={() => setShowDetailModal(false)} 
                 fetchAssets={fetchAssets}
-                />
+              />
             </Modal>
 
-            <Popups
-              showConfirmYesNo={showConfirmYesNo}
-              confirmYesNoTitle="Restore Asset"
-              confirmYesNoBody="Are you sure you want to restore this asset?"
-              confirmYesLabel="Yes, Restore"
-              confirmNoLabel="Cancel"
-              onConfirmYes={confirmDelete}
-              onConfirmNo={cancelDelete}
+            <Modalbigger
+              isOpen={showPdfPreview}
+              onClose={() => setShowPdfPreview(false)}
+              title="Asset Details PDF Preview"
+              footer={
+                <button
+                  className="btn btn-form-green"
+                  onClick={() => {
+                    const link = document.createElement("a");
+                    link.href = pdfPreviewUrl;
+                    link.download = selectedPDFName;
+                    link.click();
+                  }}
+                >
+                  Download PDF
+                </button>
+              }
+            >
+              <div style={{ height: "80vh" }}>
+                {pdfPreviewUrl && (
+                  <iframe
+                    src={pdfPreviewUrl}
+                    title="Asset Details PDF Preview"
+                    width="100%"
+                    height="100%"
+                    style={{ border: "none" }}
+                  />
+                )}
+              </div>
+            </Modalbigger>
 
-              showResponse={showResponse}
-              responseMessage={responseMessage}
-              onCloseResponse={() => setShowResponse(false)}
+            <Popups
+              showLoading={showLoading}
+              loadingText={loadingText || "Generating PDF, please wait..."}
             />
 
       </div>
