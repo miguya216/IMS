@@ -98,7 +98,7 @@ export const generateIIRPDF = async ({ employeeName, role, room, unit, assets, r
           lineWidth: 0.5,
           lineColor: [0, 0, 0],
         },
-        margin: { bottom: 15 },
+        margin: { bottom: 15, left: 30},
         tableWidth: "auto",
         columnStyles: {
           0: { cellWidth: 60 },

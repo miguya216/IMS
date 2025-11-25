@@ -32,7 +32,7 @@ const InstitutesConsumables = () => {
                 <table className="custom-table">
                     <thead>
                         <tr>
-                            <th>From Transaction No.</th>
+                            <th>Transaction No.</th>
                             <th>Consumable Name</th>
                             <th>Date Consumed</th>
                             <th>Quantity</th>
@@ -49,10 +49,10 @@ const InstitutesConsumables = () => {
                         ) : (
                             filteredRows.map((row, index) => (
                                 <tr key={index}>
-                                    <td>{row.transaction_no}</td>
-                                    <td>{row.consumable_name}</td>
-                                    <td>{new Date(row.date_consumed).toLocaleDateString()}</td>
-                                    <td><b>{row.quantity}</b></td>
+                                    <td data-label="Transaction No.">{row.transaction_no}</td>
+                                    <td data-label="Consumable Name">{row.consumable_name}</td>
+                                    <td data-label="Date Consumed">{new Date(row.date_consumed).toLocaleDateString()}</td>
+                                    <td data-label="Quantity"><b>{row.quantity}</b></td>
                                 </tr>
                             ))
                         )}

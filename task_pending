@@ -1,0 +1,186 @@
+
+Active Assets > Serviceable Assets - done
+Remove Transfer in Add Assets - done
+Add Text Description to Hover Buttons - done
+Property Tag in city should be included in asset sticker - done
+Date Format should be - dd/mm/yyyy - done
+Can create new consumable that matches existing record  - done
+Zero (number) should be displayed in forms (RIS)  - done
+Notification not working - done
+Requisition and Issuance should be at top - done
+Serviceable Years should only be Years - done
+Inventory and Inspection Report: change destruction to disposal, add damage - done
+Add Disposed Assets in Asset Bar Nav - done
+Activity Logs should include Room Transfer - done
+Room Assignation Request - wag na toh
+
+
+
+Problem:
+- pwede bang hindi mag i update yung stock card if yung RIS status hindi pa completed? Possible kasi na kapag sa isang RIS form, may 2 consumables then yung isang is na issued yung isa null, if thats the case, yung status still issuing parin not completed so yung backend will not update the stock card kasi nga issuing palang?
+
+
+Mga di ko gets:
+Dashboard: (DONE)
+
+    Borrowed Assets - (anong klasing chart? or baka listing lang)
+    - gusto makita ni maam dito ung borrowed asset list pero ang idea ko dito is makikita ung malapit na sa date of return (done)
+
+    Asset Status - percentage of active & inactive (diba meron na nito?)
+    Asset Status
+    - literal na chart lang showing the percentage of active assets at archived assets (active and inactive lang dapat)
+
+    out of stock consumables - (ano ito? listing?)
+    Out of Stock Consumables
+    - basically maddisplay sa dashboard ung mga ubos nang consumables. 
+
+    - summary of total requesition per unit or institue by date (sa dashboard?)
+    - need ko rin clarification dito. I'll ask ma'am about this if sa mismong stock card ba tlaga or sa dashboard.
+
+    Assets by Type - Room list (anong room list?)
+    
+    Assets By Type
+    - actually sabi ni maam dito remove nalang eh tas palitan ng room list. Not sure why room list kasi may dedicated page naman un pero idea ko dito is rooms na recently inspected (suggest ko ba kay ma'am or wag na?) (wag na since inventory si mam hindi facility)
+
+
+Asset Borrowing (DONE)
+    - Issuing muna then on-going (diba ganon naman talaga?)
+    - same transaction row position fixed? (ha?)
+    - error pag no quantity issued (dapat error kapag walang quantity issued? eh pano ma se set as issuing muna yung BRS kung di pwede i leave as blank temporarily)
+    - hindi dapat pede mag On-going hanggat hindi Issuing ang status ng transaction. Ang idea sa issuing is hindi ka pa maglalagay ng ket ano bukod sa 
+    - sa 3rd question, syaka lang mag eerror if papalitan na to on-going ang transaction status tas no quantity issued (remind user in standard process)
+    - uom - fixed na by selected asset (walang UOM ang asset, optional ang uom sa RIS or BRS for the sake lang na ma-specify diba?)(done)
+    - sa uom expected ni maam na nakalagay na pc since asset naman sya(done)
+    - cancel reason should be provided (nag usap kami ni mam dito, kahit wag na, may confirmation naman kasi)(done)
+
+RIS (DONE)
+    - bawal mag submit ng walang item (di naman tlaga nakakapag submit ng walang item e, kaka test ko lang)
+    - uom fixed by default (ayan nanamn)
+    - cancel reason should be provided (ito ulit)
+
+Asset Borrowable (DONE)
+    - only accounted to user including admin (baliw, only PPSU asset lang dapat)
+    - oo nga eh my bad. Dpat tlaga nakikita lang ni ma'am dun ung naka account sa PPSU
+
+Archive Consumables (DONE)
+    - Replace to out of stock
+    - replace to out of stock basically ung name lang page papalitan
+
+IIR (DONE)
+    - date of inspection field (okay)
+    - cost should have comma (okay)
+    - kasmaa dapat yung signatures fields (okay)
+
+Disposal (Done)
+    - items are "unserviceable" (saan yan tinutukoy mo? )
+    - dun sa pdf. May nakalagay dun na 2 adjectives sa baba eh. Isa dun ung "poor" and "scrap". Nalimutan ko ung isa. Palitan nalang both adjectives tas ilalagay dun is "unserviceable".
+
+    - replace work order with disposal number (meron ng disposal number)
+    - edi remove work order nalang
+
+    - add signatory field of person who inspected asset (hindi requestor na yung sinasabing nag inspect? kaya nga nasabing for disposal form)
+    - pinaparequire ni maam etong field eh. Pero sila naman bahala dun. Basta may nakalagay lang na space kung saan pipirma ang nag inspect since pedeng si ma'am grace or si ma'am diane ang pumirma nun
+
+- pagination for BRS table both admin and user (done)
+- room list (wrong column labels) (done)
+- in transfer room and accountability, list what is being selected. (done)
+
+- remove item ID in RIS details. (done)
+
+Property Card (done)
+    - add room location on pdf (parang ang redundant, kasi na r record naman yung RA number dun e)
+    - Gusto ata ni ma'am makita agad sa form if saang room nakalocate ang asset within a transaction i guess? Example is if nag iir tas nasa room 1304 nakalagay ang asset then sa property transfer, nakalagay na sa room 1307 ang asset.
+
+    - replace asset type to asset classification (okay)
+
+    - new column sa db "asset classification" (asset type = asset class. and brand - asset description dun lang sa form).
+    - asset classification is basically distinction ng asset. Example pede mong sabihin na ang printer ay IT equipment. Bago lang kasi binaba ng Dasmariñas yan eh pina require rin sa kanila. Hingi tayo ng list neto kay ma'am.
+
+- update multi editing asset because of asset classification (done)
+
+- update reference data because of Asset classification (done)
+
+- in asset, dont let user edit condition if it is on RIS or BRS that is not completed. (done)
+
+- bug in RIS, if user cancelled the request, the status in details still pending (done)
+
+- room in property card (done)
+
+- open sans PDF (done)
+
+- PDF adjusments (
+    put gap for header and footer and limit the number of items
+    center the table content vertically ) (done)
+
+- popup icons so can tell if it is warning or error or success (done)
+- remove room assignation in user side (done)
+- asset classification for stickers (done)
+- header/footer, put preview in setting (done)
+
+- remove auto download PDF (done)
+
+- suggestion ni ma'am if possible, mag highlight ng red ang border ng field box na hindi pa nalalagyan para alam nila agad what to fill up. (icon lalagay ko) done
+
+- loading in every module when user click pdf or details (done)
+
+- out of stock, make qty red if less than or equal to 10 pcs (done)
+
+- dont allow user edit the kld domain in user details (done)
+
+- dun sa fixed row ang gusto ni ma'am kung saan nya na click ung transaction, andun parin sya nakalagay after iupdate. 
+    Ayaw nya malipat ng position or order un. (done)
+
+- ris/brs - priority pending, issuing, on-going, cancelled then completed (done)
+
+- footer for small modal so button can be click easily. (done)
+
+- change the time into standard time (done)
+
+- loading popup when clicking PDF (done)
+
+- room list bug (done)
+
+- on records that not related to user can be seen in audit(done)
+
+- pdf, yung tables (done)
+
+- barcode scanning (done)
+
+- unit in sidebar (done)
+
+- room selection should be all (done)
+
+- date still not in standard time 
+    (
+        time requested (admin)
+        all time (custodian)
+    ) (done)
+
+- proper sorting in BRS is not applied (done)
+
+- check box (done)
+
+- in forms, if 0 strictly 0 (done)
+
+- when user put qty in ris issuance, if remove, still saves so it become 0 (done)
+
+- return remarks not regex and borrowed (done)
+
+- unserviceable assets for custodiand (done)
+
+- signatories layout in IIR (done)
+
+__________________________________________________________________________________________
+
+TASK PENDING:
+
+- update and delete multi asset, specify what is being updated and what kld tag 
+- in activity logs, also the look ups, inserting new look ups in forms(asset, user) should logged too..
+- sort function para sa tables
+- email user in every transactions
+
+===== NOT SURE ======
+- dont let user input user with same existing unit
+- put also multiple select (checkbox) in consumables
+- put position because role is only for accounts
+__________________________________________________________________________________________

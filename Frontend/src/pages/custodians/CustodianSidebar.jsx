@@ -53,7 +53,7 @@ const CustodianSidebar = ({ closeSidebar, openAccordion, setOpenAccordion, isDes
                   `nav-link sidebar-link ${isActive ? "active-link" : ""}`
                 }
               >
-                Assigned Assets
+                Assigned
               </NavLink>
             </li>
             <li className="nav-item">
@@ -64,7 +64,7 @@ const CustodianSidebar = ({ closeSidebar, openAccordion, setOpenAccordion, isDes
                   `nav-link sidebar-link ${isActive ? "active-link" : ""}`
                 }
               >
-                Archive Assets
+                Unserviceable
               </NavLink>
             </li>
             {/* <li className="nav-item">
