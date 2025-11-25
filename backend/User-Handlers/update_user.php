@@ -1,18 +1,14 @@
 <?php
 session_start();
 require_once __DIR__ . '/../conn.php';
-require_once __DIR__ . '/../../vendor/autoload.php';
-require_once __DIR__ . '/../logActivity.php'; // ✅ make sure this is included
-
-use Endroid\QrCode\QrCode;
-use Endroid\QrCode\Writer\PngWriter;
+require_once __DIR__ . '/../logActivity.php'; 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode(file_get_contents("php://input"), true);
 
     $update = new UpdateUser();
 
-    // ✅ Get account_ID from session
+    // Get account_ID from session
     $account_ID = $_SESSION['user']['user_ID'] ?? null;
 
     $response = $update->UpdateUser(
@@ -173,20 +169,6 @@ class UpdateUser {
                         $role_ID,
                         password_hash($password, PASSWORD_DEFAULT)
                     ]);
-
-                    // Generate QR
-                    $qr = new QrCode($kld_ID);
-                    $writer = new PngWriter();
-                    $qrFilename = uniqid("qr_account_") . ".png";
-                    $qrPath = "qrcodes/$qrFilename";
-                    file_put_contents($_SERVER['DOCUMENT_ROOT'] . "/IMS-REACT/frontend/public/" . $qrPath, $writer->write($qr)->getString());
-
-                    $stmt = $this->pdo->prepare("INSERT INTO qr_code (qr_image_path) VALUES (?)");
-                    $stmt->execute([$qrPath]);
-                    $new_qr_id = $this->pdo->lastInsertId();
-
-                    $stmt = $this->pdo->prepare("UPDATE account SET qr_ID = ? WHERE user_ID = ?");
-                    $stmt->execute([$new_qr_id, $user_ID]);
                 }
             }
 

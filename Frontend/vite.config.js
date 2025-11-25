@@ -15,7 +15,7 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost',
         changeOrigin: true,
-        rewrite: path => path.replace(/^\/api/, '/IMS-react/backend/'),
+        rewrite: path => path.replace(/^\/api/, '/ims/backend/'),
       }
     }
   }
@@ -36,7 +36,7 @@ export default defineConfig({
 //       '/api': {
 //         target: 'http://localhost', // Assuming XAMPP backend is here
 //         changeOrigin: true,
-//         rewrite: (path) => path.replace(/^\/api/, '/IMS-react/backend/'),
+//         rewrite: (path) => path.replace(/^\/api/, '/ims/backend/'),
 //       },
 //     },
 //   },

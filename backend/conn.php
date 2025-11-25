@@ -17,8 +17,8 @@ try {
     die("Database connection failed: " . $e->getMessage());
 }
 
-// Change only this when moving from local → hosting
-define("BASE_STORAGE_PATH", $_SERVER['DOCUMENT_ROOT'] . '/IMS-REACT/frontend/public/');
+// Change only this when moving from local to hosting
+define("BASE_STORAGE_PATH", $_SERVER['DOCUMENT_ROOT'] . '/IMS/frontend/public/');
 // define("BASE_STORAGE_PATH", $_SERVER['DOCUMENT_ROOT'] . '/'); // for hosting
 
 ?>
