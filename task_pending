@@ -170,15 +170,16 @@ Property Card (done)
 
 - signatories layout in IIR (done)
 
+- smtp password should modify (done)
+
 __________________________________________________________________________________________
 
 TASK PENDING:
 
-- update and delete multi asset, specify what is being updated and what kld tag 
+- in update and delete multi asset, specify what is being updated and what kld tag in activity logs
 - in activity logs, also the look ups, inserting new look ups in forms(asset, user) should logged too..
 - sort function para sa tables
 - email user in every transactions
-- smtp password should modify
 
 ===== NOT SURE ======
 - dont let user input user with same existing unit

@@ -10,6 +10,7 @@ USE IMS;
 CREATE TABLE settings_preferences (
     setting_pref_ID TINYINT PRIMARY KEY,
     email_sender VARCHAR(255) NOT NULL,
+    email_sender_password VARCHAR(80) NOT NULL,
     header_footer_img_path VARCHAR(255) NULL
 );
 

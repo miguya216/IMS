@@ -7,18 +7,19 @@ require_once __DIR__ . '/../vendor/autoload.php';
 function getMailer(): PHPMailer {
     global $pdo; 
     // Fetch email sender from DB
-    $stmt = $pdo->query("SELECT email_sender FROM settings_preferences LIMIT 1");
+    $stmt = $pdo->query("SELECT email_sender, email_sender_password FROM settings_preferences LIMIT 1");
     $row = $stmt->fetch();
 
     // Fallback if DB is empty
-    $emailSender = $row ? $row['email_sender'] : 'default@email.com';
+    $emailSender = $row ? $row['email_sender'] : 'repuya.juanmiguel.kld.com';
+    $emailSenderPassword = $row ? $row['email_sender_password'] : 'qglriuafygubefju';
 
     $mail = new PHPMailer(true);
     $mail->isSMTP();
     $mail->Host       = 'smtp.gmail.com';
     $mail->SMTPAuth   = true;
     $mail->Username   = $emailSender;
-    $mail->Password   = 'qglriuafygubefju'; 
+    $mail->Password   = $emailSenderPassword; 
     $mail->SMTPSecure = 'tls';
     $mail->Port       = 587;
 

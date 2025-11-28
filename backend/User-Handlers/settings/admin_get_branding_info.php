@@ -4,13 +4,14 @@ header('Content-Type: application/json');
 
 try {
     // Fetch the first (and usually only) row from settings_preferences
-    $stmt = $pdo->query("SELECT email_sender, header_footer_img_path FROM settings_preferences LIMIT 1");
+    $stmt = $pdo->query("SELECT email_sender, email_sender_password, header_footer_img_path FROM settings_preferences LIMIT 1");
     $result = $stmt->fetch();
 
     if ($result) {
         echo json_encode([
             "error" => false,
             "emailSender" => $result['email_sender'],
+            "emailSenderPassword" => $result['email_sender_password'],
             "headerFooterImgPath" => $result['header_footer_img_path']
         ]);
     } else {

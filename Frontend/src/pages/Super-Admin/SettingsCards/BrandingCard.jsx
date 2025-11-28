@@ -12,8 +12,11 @@ const BrandingSettingsCard = ({ onRefreshLogs }) => {
 
   const [brandingInfo, setBrandingInfo] = useState({
     emailSender: "",
+    emailSenderPassword: "",
     headerFooterImgPath: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
+
   const[imgFullPath, setImgFullPath] = useState(null);
 
   const [tempBrandingInfo, setTempBrandingInfo] = useState({ ...brandingInfo });
@@ -24,6 +27,9 @@ const BrandingSettingsCard = ({ onRefreshLogs }) => {
   const [showResponse, setShowResponse] = useState(false);
   const [responseTitle, setResponseTitle] = useState("");
   const [responseMessage, setResponseMessage] = useState("");
+  const [showHelp, setShowHelp] = useState(false);
+  const [helpMessage, setHelpMessage] = useState("");
+
 
   /** -------------------------------
    *  FETCH EXISTING BRANDING INFO
@@ -185,6 +191,34 @@ const BrandingSettingsCard = ({ onRefreshLogs }) => {
     }
   };
 
+  const handleShowEmailHelp = () => {
+    setHelpMessage(`
+      <p><strong>What is the Email Sender?</strong></p>
+
+      <p>This email account is used by the system to send automated messages such as:</p>
+
+      <ul style="list-style:none; padding-left:0;">
+        <li>Password reset emails</li>
+        <li>Account verification emails</li>
+        <li>Notifications and alerts</li>
+        <li>System-generated reports</li>
+      </ul>
+
+      <p><strong>Important:</strong></p>
+      <ul style="list-style:none; padding-left:0;">
+        <li>The email must allow <strong>SMTP access</strong>.</li>
+        <li>Enter the correct password for this email account.</li>
+        <li>If you are using Gmail, you must generate an <strong>App Password</strong> if 2FA is enabled; do <em>not</em> use your regular Gmail password.</li>
+        <li>Currently, only Gmail SMTP settings are supported (smtp.gmail.com, TLS, port 587). Using other email providers may require updating SMTP settings in the system.</li>
+      </ul>
+
+      <p>⚠️ Changing the Email Sender or password to invalid credentials will prevent the system from sending emails properly.</p>
+    `);
+
+    setShowHelp(true);
+  };
+
+
   /** -------------------------------
    *  RENDER
    *  ------------------------------- */
@@ -194,58 +228,110 @@ const BrandingSettingsCard = ({ onRefreshLogs }) => {
         <h4 className="card-title">Branding Settings</h4>
 
         <div className="ps-3 mt-3">
-
           {/* ------------------- Email Sender ------------------- */}
-          <div className="row">
-            <div className="col-md-6">
+          <div className="row mb-5 align-items-end">
+            <div className="col-md-4">
               <label><strong>IMS Email Sender</strong></label>
-
-              {isEditing ? (
+              <div className="input-group mt-2 mb-2">
+                {isEditing ? (
                 <input
                   type="email"
                   name="emailSender"
                   value={tempBrandingInfo.emailSender}
                   onChange={handleChange}
-                  className="form-control mt-2 mb-2"
-                  placeholder="Enter sender email"
+                  className="form-control"
+                  placeholder="Enter email sender"
                 />
               ) : (
-                <p>{brandingInfo.emailSender}</p>
+                <input 
+                  type="text"
+                  value={brandingInfo.emailSender}
+                  className="form-control"
+                  disabled
+                />
               )}
+              </div>
+            </div>
+
+           <div className="col-md-4">
+            <label><strong>Email Sender Password</strong></label>
+
+            <div className="input-group mt-2 mb-2">
+
+              {isEditing ? (
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="emailSenderPassword"
+                  value={tempBrandingInfo.emailSenderPassword}
+                  onChange={handleChange}
+                  className="form-control"
+                  placeholder="Enter email sender password"
+                />
+              ) : (
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={brandingInfo.emailSenderPassword}
+                  className="form-control"
+                  disabled
+                />
+              )}
+
+              {/* ---- Toggle button ---- */}
+              <button
+                type="button"
+                className="btn btn-outline-secondary"
+                onClick={() => setShowPassword((prev) => !prev)}
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+
             </div>
           </div>
 
-          {/* ------------------- Buttons ------------------- */}
-          <div className="col-md-6 mb-5">
-            {isEditing ? (
-              <>
+            {/* ------------------- Buttons ------------------- */}
+            <div className="col-md-4 d-flex align-items-end">
+              <div className="input-group mt-2 mb-2">
+
+                {isEditing ? (
+                  <>
+                    <button
+                      className="btn btn-form-green me-2"
+                      onClick={handleSaveClick}
+                    >
+                      Save
+                    </button>
+                    <button
+                      className="btn btn-form-red me-2"
+                      onClick={handleCancel}
+                    >
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    className="btn btn-form-yellow me-2"
+                    onClick={() => setIsEditing(true)}
+                  >
+                    Edit Email Sender
+                  </button>
+                )}
+
+                {/* QUESTION MARK BUTTON */}
                 <button
-                  className="btn btn-form-green me-2"
-                  onClick={handleSaveClick}
+                  type="button"
+                  className="btn btn-outline-secondary"
+                  onClick={handleShowEmailHelp}
                 >
-                  Save
+                  ?
                 </button>
-                <button
-                  className="btn btn-form-red"
-                  onClick={handleCancel}
-                >
-                  Cancel
-                </button>
-              </>
-            ) : (
-              <button
-                className="btn btn-form-yellow"
-                onClick={() => setIsEditing(true)}
-              >
-                Edit Email Sender
-              </button>
-            )}
+              </div>
+            </div>            
           </div>
 
           {/* ------------------- Header/Footer Upload ------------------- */}
           <div className="row align-items-end">
             <div className="col-md-3 mb-3">
-                <label><strong>Header/Footer Image for PDF</strong></label>
+                <label className="mb-3"><strong>Header/Footer Image for PDF</strong></label>
 
                 {loading ? (
                   <>
@@ -302,6 +388,13 @@ const BrandingSettingsCard = ({ onRefreshLogs }) => {
         responseTitle={responseTitle}
         responseMessage={responseMessage}
         onCloseResponse={() => setShowResponse(false)}
+
+        showConfirmDone={showHelp}
+        confirmDoneTitle="ℹ️ Email Sender Help"
+        confirmDoneBody={helpMessage}
+        confirmDoneLabel="Close"
+        confirmDoneHtml={true}
+        onConfirmDone={() => setShowHelp(false)}
       />
     </div>
   );
