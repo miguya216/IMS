@@ -178,6 +178,7 @@ TASK PENDING:
 - in activity logs, also the look ups, inserting new look ups in forms(asset, user) should logged too..
 - sort function para sa tables
 - email user in every transactions
+- smtp password should modify
 
 ===== NOT SURE ======
 - dont let user input user with same existing unit
