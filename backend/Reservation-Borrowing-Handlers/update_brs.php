@@ -2,7 +2,23 @@
 header("Content-Type: application/json");
 require_once __DIR__ . "/../conn.php";
 require_once __DIR__ . "/../Notification-Handlers/notif_config.php";
+require_once __DIR__ . '/../email_config.php';
 session_start();
+
+function sendEmail($recipientEmail, $subject, $body) {
+    try {
+        $mail = getMailer();
+        $mail->addAddress($recipientEmail);
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body    = $body;
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log("Email could not be sent. Mailer Error: {$mail->ErrorInfo}");
+        return false;
+    }
+}
 
 try {
     $data = json_decode(file_get_contents("php://input"), true);
@@ -113,6 +129,29 @@ try {
     $module = "BRS";
 
     sendNotification($pdo, $title, $message, $recipient_user_ID, $sender_account_ID, $module, $brs_no);
+
+    // Fetch creator's email
+    $stmtEmail = $pdo->prepare("
+        SELECT k.kld_email
+        FROM account a
+        JOIN kld k ON a.kld_ID = k.kld_ID
+        WHERE a.user_ID = ?
+        LIMIT 1
+    ");
+    $stmtEmail->execute([$recipient_user_ID]);
+    $creatorEmail = $stmtEmail->fetchColumn();
+
+    if ($creatorEmail) {
+        $emailSubject = "BRS Updated: {$brs_no}";
+        $emailBody = "
+            <p>Hello,</p>
+            <p>Your Reservation and Borrowing Request <strong>{$brs_no}</strong> has been updated by an Admin.</p>
+            <p>Status: <strong>" . strtoupper($brs_status ?: "unchanged") . "</strong></p>
+            <p>Please check the system for details.</p>
+            <p>Regards,<br>IMS Admin</p>
+        ";
+        sendEmail($creatorEmail, $emailSubject, $emailBody);
+    }
 
     echo json_encode([
         "success" => true,

@@ -2,8 +2,25 @@
 // api/Reservation-Borrowing-Handlers/cancel_brs.php
 require_once __DIR__ . "/../conn.php";
 require_once __DIR__ . "/../Notification-Handlers/notif_config.php";
+require_once __DIR__ . '/../email_config.php';
+
 session_start();
 header("Content-Type: application/json; charset=UTF-8");
+
+function sendEmail($recipientEmail, $subject, $body) {
+    try {
+        $mail = getMailer();
+        $mail->addAddress($recipientEmail);
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body    = $body;
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log("Email could not be sent. Mailer Error: {$mail->ErrorInfo}");
+        return false;
+    }
+}
 
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -84,6 +101,30 @@ try {
         }
     } else {
         sendNotification($pdo, $title, $message, null, $user_ID, $module, $brs_no);
+    }
+
+    // === STEP 4: Email Admins and Super-Admins ===
+    $adminEmailsQuery = $pdo->query("
+        SELECT kld.kld_email
+        FROM account a
+        JOIN role r ON a.role_ID = r.role_ID
+        JOIN kld ON a.kld_ID = kld.kld_ID
+        WHERE (r.role_name = 'Super-Admin' OR r.role_name = 'Admin')
+        AND r.role_status = 'active'
+        AND kld.kld_email IS NOT NULL
+    ");
+    $adminEmails = $adminEmailsQuery->fetchAll(PDO::FETCH_COLUMN);
+
+    $emailSubject = "RIS Cancelled: {$brs_no}";
+    $emailBody = "
+        <p>Hello,</p>
+        <p>The Reservation and Borrowing Request <strong>{$brs_no}</strong> has been <strong>cancelled</strong>.</p>
+        <p>Please check the system for more details.</p>
+        <p>Regards,<br>IMS Admin</p>
+    ";
+
+    foreach ($adminEmails as $email) {
+        sendEmail($email, $emailSubject, $emailBody);
     }
 
     echo json_encode([
